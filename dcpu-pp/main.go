@@ -4,14 +4,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"runtime"
-	"flag"
 )
 
 const (
-	AppName = "dcpu-pp"
+	AppName    = "dcpu-pp"
 	AppVersion = "0.1"
 )
 
