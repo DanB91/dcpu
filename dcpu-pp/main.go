@@ -7,6 +7,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
+	"path/filepath"
 	"runtime"
 )
 
@@ -39,6 +41,29 @@ func parseArgs() *Config {
 	if help {
 		flag.Usage()
 		os.Exit(0)
+	}
+
+	// Collect source files
+	root, err := os.Getwd()
+	if err == nil {
+		err = filepath.Walk(root, func(file string, info os.FileInfo, err error) error {
+			if info.IsDir() || path.Ext(file) != ".dasm" {
+				return nil
+			}
+
+			c.Input = append(c.Input, file)
+			return nil
+		})
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Collect source files: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if len(c.Input) == 0 {
+		fmt.Fprintf(os.Stderr, "No source files.\n")
+		os.Exit(1)
 	}
 
 	return c
