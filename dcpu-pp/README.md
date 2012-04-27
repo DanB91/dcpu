@@ -1,12 +1,18 @@
 ## DCPU Preprocessor
 
 This app is a DCPU Assembly preprocessor. It parses the given input file(s).
+When run in a project dir, it considers all `.dasm` files in that
+directory to be part of the same project.
+
+### External references
 
 Any references to undefined labels are assumed to be defined
 in external files names `<labelname>.dasm`. The 'assembler' looks in a
 predefined path to resolve these files. It then simply includes the file
-contents into the main source file. This allows us to keep source files
+contents into the output source file. This allows us to keep source files
 small and manageable.
+
+### Minification
 
 Everything is minified and stripped of unnecessary bloat and then
 spit out as a single chunk of DCPU assembly code. This can be pasted into
