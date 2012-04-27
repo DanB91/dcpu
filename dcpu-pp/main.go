@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -25,11 +26,13 @@ func main() {
 // process commandline arguments.
 func parseArgs() *Config {
 	var version, help bool
+	var include string
 
 	c := NewConfig()
 
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
+	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
 	flag.Parse()
 
 	if version {
@@ -64,6 +67,27 @@ func parseArgs() *Config {
 	if len(c.Input) == 0 {
 		fmt.Fprintf(os.Stderr, "No source files.\n")
 		os.Exit(1)
+	}
+
+	// Parse include paths.
+	if len(include) > 0 {
+		c.Include = strings.Split(include, ":")
+
+		for i := range c.Include {
+			c.Include[i] = path.Clean(c.Include[i])
+			v := c.Include[i]
+
+			stat, err := os.Lstat(v)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Test import paths: %v\n", err)
+				os.Exit(1)
+			}
+
+			if !stat.IsDir() {
+				fmt.Fprintf(os.Stderr, "Import path %q is not a directory.\n", v)
+				os.Exit(1)
+			}
+		}
 	}
 
 	return c
