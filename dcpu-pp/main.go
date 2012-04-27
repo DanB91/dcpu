@@ -4,8 +4,10 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -19,16 +21,43 @@ const (
 )
 
 func main() {
+	var buf bytes.Buffer
+	var err error
+
 	cfg := parseArgs()
-	fmt.Printf("%+v\n", cfg)
+
+	if err = collectFiles(&buf, cfg.Input); err != nil {
+		fmt.Fprintf(os.Stderr, "Collect source: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%s\n", buf.String())
+}
+
+// collectFiles takes the input files and loads their contents
+// into the supplied buffer.
+func collectFiles(w io.Writer, files []string) (err error) {
+	var fd *os.File
+
+	for i := range files {
+		if fd, err = os.Open(files[i]); err != nil {
+			return
+		}
+
+		io.Copy(w, fd)
+		fd.Close()
+
+		// Ensure file content is delimited by a newline.
+		w.Write([]byte{'\n'})
+	}
+
+	return
 }
 
 // process commandline arguments.
 func parseArgs() *Config {
 	var version, help bool
 	var include string
-
-	c := NewConfig()
 
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
@@ -45,6 +74,8 @@ func parseArgs() *Config {
 		flag.Usage()
 		os.Exit(0)
 	}
+
+	c := NewConfig()
 
 	// Collect source files
 	root, err := os.Getwd()
@@ -74,8 +105,8 @@ func parseArgs() *Config {
 		c.Include = strings.Split(include, ":")
 
 		for i := range c.Include {
-			c.Include[i] = path.Clean(c.Include[i])
-			v := c.Include[i]
+			v := path.Clean(c.Include[i])
+			c.Include[i] = v
 
 			stat, err := os.Lstat(v)
 			if err != nil {
