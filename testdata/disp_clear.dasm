@@ -1,0 +1,10 @@
+; disp_clear(a:start, b:size, c:clr)
+; Fills the screen with a given background colour.
+:disp_clear
+  set i, a
+  set j, b
+:disp_clear_loop
+  sti [i], c
+  ifl i, b
+    set pc, disp_clear_loop
+  set pc, pop

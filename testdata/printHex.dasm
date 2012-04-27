@@ -1,0 +1,31 @@
+; printHex(a:dst, b:num, c:clr)
+; Prints the string representation of
+; the given number.
+:printHex
+  set push, 0xff
+
+:printHex_loop1
+  set push, b
+  mod peek, 16
+  shr b, 5
+
+  ifn b, 0
+    set pc, printHex_loop1
+ 
+:printHex_loop2
+  set [a], pop
+  add [a], 0x30
+
+  ifg [a], 0x39
+    add [a], 7
+
+  bor [a], c
+  add a, 1
+
+  ifn peek, 0xff
+    set pc, printHex_loop2
+
+  set [a], 0x68
+  bor [a], c
+  add sp, 1
+  set pc, pop
