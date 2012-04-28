@@ -185,6 +185,8 @@ func hasLabel(n []Node, file int, target string) bool {
 			if tt.File() == file && tt.Data == target {
 				return true
 			}
+
+			// @_@ These are not the labels you are looking for. @_@
 		}
 	}
 
