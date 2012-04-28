@@ -41,7 +41,9 @@ func resolveIncludes(ast *AST, c *Config) (err error) {
 
 	findLabels(ast.Root.Children, &labels)
 	findRefs(ast.Root.Children, &refs)
+
 	refs = findUndefinedRefs(refs, labels)
+	refs = stripDuplicates(refs)
 
 	if len(refs) == 0 {
 		// No undefined references. We're done here.
@@ -76,8 +78,7 @@ func loadInclude(ast *AST, c *Config, r *Name) (err error) {
 		stat, err = os.Lstat(file)
 
 		if err != nil || stat.IsDir() {
-			return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
-				"Undefined reference: %q", r.Data)
+			continue
 		}
 
 		if err = readSource(ast, file); err != nil {
@@ -89,9 +90,12 @@ func loadInclude(ast *AST, c *Config, r *Name) (err error) {
 				"Undefined reference: %q. Include file was found, but "+
 					"it did not define the desired label.", r.Data)
 		}
+
+		return
 	}
 
-	return
+	return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+		"Undefined reference: %q", r.Data)
 }
 
 // findLabels recursively finds Label nodes.
@@ -155,6 +159,29 @@ outer:
 	}
 
 	return refs
+}
+
+// stripDuplicates removes duplicate entries from the given list.
+func stripDuplicates(r []*Name) []*Name {
+	l := make([]*Name, 0, len(r))
+
+	for i := range r {
+		if !containsName(l, r[i].Data) {
+			l = append(l, r[i])
+		}
+	}
+
+	return l
+}
+
+// containsName returns true if the given list contains the supplied Name.
+func containsName(r []*Name, data string) bool {
+	for i := range r {
+		if r[i].Data == data {
+			return true
+		}
+	}
+	return false
 }
 
 // includeHasLabel checks if a newly parsed include actually
