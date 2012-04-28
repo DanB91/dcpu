@@ -119,16 +119,6 @@ outer:
 	return refs
 }
 
-// containsName returns true if the given list contains the supplied Name.
-func containsName(r []*Name, data string) bool {
-	for i := range r {
-		if r[i].Data == data {
-			return true
-		}
-	}
-	return false
-}
-
 // includeHasLabel checks if a newly parsed include actually
 // contains the label reference we are looking for.
 func includeHasLabel(ast *AST, file string, target string) bool {

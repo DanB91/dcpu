@@ -96,3 +96,13 @@ func stripDuplicateNames(r []*Name) []*Name {
 
 	return l
 }
+
+// containsName returns true if the given list contains the supplied Name.
+func containsName(r []*Name, data string) bool {
+	for i := range r {
+		if r[i].Data == data {
+			return true
+		}
+	}
+	return false
+}
