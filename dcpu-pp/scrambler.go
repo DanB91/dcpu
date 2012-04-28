@@ -24,7 +24,7 @@ func (p *Scrambler) Process(ast *AST) (err error) {
 
 	for i = range labels {
 		old := labels[i].Data
-		labels[i].Data = fmt.Sprintf("l%04x", i)
+		labels[i].Data = fmt.Sprintf("l%x", i)
 
 		for j = range refs {
 			if refs[j].Data == old {
