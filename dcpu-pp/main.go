@@ -30,6 +30,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = Process(&ast); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
 	if cfg.DumpAST {
 		writeAst(cfg.Output, &ast)
 	} else {
