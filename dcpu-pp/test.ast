@@ -1,0 +1,961 @@
+Files:
+  0 - ./test.dasm
+  1 - ../testdata/hw_detect.dasm
+  2 - ../testdata/disp_clear.dasm
+  3 - ../testdata/println.dasm
+  4 - ../testdata/printhex.dasm
+Nodes:
+00:0000:000 *main.Block {
+  00:0001:002 *main.Comment(" Find display")
+  00:0002:003 *main.Instruction {
+    00:0002:003 *main.Name("set")
+    00:0002:007 *main.Expression {
+      00:0002:007 *main.Name("a")
+    }
+    00:0002:010 *main.Expression {
+      00:0002:010 *main.Number(0xf615)
+    }
+  }
+  00:0003:003 *main.Instruction {
+    00:0003:003 *main.Name("set")
+    00:0003:007 *main.Expression {
+      00:0003:007 *main.Name("b")
+    }
+    00:0003:010 *main.Expression {
+      00:0003:010 *main.Number(0x7349)
+    }
+  }
+  00:0004:003 *main.Instruction {
+    00:0004:003 *main.Name("jsr")
+    00:0004:007 *main.Expression {
+      00:0004:007 *main.Name("hw_detect")
+    }
+  }
+  00:0005:003 *main.Instruction {
+    00:0005:003 *main.Name("set")
+    00:0005:007 *main.Expression {
+      00:0005:007 *main.Block {
+        00:0005:008 *main.Name("display")
+      }
+    }
+    00:0005:018 *main.Expression {
+      00:0005:018 *main.Name("a")
+    }
+  }
+  00:0007:002 *main.Comment(" Find keyboard")
+  00:0008:003 *main.Instruction {
+    00:0008:003 *main.Name("set")
+    00:0008:007 *main.Expression {
+      00:0008:007 *main.Name("a")
+    }
+    00:0008:010 *main.Expression {
+      00:0008:010 *main.Number(0x7406)
+    }
+  }
+  00:0009:003 *main.Instruction {
+    00:0009:003 *main.Name("set")
+    00:0009:007 *main.Expression {
+      00:0009:007 *main.Name("b")
+    }
+    00:0009:010 *main.Expression {
+      00:0009:010 *main.Number(0x30cf)
+    }
+  }
+  00:0010:003 *main.Instruction {
+    00:0010:003 *main.Name("jsr")
+    00:0010:007 *main.Expression {
+      00:0010:007 *main.Name("hw_detect")
+    }
+  }
+  00:0011:003 *main.Instruction {
+    00:0011:003 *main.Name("set")
+    00:0011:007 *main.Expression {
+      00:0011:007 *main.Block {
+        00:0011:008 *main.Name("keyboard")
+      }
+    }
+    00:0011:019 *main.Expression {
+      00:0011:019 *main.Name("a")
+    }
+  }
+  00:0013:002 *main.Comment(" Find clock")
+  00:0014:003 *main.Instruction {
+    00:0014:003 *main.Name("set")
+    00:0014:007 *main.Expression {
+      00:0014:007 *main.Name("a")
+    }
+    00:0014:010 *main.Expression {
+      00:0014:010 *main.Number(0xb402)
+    }
+  }
+  00:0015:003 *main.Instruction {
+    00:0015:003 *main.Name("set")
+    00:0015:007 *main.Expression {
+      00:0015:007 *main.Name("b")
+    }
+    00:0015:010 *main.Expression {
+      00:0015:010 *main.Number(0x12d0)
+    }
+  }
+  00:0016:003 *main.Instruction {
+    00:0016:003 *main.Name("jsr")
+    00:0016:007 *main.Expression {
+      00:0016:007 *main.Name("hw_detect")
+    }
+  }
+  00:0017:003 *main.Instruction {
+    00:0017:003 *main.Name("set")
+    00:0017:007 *main.Expression {
+      00:0017:007 *main.Block {
+        00:0017:008 *main.Name("clock")
+      }
+    }
+    00:0017:016 *main.Expression {
+      00:0017:016 *main.Name("a")
+    }
+  }
+  00:0019:002 *main.Comment(" map vidmem")
+  00:0020:003 *main.Instruction {
+    00:0020:003 *main.Name("set")
+    00:0020:007 *main.Expression {
+      00:0020:007 *main.Name("a")
+    }
+    00:0020:010 *main.Expression {
+      00:0020:010 *main.Number(0x0000)
+    }
+  }
+  00:0021:003 *main.Instruction {
+    00:0021:003 *main.Name("set")
+    00:0021:007 *main.Expression {
+      00:0021:007 *main.Name("b")
+    }
+    00:0021:010 *main.Expression {
+      00:0021:010 *main.Block {
+        00:0021:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0022:003 *main.Instruction {
+    00:0022:003 *main.Name("hwi")
+    00:0022:007 *main.Expression {
+      00:0022:007 *main.Block {
+        00:0022:008 *main.Name("display")
+      }
+    }
+  }
+  00:0024:002 *main.Comment(" set border colour")
+  00:0025:003 *main.Instruction {
+    00:0025:003 *main.Name("set")
+    00:0025:007 *main.Expression {
+      00:0025:007 *main.Name("a")
+    }
+    00:0025:010 *main.Expression {
+      00:0025:010 *main.Number(0x0003)
+    }
+  }
+  00:0026:003 *main.Instruction {
+    00:0026:003 *main.Name("set")
+    00:0026:007 *main.Expression {
+      00:0026:007 *main.Name("b")
+    }
+    00:0026:010 *main.Expression {
+      00:0026:010 *main.Number(0x0009)
+      00:0026:013 *main.Comment(" lightblue")
+    }
+  }
+  00:0027:003 *main.Instruction {
+    00:0027:003 *main.Name("hwi")
+    00:0027:007 *main.Expression {
+      00:0027:007 *main.Block {
+        00:0027:008 *main.Name("display")
+      }
+    }
+  }
+  00:0029:003 *main.Instruction {
+    00:0029:003 *main.Name("set")
+    00:0029:007 *main.Expression {
+      00:0029:007 *main.Name("a")
+    }
+    00:0029:010 *main.Expression {
+      00:0029:010 *main.Block {
+        00:0029:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0030:003 *main.Instruction {
+    00:0030:003 *main.Name("set")
+    00:0030:007 *main.Expression {
+      00:0030:007 *main.Name("b")
+    }
+    00:0030:010 *main.Expression {
+      00:0030:010 *main.Name("a")
+    }
+  }
+  00:0031:003 *main.Instruction {
+    00:0031:003 *main.Name("add")
+    00:0031:007 *main.Expression {
+      00:0031:007 *main.Name("b")
+    }
+    00:0031:010 *main.Expression {
+      00:0031:010 *main.Block {
+        00:0031:011 *main.Name("screensize")
+      }
+    }
+  }
+  00:0032:003 *main.Instruction {
+    00:0032:003 *main.Name("set")
+    00:0032:007 *main.Expression {
+      00:0032:007 *main.Name("c")
+    }
+    00:0032:010 *main.Expression {
+      00:0032:010 *main.Number(0x9120)
+    }
+  }
+  00:0033:003 *main.Instruction {
+    00:0033:003 *main.Name("jsr")
+    00:0033:007 *main.Expression {
+      00:0033:007 *main.Name("disp_clear")
+    }
+  }
+  00:0035:002 *main.Comment(" println(disp_label)")
+  00:0036:003 *main.Instruction {
+    00:0036:003 *main.Name("set")
+    00:0036:007 *main.Expression {
+      00:0036:007 *main.Name("a")
+    }
+    00:0036:010 *main.Expression {
+      00:0036:010 *main.Number(0x0021)
+    }
+  }
+  00:0037:003 *main.Instruction {
+    00:0037:003 *main.Name("add")
+    00:0037:007 *main.Expression {
+      00:0037:007 *main.Name("a")
+    }
+    00:0037:010 *main.Expression {
+      00:0037:010 *main.Block {
+        00:0037:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0038:003 *main.Instruction {
+    00:0038:003 *main.Name("set")
+    00:0038:007 *main.Expression {
+      00:0038:007 *main.Name("b")
+    }
+    00:0038:010 *main.Expression {
+      00:0038:010 *main.Name("strdisplay")
+    }
+  }
+  00:0039:003 *main.Instruction {
+    00:0039:003 *main.Name("set")
+    00:0039:007 *main.Expression {
+      00:0039:007 *main.Name("c")
+    }
+    00:0039:010 *main.Expression {
+      00:0039:010 *main.Number(0x9100)
+    }
+  }
+  00:0040:003 *main.Instruction {
+    00:0040:003 *main.Name("jsr")
+    00:0040:007 *main.Expression {
+      00:0040:007 *main.Name("println")
+    }
+  }
+  00:0043:002 *main.Comment(" printHex(disp_addre"...)
+  00:0044:003 *main.Instruction {
+    00:0044:003 *main.Name("set")
+    00:0044:007 *main.Expression {
+      00:0044:007 *main.Name("a")
+    }
+    00:0044:010 *main.Expression {
+      00:0044:010 *main.Number(0x002c)
+    }
+  }
+  00:0045:003 *main.Instruction {
+    00:0045:003 *main.Name("add")
+    00:0045:007 *main.Expression {
+      00:0045:007 *main.Name("a")
+    }
+    00:0045:010 *main.Expression {
+      00:0045:010 *main.Block {
+        00:0045:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0046:003 *main.Instruction {
+    00:0046:003 *main.Name("set")
+    00:0046:007 *main.Expression {
+      00:0046:007 *main.Name("b")
+    }
+    00:0046:010 *main.Expression {
+      00:0046:010 *main.Block {
+        00:0046:011 *main.Name("display")
+      }
+    }
+  }
+  00:0047:003 *main.Instruction {
+    00:0047:003 *main.Name("jsr")
+    00:0047:007 *main.Expression {
+      00:0047:007 *main.Name("printhex")
+    }
+  }
+  00:0050:002 *main.Comment(" println(keyboard_la"...)
+  00:0051:003 *main.Instruction {
+    00:0051:003 *main.Name("set")
+    00:0051:007 *main.Expression {
+      00:0051:007 *main.Name("a")
+    }
+    00:0051:010 *main.Expression {
+      00:0051:010 *main.Number(0x0041)
+    }
+  }
+  00:0052:003 *main.Instruction {
+    00:0052:003 *main.Name("add")
+    00:0052:007 *main.Expression {
+      00:0052:007 *main.Name("a")
+    }
+    00:0052:010 *main.Expression {
+      00:0052:010 *main.Block {
+        00:0052:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0053:003 *main.Instruction {
+    00:0053:003 *main.Name("set")
+    00:0053:007 *main.Expression {
+      00:0053:007 *main.Name("b")
+    }
+    00:0053:010 *main.Expression {
+      00:0053:010 *main.Name("strkeyboard")
+    }
+  }
+  00:0054:003 *main.Instruction {
+    00:0054:003 *main.Name("jsr")
+    00:0054:007 *main.Expression {
+      00:0054:007 *main.Name("println")
+    }
+  }
+  00:0057:002 *main.Comment(" printHex(keyboard_a"...)
+  00:0058:003 *main.Instruction {
+    00:0058:003 *main.Name("set")
+    00:0058:007 *main.Expression {
+      00:0058:007 *main.Name("a")
+    }
+    00:0058:010 *main.Expression {
+      00:0058:010 *main.Number(0x004c)
+    }
+  }
+  00:0059:003 *main.Instruction {
+    00:0059:003 *main.Name("add")
+    00:0059:007 *main.Expression {
+      00:0059:007 *main.Name("a")
+    }
+    00:0059:010 *main.Expression {
+      00:0059:010 *main.Block {
+        00:0059:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0060:003 *main.Instruction {
+    00:0060:003 *main.Name("set")
+    00:0060:007 *main.Expression {
+      00:0060:007 *main.Name("b")
+    }
+    00:0060:010 *main.Expression {
+      00:0060:010 *main.Block {
+        00:0060:011 *main.Name("keyboard")
+      }
+    }
+  }
+  00:0061:003 *main.Instruction {
+    00:0061:003 *main.Name("jsr")
+    00:0061:007 *main.Expression {
+      00:0061:007 *main.Name("printhex")
+    }
+  }
+  00:0064:002 *main.Comment(" println(clock_label"...)
+  00:0065:003 *main.Instruction {
+    00:0065:003 *main.Name("set")
+    00:0065:007 *main.Expression {
+      00:0065:007 *main.Name("a")
+    }
+    00:0065:010 *main.Expression {
+      00:0065:010 *main.Number(0x0061)
+    }
+  }
+  00:0066:003 *main.Instruction {
+    00:0066:003 *main.Name("add")
+    00:0066:007 *main.Expression {
+      00:0066:007 *main.Name("a")
+    }
+    00:0066:010 *main.Expression {
+      00:0066:010 *main.Block {
+        00:0066:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0067:003 *main.Instruction {
+    00:0067:003 *main.Name("set")
+    00:0067:007 *main.Expression {
+      00:0067:007 *main.Name("b")
+    }
+    00:0067:010 *main.Expression {
+      00:0067:010 *main.Name("strclock")
+    }
+  }
+  00:0068:003 *main.Instruction {
+    00:0068:003 *main.Name("jsr")
+    00:0068:007 *main.Expression {
+      00:0068:007 *main.Name("println")
+    }
+  }
+  00:0071:002 *main.Comment(" printHex(clock_addr"...)
+  00:0072:003 *main.Instruction {
+    00:0072:003 *main.Name("set")
+    00:0072:007 *main.Expression {
+      00:0072:007 *main.Name("a")
+    }
+    00:0072:010 *main.Expression {
+      00:0072:010 *main.Number(0x006c)
+    }
+  }
+  00:0073:003 *main.Instruction {
+    00:0073:003 *main.Name("add")
+    00:0073:007 *main.Expression {
+      00:0073:007 *main.Name("a")
+    }
+    00:0073:010 *main.Expression {
+      00:0073:010 *main.Block {
+        00:0073:011 *main.Name("vidmem")
+      }
+    }
+  }
+  00:0074:003 *main.Instruction {
+    00:0074:003 *main.Name("set")
+    00:0074:007 *main.Expression {
+      00:0074:007 *main.Name("b")
+    }
+    00:0074:010 *main.Expression {
+      00:0074:010 *main.Block {
+        00:0074:011 *main.Name("clock")
+      }
+    }
+  }
+  00:0075:003 *main.Instruction {
+    00:0075:003 *main.Name("jsr")
+    00:0075:007 *main.Expression {
+      00:0075:007 *main.Name("printhex")
+    }
+  }
+  00:0077:003 *main.Instruction {
+    00:0077:003 *main.Name("sub")
+    00:0077:007 *main.Expression {
+      00:0077:007 *main.Name("pc")
+    }
+    00:0077:011 *main.Expression {
+      00:0077:011 *main.Number(0x0001)
+    }
+  }
+  00:0079:002 *main.Comment(" Program data for va"...)
+  00:0080:002 *main.Label("strdisplay")
+  00:0081:003 *main.Instruction {
+    00:0081:003 *main.Name("dat")
+    00:0081:008 *main.Expression {
+      00:0081:008 *main.String("* Display: ")
+    }
+    00:0081:022 *main.Expression {
+      00:0081:022 *main.Number(0x0000)
+    }
+  }
+  00:0082:002 *main.Label("strkeyboard")
+  00:0083:003 *main.Instruction {
+    00:0083:003 *main.Name("dat")
+    00:0083:008 *main.Expression {
+      00:0083:008 *main.String("* Keyboard: ")
+    }
+    00:0083:023 *main.Expression {
+      00:0083:023 *main.Number(0x0000)
+    }
+  }
+  00:0084:002 *main.Label("strclock")
+  00:0085:003 *main.Instruction {
+    00:0085:003 *main.Name("dat")
+    00:0085:008 *main.Expression {
+      00:0085:008 *main.String("* Clock: ")
+    }
+    00:0085:020 *main.Expression {
+      00:0085:020 *main.Number(0x0000)
+    }
+  }
+  00:0086:002 *main.Label("vidmem")
+  00:0087:003 *main.Instruction {
+    00:0087:003 *main.Name("dat")
+    00:0087:007 *main.Expression {
+      00:0087:007 *main.Number(0x8000)
+    }
+  }
+  00:0088:002 *main.Label("display")
+  00:0089:003 *main.Instruction {
+    00:0089:003 *main.Name("dat")
+    00:0089:007 *main.Expression {
+      00:0089:007 *main.Number(0x0000)
+    }
+  }
+  00:0090:002 *main.Label("keyboard")
+  00:0091:003 *main.Instruction {
+    00:0091:003 *main.Name("dat")
+    00:0091:007 *main.Expression {
+      00:0091:007 *main.Number(0x0000)
+    }
+  }
+  00:0092:002 *main.Label("clock")
+  00:0093:003 *main.Instruction {
+    00:0093:003 *main.Name("dat")
+    00:0093:007 *main.Expression {
+      00:0093:007 *main.Number(0x0000)
+    }
+  }
+  00:0094:002 *main.Label("screensize")
+  00:0095:003 *main.Instruction {
+    00:0095:003 *main.Name("dat")
+    00:0095:007 *main.Expression {
+      00:0095:007 *main.Number(0x0182)
+    }
+  }
+  01:0001:002 *main.Comment(" hw_detect finds a s"...)
+  01:0002:002 *main.Comment(" based on the device"...)
+  01:0003:002 *main.Comment(" A and B. It returns"...)
+  01:0004:002 *main.Comment(" A will be -1 if the"...)
+  01:0005:002 *main.Label("hw_detect")
+  01:0006:003 *main.Instruction {
+    01:0006:003 *main.Name("set")
+    01:0006:007 *main.Expression {
+      01:0006:007 *main.Name("i")
+    }
+    01:0006:010 *main.Expression {
+      01:0006:010 *main.Name("a")
+    }
+  }
+  01:0007:003 *main.Instruction {
+    01:0007:003 *main.Name("set")
+    01:0007:007 *main.Expression {
+      01:0007:007 *main.Name("j")
+    }
+    01:0007:010 *main.Expression {
+      01:0007:010 *main.Name("b")
+    }
+  }
+  01:0008:003 *main.Instruction {
+    01:0008:003 *main.Name("hwn")
+    01:0008:007 *main.Expression {
+      01:0008:007 *main.Name("z")
+    }
+  }
+  01:0009:003 *main.Instruction {
+    01:0009:003 *main.Name("sub")
+    01:0009:007 *main.Expression {
+      01:0009:007 *main.Name("z")
+    }
+    01:0009:010 *main.Expression {
+      01:0009:010 *main.Number(0x0001)
+    }
+  }
+  01:0011:002 *main.Label("hw_detect_loop")
+  01:0012:003 *main.Instruction {
+    01:0012:003 *main.Name("hwq")
+    01:0012:007 *main.Expression {
+      01:0012:007 *main.Name("z")
+    }
+  }
+  01:0014:003 *main.Instruction {
+    01:0014:003 *main.Name("ife")
+    01:0014:007 *main.Expression {
+      01:0014:007 *main.Name("a")
+    }
+    01:0014:010 *main.Expression {
+      01:0014:010 *main.Name("i")
+    }
+  }
+  01:0015:005 *main.Instruction {
+    01:0015:005 *main.Name("ife")
+    01:0015:009 *main.Expression {
+      01:0015:009 *main.Name("b")
+    }
+    01:0015:012 *main.Expression {
+      01:0015:012 *main.Name("j")
+    }
+  }
+  01:0016:007 *main.Instruction {
+    01:0016:007 *main.Name("set")
+    01:0016:011 *main.Expression {
+      01:0016:011 *main.Name("pc")
+    }
+    01:0016:015 *main.Expression {
+      01:0016:015 *main.Name("hw_detect_ret")
+    }
+  }
+  01:0018:003 *main.Instruction {
+    01:0018:003 *main.Name("sub")
+    01:0018:007 *main.Expression {
+      01:0018:007 *main.Name("z")
+    }
+    01:0018:010 *main.Expression {
+      01:0018:010 *main.Number(0x0001)
+    }
+  }
+  01:0019:003 *main.Instruction {
+    01:0019:003 *main.Name("ifg")
+    01:0019:007 *main.Expression {
+      01:0019:007 *main.Name("z")
+    }
+    01:0019:010 *main.Expression {
+      01:0019:010 *main.Number(0x0000)
+    }
+  }
+  01:0020:005 *main.Instruction {
+    01:0020:005 *main.Name("set")
+    01:0020:009 *main.Expression {
+      01:0020:009 *main.Name("pc")
+    }
+    01:0020:013 *main.Expression {
+      01:0020:013 *main.Name("hw_detect_loop")
+    }
+  }
+  01:0022:002 *main.Label("hw_detect_ret")
+  01:0023:003 *main.Instruction {
+    01:0023:003 *main.Name("set")
+    01:0023:007 *main.Expression {
+      01:0023:007 *main.Name("a")
+    }
+    01:0023:010 *main.Expression {
+      01:0023:010 *main.Name("z")
+    }
+  }
+  01:0024:003 *main.Instruction {
+    01:0024:003 *main.Name("set")
+    01:0024:007 *main.Expression {
+      01:0024:007 *main.Name("pc")
+    }
+    01:0024:011 *main.Expression {
+      01:0024:011 *main.Name("pop")
+    }
+  }
+  02:0001:002 *main.Comment(" disp_clear(a:start,"...)
+  02:0002:002 *main.Comment(" Fills the screen wi"...)
+  02:0003:002 *main.Label("disp_clear")
+  02:0004:003 *main.Instruction {
+    02:0004:003 *main.Name("set")
+    02:0004:007 *main.Expression {
+      02:0004:007 *main.Name("i")
+    }
+    02:0004:010 *main.Expression {
+      02:0004:010 *main.Name("a")
+    }
+  }
+  02:0005:003 *main.Instruction {
+    02:0005:003 *main.Name("set")
+    02:0005:007 *main.Expression {
+      02:0005:007 *main.Name("j")
+    }
+    02:0005:010 *main.Expression {
+      02:0005:010 *main.Name("b")
+    }
+  }
+  02:0006:002 *main.Label("disp_clear_loop")
+  02:0007:003 *main.Instruction {
+    02:0007:003 *main.Name("sti")
+    02:0007:007 *main.Expression {
+      02:0007:007 *main.Block {
+        02:0007:008 *main.Name("i")
+      }
+    }
+    02:0007:012 *main.Expression {
+      02:0007:012 *main.Name("c")
+    }
+  }
+  02:0008:003 *main.Instruction {
+    02:0008:003 *main.Name("ifl")
+    02:0008:007 *main.Expression {
+      02:0008:007 *main.Name("i")
+    }
+    02:0008:010 *main.Expression {
+      02:0008:010 *main.Name("b")
+    }
+  }
+  02:0009:005 *main.Instruction {
+    02:0009:005 *main.Name("set")
+    02:0009:009 *main.Expression {
+      02:0009:009 *main.Name("pc")
+    }
+    02:0009:013 *main.Expression {
+      02:0009:013 *main.Name("disp_clear_loop")
+    }
+  }
+  02:0010:003 *main.Instruction {
+    02:0010:003 *main.Name("set")
+    02:0010:007 *main.Expression {
+      02:0010:007 *main.Name("pc")
+    }
+    02:0010:011 *main.Expression {
+      02:0010:011 *main.Name("pop")
+    }
+  }
+  03:0001:002 *main.Comment(" printLn(a:dst, b:sr"...)
+  03:0002:002 *main.Comment(" Prints the given st"...)
+  03:0003:002 *main.Label("println")
+  03:0004:003 *main.Instruction {
+    03:0004:003 *main.Name("set")
+    03:0004:007 *main.Expression {
+      03:0004:007 *main.Name("i")
+    }
+    03:0004:010 *main.Expression {
+      03:0004:010 *main.Name("a")
+    }
+  }
+  03:0005:003 *main.Instruction {
+    03:0005:003 *main.Name("set")
+    03:0005:007 *main.Expression {
+      03:0005:007 *main.Name("j")
+    }
+    03:0005:010 *main.Expression {
+      03:0005:010 *main.Name("b")
+    }
+  }
+  03:0006:002 *main.Label("println_loop")
+  03:0007:003 *main.Instruction {
+    03:0007:003 *main.Name("ife")
+    03:0007:007 *main.Expression {
+      03:0007:007 *main.Block {
+        03:0007:008 *main.Name("j")
+      }
+    }
+    03:0007:012 *main.Expression {
+      03:0007:012 *main.Number(0x0000)
+    }
+  }
+  03:0008:005 *main.Instruction {
+    03:0008:005 *main.Name("set")
+    03:0008:009 *main.Expression {
+      03:0008:009 *main.Name("pc")
+    }
+    03:0008:013 *main.Expression {
+      03:0008:013 *main.Name("pop")
+    }
+  }
+  03:0009:003 *main.Instruction {
+    03:0009:003 *main.Name("bor")
+    03:0009:007 *main.Expression {
+      03:0009:007 *main.Block {
+        03:0009:008 *main.Name("j")
+      }
+    }
+    03:0009:012 *main.Expression {
+      03:0009:012 *main.Name("c")
+    }
+  }
+  03:0010:003 *main.Instruction {
+    03:0010:003 *main.Name("sti")
+    03:0010:007 *main.Expression {
+      03:0010:007 *main.Block {
+        03:0010:008 *main.Name("i")
+      }
+    }
+    03:0010:012 *main.Expression {
+      03:0010:012 *main.Block {
+        03:0010:013 *main.Name("j")
+      }
+    }
+  }
+  03:0011:003 *main.Instruction {
+    03:0011:003 *main.Name("set")
+    03:0011:007 *main.Expression {
+      03:0011:007 *main.Name("pc")
+    }
+    03:0011:011 *main.Expression {
+      03:0011:011 *main.Name("println_loop")
+    }
+  }
+  04:0001:002 *main.Comment(" printHex(a:dst, b:n"...)
+  04:0002:002 *main.Comment(" Prints the string r"...)
+  04:0003:002 *main.Comment(" the given number.")
+  04:0004:002 *main.Label("printhex")
+  04:0005:003 *main.Instruction {
+    04:0005:003 *main.Name("set")
+    04:0005:007 *main.Expression {
+      04:0005:007 *main.Name("push")
+    }
+    04:0005:013 *main.Expression {
+      04:0005:013 *main.Number(0x00ff)
+    }
+  }
+  04:0007:002 *main.Label("printhex_loop1")
+  04:0008:003 *main.Instruction {
+    04:0008:003 *main.Name("set")
+    04:0008:007 *main.Expression {
+      04:0008:007 *main.Name("push")
+    }
+    04:0008:013 *main.Expression {
+      04:0008:013 *main.Name("b")
+    }
+  }
+  04:0009:003 *main.Instruction {
+    04:0009:003 *main.Name("mod")
+    04:0009:007 *main.Expression {
+      04:0009:007 *main.Name("peek")
+    }
+    04:0009:013 *main.Expression {
+      04:0009:013 *main.Number(0x0010)
+    }
+  }
+  04:0010:003 *main.Instruction {
+    04:0010:003 *main.Name("shr")
+    04:0010:007 *main.Expression {
+      04:0010:007 *main.Name("b")
+    }
+    04:0010:010 *main.Expression {
+      04:0010:010 *main.Number(0x0005)
+    }
+  }
+  04:0012:003 *main.Instruction {
+    04:0012:003 *main.Name("ifn")
+    04:0012:007 *main.Expression {
+      04:0012:007 *main.Name("b")
+    }
+    04:0012:010 *main.Expression {
+      04:0012:010 *main.Number(0x0000)
+    }
+  }
+  04:0013:005 *main.Instruction {
+    04:0013:005 *main.Name("set")
+    04:0013:009 *main.Expression {
+      04:0013:009 *main.Name("pc")
+    }
+    04:0013:013 *main.Expression {
+      04:0013:013 *main.Name("printhex_loop1")
+    }
+  }
+  04:0015:002 *main.Label("printhex_loop2")
+  04:0016:003 *main.Instruction {
+    04:0016:003 *main.Name("set")
+    04:0016:007 *main.Expression {
+      04:0016:007 *main.Block {
+        04:0016:008 *main.Name("a")
+      }
+    }
+    04:0016:012 *main.Expression {
+      04:0016:012 *main.Name("pop")
+    }
+  }
+  04:0017:003 *main.Instruction {
+    04:0017:003 *main.Name("add")
+    04:0017:007 *main.Expression {
+      04:0017:007 *main.Block {
+        04:0017:008 *main.Name("a")
+      }
+    }
+    04:0017:012 *main.Expression {
+      04:0017:012 *main.Number(0x0030)
+    }
+  }
+  04:0019:003 *main.Instruction {
+    04:0019:003 *main.Name("ifg")
+    04:0019:007 *main.Expression {
+      04:0019:007 *main.Block {
+        04:0019:008 *main.Name("a")
+      }
+    }
+    04:0019:012 *main.Expression {
+      04:0019:012 *main.Number(0x0039)
+    }
+  }
+  04:0020:005 *main.Instruction {
+    04:0020:005 *main.Name("add")
+    04:0020:009 *main.Expression {
+      04:0020:009 *main.Block {
+        04:0020:010 *main.Name("a")
+      }
+    }
+    04:0020:014 *main.Expression {
+      04:0020:014 *main.Number(0x0007)
+    }
+  }
+  04:0022:003 *main.Instruction {
+    04:0022:003 *main.Name("bor")
+    04:0022:007 *main.Expression {
+      04:0022:007 *main.Block {
+        04:0022:008 *main.Name("a")
+      }
+    }
+    04:0022:012 *main.Expression {
+      04:0022:012 *main.Name("c")
+    }
+  }
+  04:0023:003 *main.Instruction {
+    04:0023:003 *main.Name("add")
+    04:0023:007 *main.Expression {
+      04:0023:007 *main.Name("a")
+    }
+    04:0023:010 *main.Expression {
+      04:0023:010 *main.Number(0x0001)
+    }
+  }
+  04:0025:003 *main.Instruction {
+    04:0025:003 *main.Name("ifn")
+    04:0025:007 *main.Expression {
+      04:0025:007 *main.Name("peek")
+    }
+    04:0025:013 *main.Expression {
+      04:0025:013 *main.Number(0x00ff)
+    }
+  }
+  04:0026:005 *main.Instruction {
+    04:0026:005 *main.Name("set")
+    04:0026:009 *main.Expression {
+      04:0026:009 *main.Name("pc")
+    }
+    04:0026:013 *main.Expression {
+      04:0026:013 *main.Name("printhex_loop2")
+    }
+  }
+  04:0028:003 *main.Instruction {
+    04:0028:003 *main.Name("set")
+    04:0028:007 *main.Expression {
+      04:0028:007 *main.Block {
+        04:0028:008 *main.Name("a")
+      }
+    }
+    04:0028:012 *main.Expression {
+      04:0028:012 *main.Number(0x0068)
+    }
+  }
+  04:0029:003 *main.Instruction {
+    04:0029:003 *main.Name("bor")
+    04:0029:007 *main.Expression {
+      04:0029:007 *main.Block {
+        04:0029:008 *main.Name("a")
+      }
+    }
+    04:0029:012 *main.Expression {
+      04:0029:012 *main.Name("c")
+    }
+  }
+  04:0030:003 *main.Instruction {
+    04:0030:003 *main.Name("add")
+    04:0030:007 *main.Expression {
+      04:0030:007 *main.Name("sp")
+    }
+    04:0030:011 *main.Expression {
+      04:0030:011 *main.Number(0x0001)
+    }
+  }
+  04:0031:003 *main.Instruction {
+    04:0031:003 *main.Name("set")
+    04:0031:007 *main.Expression {
+      04:0031:007 *main.Name("pc")
+    }
+    04:0031:011 *main.Expression {
+      04:0031:011 *main.Name("pop")
+    }
+  }
+}
