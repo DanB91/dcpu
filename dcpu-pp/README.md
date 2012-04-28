@@ -16,9 +16,9 @@ All this presupposes that each included file contains at least one label
 with the same name as the reference. The preprocessor checks the
 included code to make sure this is the case.
 
-### Proprocessor modes
+### Preprocessor modes
 
-The application operates on a list of post-processor types which register
+The application operates on a list of pre-processor types which register
 themselves at startup. They can be included in the parsing session through
 their own commandline switches.
 
