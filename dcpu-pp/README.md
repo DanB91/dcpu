@@ -16,11 +16,28 @@ All this presupposes that each included file contains at least one label
 with the same name as the reference. The preprocessor checks the
 included code to make sure this is the case.
 
-### Minification
+### Proprocessor modes
 
-Everything is minified and stripped of unnecessary bloat and then
-spit out as a single chunk of DCPU assembly code. This can be pasted into
-any of the numerous emulators and run.
+The application operates on a list of post-processor types which register
+themselves at startup. They can be included in the parsing session through
+their own commandline switches.
+
+Invoke the program with the `-h` flag to see a list of options.
+All boolean switches with a name `> 1` character can be considered
+one of these registered processors and they each perform a specific
+transformation on the complete AST. By supplying their respective switch
+in the commandline invocation, you activate them. 
+
+For example, the `-scramble` switch below controls the Scramble processor.
+
+    $ dcpu-pp -h 
+    Usage of ./dcpu-pp:
+      -a=false: Dump the source code parse tree to stdout.
+      -h=false: Display this help.
+      -i="": Colon-separated list of additional include paths.
+      -o="": Name of destination file. Defaults to stdout.
+      -scramble=false: Obfuscate label names and label references.
+      -v=false: Display version information.
 
 ### Usage
 
