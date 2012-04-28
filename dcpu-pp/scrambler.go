@@ -13,5 +13,11 @@ type Scrambler struct{}
 func NewScrambler() Processor { return new(Scrambler) }
 
 func (p *Scrambler) Process(ast *AST) (err error) {
+	var labels []*Label
+	var refs []*Name
+
+	findLabels(ast.Root.Children, &labels)
+	findReferences(ast.Root.Children, &refs)
+
 	return
 }

@@ -40,10 +40,10 @@ func resolveIncludes(ast *AST, c *Config) (err error) {
 	var refs []*Name
 
 	findLabels(ast.Root.Children, &labels)
-	findRefs(ast.Root.Children, &refs)
+	findReferences(ast.Root.Children, &refs)
 
 	refs = findUndefinedRefs(refs, labels)
-	refs = stripDuplicates(refs)
+	refs = stripDuplicateNames(refs)
 
 	if len(refs) == 0 {
 		// No undefined references. We're done here.
@@ -98,48 +98,6 @@ func loadInclude(ast *AST, c *Config, r *Name) (err error) {
 		"Undefined reference: %q", r.Data)
 }
 
-// findLabels recursively finds Label nodes.
-func findLabels(n []Node, l *[]*Label) {
-	for i := range n {
-		switch tt := n[i].(type) {
-		case *Expression:
-			findLabels(tt.Children, l)
-
-		case *Block:
-			findLabels(tt.Children, l)
-
-		case *Instruction:
-			findLabels(tt.Children, l)
-
-		case *Label:
-			*l = append(*l, tt)
-		}
-	}
-}
-
-// findRefs recursively finds Label references.
-func findRefs(n []Node, l *[]*Name) {
-	for i := range n {
-		switch tt := n[i].(type) {
-		case *Expression:
-			findRefs(tt.Children, l)
-
-		case *Block:
-			findRefs(tt.Children, l)
-
-		case *Instruction:
-			findRefs(tt.Children, l)
-
-		case *Name:
-			if isRegister(tt.Data) || isInstruction(tt.Data) {
-				continue
-			}
-
-			*l = append(*l, tt)
-		}
-	}
-}
-
 // findUndefinedRefs compares both given lists of labels and
 // label references. Any reference that is not present in the
 // label list, is considered unresolved and added to the 
@@ -159,19 +117,6 @@ outer:
 	}
 
 	return refs
-}
-
-// stripDuplicates removes duplicate entries from the given list.
-func stripDuplicates(r []*Name) []*Name {
-	l := make([]*Name, 0, len(r))
-
-	for i := range r {
-		if !containsName(l, r[i].Data) {
-			l = append(l, r[i])
-		}
-	}
-
-	return l
 }
 
 // containsName returns true if the given list contains the supplied Name.

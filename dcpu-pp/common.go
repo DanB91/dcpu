@@ -41,3 +41,58 @@ func isInstruction(v string) bool {
 	}
 	return false
 }
+
+// findLabels recursively finds Label nodes.
+func findLabels(n []Node, l *[]*Label) {
+	for i := range n {
+		switch tt := n[i].(type) {
+		case *Expression:
+			findLabels(tt.Children, l)
+
+		case *Block:
+			findLabels(tt.Children, l)
+
+		case *Instruction:
+			findLabels(tt.Children, l)
+
+		case *Label:
+			*l = append(*l, tt)
+		}
+	}
+}
+
+// findReferences recursively finds Label references.
+func findReferences(n []Node, l *[]*Name) {
+	for i := range n {
+		switch tt := n[i].(type) {
+		case *Expression:
+			findReferences(tt.Children, l)
+
+		case *Block:
+			findReferences(tt.Children, l)
+
+		case *Instruction:
+			findReferences(tt.Children, l)
+
+		case *Name:
+			if isRegister(tt.Data) || isInstruction(tt.Data) {
+				continue
+			}
+
+			*l = append(*l, tt)
+		}
+	}
+}
+
+// stripDuplicateNames removes duplicate entries from the given Name list.
+func stripDuplicateNames(r []*Name) []*Name {
+	l := make([]*Name, 0, len(r))
+
+	for i := range r {
+		if !containsName(l, r[i].Data) {
+			l = append(l, r[i])
+		}
+	}
+
+	return l
+}
