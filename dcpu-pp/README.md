@@ -13,7 +13,8 @@ contents into the output source file. This allows us to keep source files
 small and manageable. The filenames are expected to be all lower-case.
 
 All this presupposes that each included file contains at least one label
-with the same name as the reference.
+with the same name as the reference. The preprocessor checks the
+included code to make sure this is the case.
 
 ### Minification
 
