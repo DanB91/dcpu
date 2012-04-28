@@ -19,7 +19,9 @@ var (
 
 // writeSource writes the given AST out as assembly source code.
 func writeSource(w io.Writer, a *AST) {
-	writeSourceNode(w, a.Root)
+	for _, v := range a.Root.Children {
+		writeSourceNode(w, v)
+	}
 }
 
 func writeSourceNode(w io.Writer, n Node) {
