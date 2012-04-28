@@ -1,6 +1,6 @@
-## DCPU Preprocessor
+## DCPU Pre-processor
 
-This app is a DCPU Assembly preprocessor. It parses the given input file(s).
+This app is a DCPU Assembly pre-processor. It parses the given input file(s).
 When run in a project dir, it considers all `.dasm` files in that
 directory to be part of the same project.
 
@@ -13,10 +13,10 @@ contents into the output source file. This allows us to keep source files
 small and manageable. The filenames are expected to be all lower-case.
 
 All this presupposes that each included file contains at least one label
-with the same name as the reference. The preprocessor checks the
+with the same name as the reference. The pre-processor checks the
 included code to make sure this is the case.
 
-### Preprocessor modes
+### pre-processor modes
 
 The application operates on a list of pre-processor types which register
 themselves at startup. They can be included in the parsing session through
