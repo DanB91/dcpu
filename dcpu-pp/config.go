@@ -8,13 +8,14 @@ import (
 	"os"
 )
 
-// Proprocessor mode of operation
+// Proprocessor mode flags.
 type ParseMode uint8
 
-// Known modes
+// Known mode flags.
 const (
-	ModeAssemble ParseMode = iota // Default mode - BUild output source.
-	ModeDumpAST                   // Dump AST for all source code.
+	ModeAssemble ParseMode = 1 << iota // Default mode - BUild output source.
+	ModeDumpAST                        // Dump AST for all source code.
+	ModeScramble                       // Scramble label names and references.
 )
 
 // Config holds configuration and state data for the preprocessor.

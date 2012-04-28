@@ -31,7 +31,7 @@ func main() {
 
 	switch cfg.Mode {
 	case ModeAssemble:
-		if err = writeSource(cfg.Output, &ast); err != nil {
+		if err = writeSource(cfg.Output, &ast, cfg.Mode); err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
@@ -44,7 +44,7 @@ func main() {
 
 // process commandline arguments.
 func parseArgs() *Config {
-	var version, help, dumpast bool
+	var version, help, dumpast, scramble bool
 	var include, output string
 	var root string
 	var err error
@@ -53,6 +53,7 @@ func parseArgs() *Config {
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
 	flag.StringVar(&output, "o", "", "Name of destination file. Defaults to stdout.")
+	flag.BoolVar(&scramble, "s", false, "Scramble label names and references on output.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.Parse()
 
@@ -71,6 +72,12 @@ func parseArgs() *Config {
 
 	if dumpast {
 		c.Mode = ModeDumpAST
+	} else {
+		c.Mode = ModeAssemble
+	}
+
+	if scramble {
+		c.Mode |= ModeScramble
 	}
 
 	if len(output) > 0 {
