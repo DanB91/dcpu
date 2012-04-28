@@ -5,11 +5,11 @@ package main
 
 import (
 	"io"
-	"fmt"
 )
 
 // writeSource writes the given AST out as assembly source to the
 // supplied writer.
-func writeSource(w io.Writer, ast *AST) (err error) {
+func writeSource(w io.WriteCloser, ast *AST) (err error) {
+	defer w.Close()
 	return
 }

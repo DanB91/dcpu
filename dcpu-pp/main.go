@@ -31,6 +31,10 @@ func main() {
 
 	switch cfg.Mode {
 	case ModeAssemble:
+		if err = writeSource(cfg.Output, &ast); err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
 
 	case ModeDumpAST:
 		fmt.Fprintf(os.Stdout, ast.Dump())
@@ -41,11 +45,14 @@ func main() {
 // process commandline arguments.
 func parseArgs() *Config {
 	var version, help, dumpast bool
-	var include string
+	var include, output string
+	var root string
+	var err error
 
 	flag.BoolVar(&dumpast, "a", false, "Dump the source code parse tree to stdout.")
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
+	flag.StringVar(&output, "o", "", "Name of destination file. Defaults to stdout.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.Parse()
 
@@ -66,8 +73,18 @@ func parseArgs() *Config {
 		c.Mode = ModeDumpAST
 	}
 
+	if len(output) > 0 {
+		output = path.Clean(output)
+		c.Output, err = os.Create(output)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Destination file: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
 	// Collect source files
-	root, err := os.Getwd()
+	root, err = os.Getwd()
 	if err == nil {
 		err = filepath.Walk(root, func(file string, info os.FileInfo, err error) error {
 			if info.IsDir() || path.Ext(file) != ".dasm" {

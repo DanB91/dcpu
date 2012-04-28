@@ -3,6 +3,11 @@
 
 package main
 
+import (
+	"io"
+	"os"
+)
+
 // Proprocessor mode of operation
 type ParseMode uint8
 
@@ -14,15 +19,16 @@ const (
 
 // Config holds configuration and state data for the preprocessor.
 type Config struct {
-	Include []string  // List of paths where we look to resolve source file references.
-	Input   []string  // Names of input source files.
-	Output  string    // Name of output source file. Defaults to nil (stdout).
-	Mode    ParseMode // Selected mode of operation.
+	Include []string       // List of paths where we look to resolve source file references.
+	Input   []string       // Names of input source files.
+	Output  io.WriteCloser // Output source writer. Defaults to stdout.
+	Mode    ParseMode      // Selected mode of operation.
 }
 
 // NewConfig creates a new, standard configuration instance.
 func NewConfig() *Config {
 	c := new(Config)
 	c.Mode = ModeAssemble
+	c.Output = os.Stdout
 	return c
 }
