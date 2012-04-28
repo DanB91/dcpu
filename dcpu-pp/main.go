@@ -24,38 +24,18 @@ func main() {
 
 	cfg := parseArgs()
 
-	if err = parseFiles(&ast, cfg.Input); err != nil {
+	if err = readSource(&ast, cfg); err != nil {
 		fmt.Fprintf(os.Stderr, "Parsing source: %v\n", err)
 		os.Exit(1)
 	}
 
 	switch cfg.Mode {
 	case ModeAssemble:
+
 	case ModeDumpAST:
 		fmt.Fprintf(os.Stdout, ast.Dump())
 		os.Exit(0)
 	}
-}
-
-// parseFiles takes the input files and parses their contents into
-// the given AST.
-func parseFiles(ast *AST, files []string) (err error) {
-	var fd *os.File
-
-	for i := range files {
-		if fd, err = os.Open(files[i]); err != nil {
-			return
-		}
-
-		err = ast.Parse(fd, files[i])
-		fd.Close()
-
-		if err != nil {
-			return
-		}
-	}
-
-	return
 }
 
 // process commandline arguments.

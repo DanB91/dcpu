@@ -10,7 +10,7 @@ Any references to undefined labels are assumed to be defined
 in external files names `<labelname>.dasm`. The 'assembler' looks in a
 predefined path to resolve these files. It then simply includes the file
 contents into the output source file. This allows us to keep source files
-small and manageable.
+small and manageable. The filenames are expected to be all lower-case.
 
 ### Minification
 
