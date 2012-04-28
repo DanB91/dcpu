@@ -26,7 +26,8 @@ Invoke the program with the `-h` flag to see a list of options.
 All boolean switches with a name `> 1` character can be considered
 one of these registered processors and they each perform a specific
 transformation on the complete AST. By supplying their respective switch
-in the commandline invocation, you activate them. 
+in the commandline invocation, you activate them. By default, they are
+all disabled.
 
 For example, the `-scramble` switch below controls the Scramble processor.
 
