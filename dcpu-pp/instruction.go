@@ -7,7 +7,7 @@ package main
 // An opcode and optional arguments.
 type Instruction struct {
 	*NodeBase
-	Children []Node
+	children []Node
 }
 
 func NewInstruction(file, line, col int) *Instruction {
@@ -16,3 +16,6 @@ func NewInstruction(file, line, col int) *Instruction {
 		nil,
 	}
 }
+
+func (i *Instruction) Children() []Node     { return i.children }
+func (i *Instruction) SetChildren(n []Node) { i.children = n }

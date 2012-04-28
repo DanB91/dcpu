@@ -13,32 +13,26 @@ type Stripper struct{}
 func NewStripper() Processor { return new(Stripper) }
 
 func (p *Stripper) Process(ast *AST) (err error) {
-	stripComments(&ast.Root.Children)
+	stripComments(ast.Root)
 	return
 }
 
 // stripComments removes Comment nodes from the supplied list.
-func stripComments(n *[]Node) {
-	t := *n
+func stripComments(n NodeCollection) {
+	list := n.Children()
 
 loop:
-	for i := range t {
-		switch tt := t[i].(type) {
+	for i := range list {
+		switch tt := list[i].(type) {
 		case *Comment:
-			copy(t[i:], t[i+1:])
-			t = t[:len(t)-1]
+			copy(list[i:], list[i+1:])
+			list = list[:len(list)-1]
 			goto loop
 
-		case *Block:
-			stripComments(&tt.Children)
-
-		case *Expression:
-			stripComments(&tt.Children)
-
-		case *Instruction:
-			stripComments(&tt.Children)
+		case NodeCollection:
+			stripComments(tt)
 		}
 	}
 
-	*n = t
+	n.SetChildren(list)
 }

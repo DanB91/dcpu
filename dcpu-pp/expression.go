@@ -6,7 +6,7 @@ package main
 // An Expression is a collection of AST nodes.
 type Expression struct {
 	*NodeBase
-	Children []Node
+	children []Node
 }
 
 func NewExpression(file, line, col int) *Expression {
@@ -15,3 +15,6 @@ func NewExpression(file, line, col int) *Expression {
 		nil,
 	}
 }
+
+func (e *Expression) Children() []Node     { return e.children }
+func (e *Expression) SetChildren(n []Node) { e.children = n }

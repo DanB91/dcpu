@@ -11,6 +11,12 @@ type Node interface {
 	Base() *NodeBase
 }
 
+type NodeCollection interface {
+	Node
+	Children() []Node
+	SetChildren([]Node)
+}
+
 // Base-type for all nodes. This takes care of some common
 // aspects they all need in order to qualify as a Node interface.
 type NodeBase struct {

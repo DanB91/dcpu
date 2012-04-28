@@ -6,7 +6,7 @@ package main
 // An Block is a collection of AST nodes.
 type Block struct {
 	*NodeBase
-	Children []Node
+	children []Node
 }
 
 func NewBlock(file, line, col int) *Block {
@@ -15,3 +15,6 @@ func NewBlock(file, line, col int) *Block {
 		nil,
 	}
 }
+
+func (b *Block) Children() []Node     { return b.children }
+func (b *Block) SetChildren(n []Node) { b.children = n }

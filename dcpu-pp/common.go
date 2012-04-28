@@ -46,14 +46,8 @@ func isInstruction(v string) bool {
 func findLabels(n []Node, l *[]*Label) {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case *Expression:
-			findLabels(tt.Children, l)
-
-		case *Block:
-			findLabels(tt.Children, l)
-
-		case *Instruction:
-			findLabels(tt.Children, l)
+		case NodeCollection:
+			findLabels(tt.Children(), l)
 
 		case *Label:
 			*l = append(*l, tt)
@@ -65,14 +59,8 @@ func findLabels(n []Node, l *[]*Label) {
 func findReferences(n []Node, l *[]*Name) {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case *Expression:
-			findReferences(tt.Children, l)
-
-		case *Block:
-			findReferences(tt.Children, l)
-
-		case *Instruction:
-			findReferences(tt.Children, l)
+		case NodeCollection:
+			findReferences(tt.Children(), l)
 
 		case *Name:
 			if isRegister(tt.Data) || isInstruction(tt.Data) {

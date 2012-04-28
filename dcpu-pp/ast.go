@@ -40,7 +40,7 @@ func (a *AST) Parse(r io.Reader, filename string) (err error) {
 
 	io.Copy(&buf, r)
 
-	return a.readDocument(lex.Run(buf.Bytes()), &a.Root.Children)
+	return a.readDocument(lex.Run(buf.Bytes()), &a.Root.children)
 }
 
 // readDocument reads tokens from the given channel and turns them into AST nodes.
@@ -89,7 +89,7 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 	instr := NewInstruction(len(a.Files)-1, tok.Line, tok.Col)
 	expr := NewExpression(file, 0, 0)
 
-	instr.Children = append(instr.Children,
+	instr.children = append(instr.children,
 		NewName(file, tok.Line, tok.Col, string(tok.Data)),
 	)
 
@@ -108,46 +108,46 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 
 			switch tok.Type {
 			case TokEndLine:
-				if len(expr.Children) == 0 {
+				if len(expr.children) == 0 {
 					return a.errorf(tok, "Expected expression")
 				}
 
 				// Correct expression source location
-				expr.line = expr.Children[0].Line()
-				expr.col = expr.Children[0].Col()
-				instr.Children = append(instr.Children, expr)
+				expr.line = expr.children[0].Line()
+				expr.col = expr.children[0].Col()
+				instr.children = append(instr.children, expr)
 				return
 
 			case TokComma:
-				if len(expr.Children) == 0 {
+				if len(expr.children) == 0 {
 					return a.errorf(tok, "Expected expression")
 				}
 
 				// Correct expression source location
-				expr.line = expr.Children[0].Line()
-				expr.col = expr.Children[0].Col()
-				instr.Children = append(instr.Children, expr)
+				expr.line = expr.children[0].Line()
+				expr.col = expr.children[0].Col()
+				instr.children = append(instr.children, expr)
 				expr = NewExpression(file, tok.Line, tok.Col)
 
 			case TokComment:
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewComment(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokIdent:
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewName(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokOperator:
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewOperator(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokNumber:
 				num := NewNumber(file, tok.Line, tok.Col, 0)
 				num.Parse(tok.Data)
-				expr.Children = append(expr.Children, num)
+				expr.children = append(expr.children, num)
 
 			case TokString:
 				data, err := escape(tok.Data)
@@ -155,12 +155,12 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 					return err
 				}
 
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewString(file, tok.Line, tok.Col, string(data)),
 				)
 
 			case TokRawString:
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewString(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
@@ -178,17 +178,17 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 					return a.errorf(tok, "Invalid utf8 character literal: %s", tok)
 				}
 
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewNumber(file, tok.Line, tok.Col, Word(r)),
 				)
 
 			case TokBlockStart:
-				if err = a.readBlock(c, &expr.Children, tok); err != nil {
+				if err = a.readBlock(c, &expr.children, tok); err != nil {
 					return
 				}
 
 			case TokExprStart:
-				if err = a.readExpr(c, &expr.Children, tok); err != nil {
+				if err = a.readExpr(c, &expr.children, tok); err != nil {
 					return
 				}
 
@@ -223,28 +223,28 @@ func (a *AST) readBlock(c <-chan *Token, n *[]Node, tok *Token) (err error) {
 
 			switch tok.Type {
 			case TokBlockEnd:
-				if len(block.Children) == 0 {
+				if len(block.children) == 0 {
 					return a.errorf(tok, "Expected expression")
 				}
 				return
 
 			case TokIdent:
-				block.Children = append(block.Children,
+				block.children = append(block.children,
 					NewName(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokNumber:
 				num := NewNumber(file, tok.Line, tok.Col, 0)
 				num.Parse(tok.Data)
-				block.Children = append(block.Children, num)
+				block.children = append(block.children, num)
 
 			case TokOperator:
-				block.Children = append(block.Children,
+				block.children = append(block.children,
 					NewOperator(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokExprStart:
-				if err = a.readExpr(c, &block.Children, tok); err != nil {
+				if err = a.readExpr(c, &block.children, tok); err != nil {
 					return
 				}
 
@@ -283,20 +283,20 @@ func (a *AST) readExpr(c <-chan *Token, n *[]Node, tok *Token) (err error) {
 			case TokNumber:
 				num := NewNumber(file, tok.Line, tok.Col, 0)
 				num.Parse(tok.Data)
-				expr.Children = append(expr.Children, num)
+				expr.children = append(expr.children, num)
 
 			case TokOperator:
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewOperator(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokIdent:
-				expr.Children = append(expr.Children,
+				expr.children = append(expr.children,
 					NewName(file, tok.Line, tok.Col, string(tok.Data)),
 				)
 
 			case TokExprStart:
-				if err = a.readExpr(c, &expr.Children, tok); err != nil {
+				if err = a.readExpr(c, &expr.children, tok); err != nil {
 					return
 				}
 

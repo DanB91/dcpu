@@ -24,14 +24,10 @@ func writeAst(w io.Writer, a *AST) {
 
 func writeAstNode(w io.Writer, n Node, pad string) {
 	switch tt := n.(type) {
-	case *Block:
-		writeAstCollection(w, tt, tt.Children, pad)
+	case NodeCollection:
+		writeAstCollection(w, tt, tt.Children(), pad)
 	case *Comment:
 		writeAstString(w, tt, tt.Data, pad)
-	case *Expression:
-		writeAstCollection(w, tt, tt.Children, pad)
-	case *Instruction:
-		writeAstCollection(w, tt, tt.Children, pad)
 	case *Label:
 		writeAstString(w, tt, tt.Data, pad)
 	case *Name:

@@ -39,8 +39,8 @@ func resolveIncludes(ast *AST, c *Config) (err error) {
 	var labels []*Label
 	var refs []*Name
 
-	findLabels(ast.Root.Children, &labels)
-	findReferences(ast.Root.Children, &refs)
+	findLabels(ast.Root.Children(), &labels)
+	findReferences(ast.Root.Children(), &refs)
 
 	refs = findUndefinedRefs(refs, labels)
 	refs = stripDuplicateNames(refs)
@@ -127,7 +127,7 @@ func includeHasLabel(ast *AST, file string, target string) bool {
 		return false
 	}
 
-	return hasLabel(ast.Root.Children, index, target)
+	return hasLabel(ast.Root.Children(), index, target)
 }
 
 // hasLabel recursively finds a specific label definition.
@@ -135,18 +135,8 @@ func includeHasLabel(ast *AST, file string, target string) bool {
 func hasLabel(n []Node, file int, target string) bool {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case *Expression:
-			if hasLabel(tt.Children, file, target) {
-				return true
-			}
-
-		case *Block:
-			if hasLabel(tt.Children, file, target) {
-				return true
-			}
-
-		case *Instruction:
-			if hasLabel(tt.Children, file, target) {
+		case NodeCollection:
+			if hasLabel(tt.Children(), file, target) {
 				return true
 			}
 
