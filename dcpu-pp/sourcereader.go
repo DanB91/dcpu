@@ -5,22 +5,14 @@ package main
 
 import (
 	"os"
+	"path"
 )
 
-// readSource takes the input files and parses their contents into
+// parseInput takes the input files and parses their contents into
 // the given AST.
-func readSource(ast *AST, c *Config) (err error) {
-	var fd *os.File
-
+func parseInput(ast *AST, c *Config) (err error) {
 	for i := range c.Input {
-		if fd, err = os.Open(c.Input[i]); err != nil {
-			return
-		}
-
-		err = ast.Parse(fd, c.Input[i])
-		fd.Close()
-
-		if err != nil {
+		if err = readSource(ast, c.Input[i]); err != nil {
 			return
 		}
 	}
@@ -28,17 +20,70 @@ func readSource(ast *AST, c *Config) (err error) {
 	return resolveIncludes(ast, c)
 }
 
+// readSource reads the given file and parses its contents
+// into the given AST.
+func readSource(ast *AST, file string) error {
+	fd, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+
+	defer fd.Close()
+	return ast.Parse(fd, file)
+}
+
 // resolveIncludes finds references to undefined labels.
 // It then tries to find the code for these labels in the supplied
 // include paths. Files should be defined as '<labelname>.dasm'.
 func resolveIncludes(ast *AST, c *Config) (err error) {
+	var stat os.FileInfo
 	var labels []*Label
 	var refs []*Name
+	var file string
+	var r *Name
+	var i, j int
 
 	findLabels(ast.Root.Children, &labels)
 	findRefs(ast.Root.Children, &refs)
+	refs = findUndefinedRefs(refs, labels)
 
-	println(len(labels), len(refs))
+	if len(refs) == 0 {
+		// No undefined references. We're done here.
+		return
+	}
+
+	if len(c.Include) == 0 {
+		// We have unresolved references, but no places to look
+		// for their implementation. This constitutes a booboo.
+		r = refs[0]
+		return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+			"Undefined reference: %q", r.Data)
+	}
+
+	for i = range refs {
+		r = refs[i]
+
+		for j = range c.Include {
+			file = path.Join(c.Include[j], r.Data+".dasm")
+			stat, err = os.Lstat(file)
+
+			if err != nil || stat.IsDir() {
+				return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+					"Undefined reference: %q", r.Data)
+			}
+
+			if err = readSource(ast, file); err != nil {
+				return
+			}
+
+			if !includeHasLabel(ast, file, r.Data) {
+				return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+					"Undefined reference: %q. Include file was found, but "+
+						"it did not define the desired label.", r.Data)
+			}
+		}
+	}
+
 	return
 }
 
@@ -82,4 +127,76 @@ func findRefs(n []Node, l *[]*Name) {
 			*l = append(*l, tt)
 		}
 	}
+}
+
+// findUndefinedRefs compares both given lists of labels and
+// label references. Any reference that is not present in the
+// label list, is considered unresolved and added to the 
+// returned list.
+func findUndefinedRefs(refs []*Name, labels []*Label) []*Name {
+	var i, j int
+
+outer:
+	for i = range refs {
+		for j = range labels {
+			if labels[j].Data == refs[i].Data {
+				copy(refs[i:], refs[i+1:])
+				refs = refs[:len(refs)-1]
+				goto outer
+			}
+		}
+	}
+
+	return refs
+}
+
+// includeHasLabel checks if a newly parsed include actually
+// contains the label reference we are looking for.
+func includeHasLabel(ast *AST, file string, target string) bool {
+	index := fileIndex(ast, file)
+	if index == -1 {
+		return false
+	}
+
+	return hasLabel(ast.Root.Children, index, target)
+}
+
+// hasLabel recursively finds a specific label definition.
+// Returns true if it was found. False otherwise.
+func hasLabel(n []Node, file int, target string) bool {
+	for i := range n {
+		switch tt := n[i].(type) {
+		case *Expression:
+			if hasLabel(tt.Children, file, target) {
+				return true
+			}
+
+		case *Block:
+			if hasLabel(tt.Children, file, target) {
+				return true
+			}
+
+		case *Instruction:
+			if hasLabel(tt.Children, file, target) {
+				return true
+			}
+
+		case *Label:
+			if tt.File() == file && tt.Data == target {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// fileIndex returns the given file's index as it is stored in the AST.
+func fileIndex(ast *AST, file string) int {
+	for i := range ast.Files {
+		if ast.Files[i] == file {
+			return i
+		}
+	}
+	return -1
 }

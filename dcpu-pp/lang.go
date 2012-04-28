@@ -11,7 +11,7 @@ var (
 		"set", "add", "sub", "mul", "mli", "div", "dvi", "mod", "mdi", "and",
 		"bor", "xor", "shr", "asr", "shl", "ifb", "ifc", "ife", "ifn", "ifg",
 		"ifa", "ifl", "ifu", "adx", "sbx", "sti", "std", "jsr", "int", "iag",
-		"ias", "rfi", "iaq", "hwn", "hwq", "hwi",
+		"ias", "rfi", "iaq", "hwn", "hwq", "hwi", "dat",
 	}
 
 	regs = []string{

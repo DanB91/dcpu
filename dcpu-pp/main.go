@@ -24,8 +24,8 @@ func main() {
 
 	cfg := parseArgs()
 
-	if err = readSource(&ast, cfg); err != nil {
-		fmt.Fprintf(os.Stderr, "Parsing source: %v\n", err)
+	if err = parseInput(&ast, cfg); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
@@ -99,7 +99,7 @@ func parseArgs() *Config {
 
 			stat, err := os.Lstat(v)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Test import paths: %v\n", err)
+				fmt.Fprintf(os.Stderr, "Failed to stat %q: %v\n", v, err)
 				os.Exit(1)
 			}
 

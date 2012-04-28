@@ -12,6 +12,9 @@ predefined path to resolve these files. It then simply includes the file
 contents into the output source file. This allows us to keep source files
 small and manageable. The filenames are expected to be all lower-case.
 
+All this presupposes that each included file contains at least one label
+with the same name as the reference.
+
 ### Minification
 
 Everything is minified and stripped of unnecessary bloat and then
