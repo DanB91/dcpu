@@ -169,7 +169,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <keyword>hwq</keyword>
           <keyword>hwi</keyword>
           <keyword>dat</keyword>
-          <keyword>brk</keyword>
         </context>
 
         <context id="types" style-ref="type">
