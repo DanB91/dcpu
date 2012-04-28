@@ -36,12 +36,8 @@ func readSource(ast *AST, file string) error {
 // It then tries to find the code for these labels in the supplied
 // include paths. Files should be defined as '<labelname>.dasm'.
 func resolveIncludes(ast *AST, c *Config) (err error) {
-	var stat os.FileInfo
 	var labels []*Label
 	var refs []*Name
-	var file string
-	var r *Name
-	var i, j int
 
 	findLabels(ast.Root.Children, &labels)
 	findRefs(ast.Root.Children, &refs)
@@ -55,32 +51,43 @@ func resolveIncludes(ast *AST, c *Config) (err error) {
 	if len(c.Include) == 0 {
 		// We have unresolved references, but no places to look
 		// for their implementation. This constitutes a booboo.
-		r = refs[0]
-		return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
-			"Undefined reference: %q", r.Data)
+		return NewParseError(ast.Files[refs[0].File()], refs[0].Line(), refs[0].Col(),
+			"Undefined reference: %q", refs[0].Data)
 	}
 
-	for i = range refs {
-		r = refs[i]
+	for i := range refs {
+		if err = loadInclude(ast, c, refs[i]); err != nil {
+			return
+		}
+	}
 
-		for j = range c.Include {
-			file = path.Join(c.Include[j], r.Data+".dasm")
-			stat, err = os.Lstat(file)
+	return
+}
 
-			if err != nil || stat.IsDir() {
-				return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
-					"Undefined reference: %q", r.Data)
-			}
+// loadInclude tries to load the given reference as an include file.
+// Parses it into the supplied AST and verifies that it contains what
+// we are looking for.
+func loadInclude(ast *AST, c *Config, r *Name) (err error) {
+	var stat os.FileInfo
+	var file string
 
-			if err = readSource(ast, file); err != nil {
-				return
-			}
+	for i := range c.Include {
+		file = path.Join(c.Include[i], r.Data+".dasm")
+		stat, err = os.Lstat(file)
 
-			if !includeHasLabel(ast, file, r.Data) {
-				return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
-					"Undefined reference: %q. Include file was found, but "+
-						"it did not define the desired label.", r.Data)
-			}
+		if err != nil || stat.IsDir() {
+			return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+				"Undefined reference: %q", r.Data)
+		}
+
+		if err = readSource(ast, file); err != nil {
+			return
+		}
+
+		if !includeHasLabel(ast, file, r.Data) {
+			return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+				"Undefined reference: %q. Include file was found, but "+
+					"it did not define the desired label.", r.Data)
 		}
 	}
 
