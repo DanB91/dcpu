@@ -4,10 +4,8 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -21,22 +19,27 @@ const (
 )
 
 func main() {
-	var buf bytes.Buffer
 	var err error
+	var ast AST
 
 	cfg := parseArgs()
 
-	if err = collectFiles(&buf, cfg.Input); err != nil {
-		fmt.Fprintf(os.Stderr, "Collect source: %v\n", err)
+	if err = parseFiles(&ast, cfg.Input); err != nil {
+		fmt.Fprintf(os.Stderr, "Parsing source: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s\n", buf.String())
+	switch cfg.Mode {
+	case ModeAssemble:
+	case ModeDumpAST:
+		fmt.Fprintf(os.Stdout, ast.Dump())
+		os.Exit(0)
+	}
 }
 
-// collectFiles takes the input files and loads their contents
-// into the supplied buffer.
-func collectFiles(w io.Writer, files []string) (err error) {
+// parseFiles takes the input files and parses their contents into
+// the given AST.
+func parseFiles(ast *AST, files []string) (err error) {
 	var fd *os.File
 
 	for i := range files {
@@ -44,11 +47,12 @@ func collectFiles(w io.Writer, files []string) (err error) {
 			return
 		}
 
-		io.Copy(w, fd)
+		err = ast.Parse(fd, files[i])
 		fd.Close()
 
-		// Ensure file content is delimited by a newline.
-		w.Write([]byte{'\n'})
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -56,12 +60,13 @@ func collectFiles(w io.Writer, files []string) (err error) {
 
 // process commandline arguments.
 func parseArgs() *Config {
-	var version, help bool
+	var version, help, dumpast bool
 	var include string
 
+	flag.BoolVar(&dumpast, "a", false, "Dump the source code parse tree to stdout.")
 	flag.BoolVar(&help, "h", false, "Display this help.")
-	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
+	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.Parse()
 
 	if version {
@@ -76,6 +81,10 @@ func parseArgs() *Config {
 	}
 
 	c := NewConfig()
+
+	if dumpast {
+		c.Mode = ModeDumpAST
+	}
 
 	// Collect source files
 	root, err := os.Getwd()

@@ -1,0 +1,96 @@
+; Find display
+  set a, 0xf615
+  set b, 0x7349
+  jsr hw_detect
+  set [display], a
+  
+; Find keyboard
+  set a, 0x7406
+  set b, 0x30cf
+  jsr hw_detect
+  set [keyboard], a
+  
+; Find clock
+  set a, 0xb402
+  set b, 0x12d0
+  jsr hw_detect
+  set [clock], a
+
+; map vidmem
+  set a, 0
+  set b, [vidmem]
+  hwi [display]
+
+; set border colour
+  set a, 3
+  set b, 9 ; lightblue
+  hwi [display]
+
+  set a, [vidmem]
+  set b, a
+  add b, [screenSize]
+  set c, 0x9120
+  jsr disp_clear
+
+; println(disp_label)
+  set a, 0x21
+  add a, [vidmem]
+  set b, strDisplay
+  set c, 0x9100
+  jsr printLn
+
+
+; printHex(disp_address)
+  set a, 0x2c
+  add a, [vidmem]
+  set b, [display]
+  jsr printHex
+
+
+; println(keyboard_label)
+  set a, 0x41
+  add a, [vidmem]
+  set b, strKeyboard
+  jsr printLn
+
+
+; printHex(keyboard_address)
+  set a, 0x4c
+  add a, [vidmem]
+  set b, [keyboard]
+  jsr printHex
+
+
+; println(clock_label)
+  set a, 0x61
+  add a, [vidmem]
+  set b, strClock
+  jsr printLn
+
+
+; printHex(clock_address)
+  set a, 0x6c
+  add a, [vidmem]
+  set b, [clock]
+  jsr printHex
+
+  sub pc, 1
+
+; Program data for various purposes.
+:strDisplay
+  dat "* Display: ", 0
+:strKeyboard
+  dat "* Keyboard: ", 0
+:strClock
+  dat "* Clock: ", 0
+:vidmem
+  dat 0x8000
+:display
+  dat 0
+:keyboard
+  dat 0
+:clock
+  dat 0
+:screenSize
+  dat 0x182
+
