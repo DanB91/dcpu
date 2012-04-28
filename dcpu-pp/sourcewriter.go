@@ -10,8 +10,6 @@ import (
 // writeSource writes the given AST out as assembly source to the
 // supplied writer. It optionally scrambles label names and references
 // to them.
-func writeSource(w io.WriteCloser, ast *AST) (err error) {
-	defer w.Close()
-
+func writeSource(w io.Writer, ast *AST) (err error) {
 	return
 }

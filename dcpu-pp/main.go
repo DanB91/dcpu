@@ -23,6 +23,7 @@ func main() {
 	var ast AST
 
 	cfg := parseArgs()
+	defer cfg.Output.Close()
 
 	if err = parseInput(&ast, cfg); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	if cfg.DumpAST {
-		fmt.Fprintf(os.Stdout, ast.Dump())
+		fmt.Fprintf(cfg.Output, ast.Dump())
 
 	} else {
 		if err = writeSource(cfg.Output, &ast); err != nil {
