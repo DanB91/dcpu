@@ -5,7 +5,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"strconv"
 	"unicode/utf8"
@@ -15,21 +14,6 @@ import (
 type AST struct {
 	Files []string // List of files names from which this tree was built.
 	Root  *Block   // Root node.
-}
-
-// Dump yields a human-readeable string representation of the entire AST.
-func (a *AST) Dump() string {
-	var b bytes.Buffer
-
-	b.WriteString("Files:\n")
-
-	for i := range a.Files {
-		fmt.Fprintf(&b, "  %d - %s\n", i, a.Files[i])
-	}
-
-	b.WriteString("Nodes:\n")
-	b.WriteString(a.Root.Dump(""))
-	return b.String()
 }
 
 // Parse takes the given input stream and merges its AST nodes with

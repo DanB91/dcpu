@@ -3,8 +3,6 @@
 
 package main
 
-import "fmt"
-
 // String holds a string value.
 type String struct {
 	*NodeBase
@@ -17,11 +15,4 @@ func NewString(file, line, col int, data string) *String {
 		NewNodeBase(file, line, col),
 		data,
 	}
-}
-
-func (n *String) Dump(pad string) string {
-	if len(n.Data) > 20 {
-		return fmt.Sprintf("%s %T(%.20q...)\n", n.NodeBase.Dump(pad), n, n.Data)
-	}
-	return fmt.Sprintf("%s %T(%q)\n", n.NodeBase.Dump(pad), n, n.Data)
 }

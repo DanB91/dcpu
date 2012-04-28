@@ -3,16 +3,12 @@
 
 package main
 
-import "fmt"
-
 // Represents a single AST node.
 type Node interface {
 	File() int
 	Line() int
 	Col() int
-
-	// Used for debug purposes
-	Dump(pad string) string
+	Base() *NodeBase
 }
 
 // Base-type for all nodes. This takes care of some common
@@ -27,10 +23,7 @@ func NewNodeBase(file, line, col int) *NodeBase {
 	return &NodeBase{file, line, col}
 }
 
-func (n *NodeBase) File() int { return n.file }
-func (n *NodeBase) Line() int { return n.line }
-func (n *NodeBase) Col() int  { return n.col }
-
-func (n *NodeBase) Dump(pad string) string {
-	return fmt.Sprintf("%s%02d:%04d:%03d", pad, n.file, n.line, n.col)
-}
+func (n *NodeBase) File() int       { return n.file }
+func (n *NodeBase) Line() int       { return n.line }
+func (n *NodeBase) Col() int        { return n.col }
+func (n *NodeBase) Base() *NodeBase { return n }

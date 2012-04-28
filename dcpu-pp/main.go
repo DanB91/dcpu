@@ -31,14 +31,9 @@ func main() {
 	}
 
 	if cfg.DumpAST {
-		fmt.Fprintf(cfg.Output, ast.Dump())
-
+		writeAst(cfg.Output, &ast)
 	} else {
-		if err = writeSource(cfg.Output, &ast); err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-			os.Exit(1)
-		}
-
+		writeSource(cfg.Output, &ast)
 	}
 }
 

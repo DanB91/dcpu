@@ -3,8 +3,6 @@
 
 package main
 
-import "fmt"
-
 // An Operator holds an arithmatic operator.
 type Operator struct {
 	*NodeBase
@@ -16,8 +14,4 @@ func NewOperator(file, line, col int, value string) *Operator {
 		NewNodeBase(file, line, col),
 		value,
 	}
-}
-
-func (n *Operator) Dump(pad string) string {
-	return fmt.Sprintf("%s %T(%q)\n", n.NodeBase.Dump(pad), n, n.Data)
 }

@@ -3,10 +3,7 @@
 
 package main
 
-import (
-	"fmt"
-	"strconv"
-)
+import "strconv"
 
 // Number holds a numerical value.
 type Number struct {
@@ -20,10 +17,6 @@ func NewNumber(file, line, col int, data Word) *Number {
 		NodeBase: NewNodeBase(file, line, col),
 		Data:     data,
 	}
-}
-
-func (n *Number) Dump(pad string) string {
-	return fmt.Sprintf("%s %T(0x%04x)\n", n.NodeBase.Dump(pad), n, n.Data)
 }
 
 // Parse attempts to process the given data as a number.
