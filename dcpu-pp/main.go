@@ -15,7 +15,7 @@ import (
 
 const (
 	AppName    = "dcpu-pp"
-	AppVersion = "0.2"
+	AppVersion = "0.3"
 )
 
 func main() {
@@ -29,32 +29,35 @@ func main() {
 		os.Exit(1)
 	}
 
-	switch cfg.Mode {
-	case ModeAssemble:
-		if err = writeSource(cfg.Output, &ast, cfg.Mode); err != nil {
+	if cfg.DumpAST {
+		fmt.Fprintf(os.Stdout, ast.Dump())
+
+	} else {
+		if err = writeSource(cfg.Output, &ast); err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
 
-	case ModeDumpAST:
-		fmt.Fprintf(os.Stdout, ast.Dump())
-		os.Exit(0)
 	}
 }
 
 // process commandline arguments.
 func parseArgs() *Config {
-	var version, help, dumpast, scramble bool
+	var version, help bool
 	var include, output string
 	var root string
 	var err error
 
-	flag.BoolVar(&dumpast, "a", false, "Dump the source code parse tree to stdout.")
+	c := NewConfig()
+
+	flag.BoolVar(&c.DumpAST, "a", false, "Dump the source code parse tree to stdout.")
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
 	flag.StringVar(&output, "o", "", "Name of destination file. Defaults to stdout.")
-	flag.BoolVar(&scramble, "s", false, "Scramble label names and references on output.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
+
+	CreateProcessorFlags()
+
 	flag.Parse()
 
 	if version {
@@ -66,18 +69,6 @@ func parseArgs() *Config {
 	if help {
 		flag.Usage()
 		os.Exit(0)
-	}
-
-	c := NewConfig()
-
-	if dumpast {
-		c.Mode = ModeDumpAST
-	} else {
-		c.Mode = ModeAssemble
-	}
-
-	if scramble {
-		c.Mode |= ModeScramble
 	}
 
 	if len(output) > 0 {
