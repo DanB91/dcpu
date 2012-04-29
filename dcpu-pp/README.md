@@ -1,14 +1,14 @@
 ## DCPU Pre-processor
 
-This app is a DCPU Assembly pre-processor. It parses the given input file(s).
-When run in a project dir, it considers all `.dasm` files in that
-directory to be part of the same project.
+This app is a DCPU Assembly pre-processor.
+It parses the given input file(s) and spits out either a single assembly source
+file or an AST.
 
 ### External references
 
 Any references to undefined labels are assumed to be defined
-in external files names `<labelname>.dasm`. The 'assembler' looks in a
-predefined path to resolve these files. It then simply includes the file
+in external files names `$labelname.dasm`. The 'assembler' looks in
+predefined paths to resolve these files. It then simply includes the file
 contents into the output source file. This allows us to keep source files
 small and manageable. The filenames are expected to be all lower-case.
 
@@ -42,7 +42,15 @@ For example, the `-scramble` switch below controls the Scramble processor.
 
 ### Usage
 
-    go get github.com/jteeuwen/dcpu/dcpu-pp
+    $ go get github.com/jteeuwen/dcpu/dcpu-pp
+
+Invocation for code in a single project directory is as follows.
+
+    $ dcpu-pp -o output.dasm main.dasm
+
+To build the same code using the scramble and strip processors:
+
+    $ dcpu-pp -o output.dasm -scramble -strip main.dasm
 
 ### License
 

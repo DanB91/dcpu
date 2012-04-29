@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -46,7 +45,6 @@ func main() {
 func parseArgs() *Config {
 	var version, help bool
 	var include, output string
-	var root string
 	var err error
 
 	c := NewConfig()
@@ -68,9 +66,17 @@ func parseArgs() *Config {
 	}
 
 	if help {
-		flag.Usage()
+		fmt.Fprintf(os.Stdout, "Usage: %s [options] file\n", os.Args[0])
+		flag.PrintDefaults()
 		os.Exit(0)
 	}
+
+	if flag.NArg() == 0 {
+		fmt.Fprintf(os.Stderr, "No source file.\n")
+		os.Exit(1)
+	}
+
+	c.Input = path.Clean(flag.Arg(0))
 
 	if len(output) > 0 {
 		output = path.Clean(output)
@@ -80,29 +86,6 @@ func parseArgs() *Config {
 			fmt.Fprintf(os.Stderr, "Destination file: %v\n", err)
 			os.Exit(1)
 		}
-	}
-
-	// Collect source files
-	root, err = os.Getwd()
-	if err == nil {
-		err = filepath.Walk(root, func(file string, info os.FileInfo, err error) error {
-			if info.IsDir() || path.Ext(file) != ".dasm" {
-				return nil
-			}
-
-			c.Input = append(c.Input, file)
-			return nil
-		})
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Collect source files: %v\n", err)
-			os.Exit(1)
-		}
-	}
-
-	if len(c.Input) == 0 {
-		fmt.Fprintf(os.Stderr, "No source files.\n")
-		os.Exit(1)
 	}
 
 	// Parse include paths.

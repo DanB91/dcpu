@@ -11,10 +11,8 @@ import (
 // parseInput takes the input files and parses their contents into
 // the given AST.
 func parseInput(ast *AST, c *Config) (err error) {
-	for i := range c.Input {
-		if err = readSource(ast, c.Input[i]); err != nil {
-			return
-		}
+	if err = readSource(ast, c.Input); err != nil {
+		return
 	}
 
 	return resolveIncludes(ast, c)

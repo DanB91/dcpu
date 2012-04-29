@@ -6,13 +6,14 @@ package main
 import (
 	"io"
 	"os"
+	"path"
 )
 
 // Config holds configuration and state data for the preprocessor.
 type Config struct {
 	Include []string       // List of paths where we look to resolve source file references.
-	Input   []string       // Names of input source files.
 	Output  io.WriteCloser // Output source writer. Defaults to stdout.
+	Input   string         // Name of input source file.
 	DumpAST bool           // Whether to dump the final AST, or assembly source.
 }
 
@@ -21,5 +22,11 @@ func NewConfig() *Config {
 	c := new(Config)
 	c.Output = os.Stdout
 	c.DumpAST = false
+
+	wd, err := os.Getwd()
+	if err == nil {
+		c.Include = append(c.Include, path.Clean(wd))
+	}
+
 	return c
 }
