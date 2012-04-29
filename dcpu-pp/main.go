@@ -71,6 +71,7 @@ func parseArgs() *Config {
 		os.Exit(0)
 	}
 
+	// See if have an input file.
 	if flag.NArg() == 0 {
 		fmt.Fprintf(os.Stderr, "No source file.\n")
 		os.Exit(1)
@@ -78,12 +79,13 @@ func parseArgs() *Config {
 
 	c.Input = path.Clean(flag.Arg(0))
 
+	// A valid output path?
 	if len(output) > 0 {
 		output = path.Clean(output)
 		c.Output, err = os.Create(output)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Destination file: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Output file: %v\n", err)
 			os.Exit(1)
 		}
 	}

@@ -83,10 +83,16 @@ func loadInclude(ast *AST, c *Config, r *Name) (err error) {
 			return
 		}
 
+		// Test if the code actually contains the label we are looking for.
 		if !includeHasLabel(ast, file, r.Data) {
 			return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
 				"Undefined reference: %q. Include file was found, but "+
 					"it did not define the desired label.", r.Data)
+		}
+
+		// This new file may hold its own include requirements.
+		if err = resolveIncludes(ast, c); err != nil {
+			return
 		}
 
 		return
