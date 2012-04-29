@@ -37,9 +37,8 @@
       set pc, device_detect_ret
 
   sub z, 1
-  ifu z, 0
-    set pc, device_detect_ret
-  set pc, device_detect_loop
+  ifa z, 0xffff
+    set pc, device_detect_loop
 
 :device_detect_ret
   set a, z

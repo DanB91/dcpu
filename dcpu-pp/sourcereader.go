@@ -4,8 +4,9 @@
 package main
 
 import (
+	"io"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 // parseInput takes the input files and parses their contents into
@@ -68,38 +69,44 @@ func resolveIncludes(ast *AST, c *Config) (err error) {
 // Parses it into the supplied AST and verifies that it contains what
 // we are looking for.
 func loadInclude(ast *AST, c *Config, r *Name) (err error) {
-	var stat os.FileInfo
 	var file string
 
+	name := r.Data + ".dasm"
+	walker := func(f string, info os.FileInfo, err error) error {
+		if filepath.Base(f) == name {
+			file = f
+			return io.EOF // Signal walker to stop.
+		}
+
+		return nil
+	}
+
 	for i := range c.Include {
-		file = path.Join(c.Include[i], r.Data+".dasm")
-		stat, err = os.Lstat(file)
+		filepath.Walk(c.Include[i], walker)
 
-		if err != nil || stat.IsDir() {
-			continue
+		if len(file) > 0 {
+			break
 		}
+	}
 
-		if err = readSource(ast, file); err != nil {
-			return
-		}
+	if len(file) == 0 {
+		return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+			"Undefined reference: %q", r.Data)
+	}
 
-		// Test if the code actually contains the label we are looking for.
-		if !includeHasLabel(ast, file, r.Data) {
-			return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
-				"Undefined reference: %q. Include file was found, but "+
-					"it did not define the desired label.", r.Data)
-		}
-
-		// This new file may hold its own include requirements.
-		if err = resolveIncludes(ast, c); err != nil {
-			return
-		}
-
+	if err = readSource(ast, file); err != nil {
 		return
 	}
 
-	return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
-		"Undefined reference: %q", r.Data)
+	// Test if the code actually contains the label we are looking for.
+	if !includeHasLabel(ast, file, r.Data) {
+		return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+			"Undefined reference: %q. Include file was found, but "+
+				"it did not define the desired label.", r.Data)
+	}
+
+	// This new file may hold its own include requirements.
+	return resolveIncludes(ast, c)
 }
 
 // findUndefinedRefs compares both given lists of labels and

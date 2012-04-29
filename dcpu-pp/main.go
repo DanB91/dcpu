@@ -14,7 +14,7 @@ import (
 
 const (
 	AppName    = "dcpu-pp"
-	AppVersion = "0.4"
+	AppVersion = "0.4.1"
 )
 
 func main() {
