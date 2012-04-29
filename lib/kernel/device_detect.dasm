@@ -1,0 +1,46 @@
+; device_index device_detect( device_id )
+;
+; This finds a specific hardware device index
+; based on the device ID you specify in registers A and B.
+;
+; It returns the device index in A.
+; A will be -1 if the device was not found.
+;
+;
+; ## Example usage:
+;
+;    ...
+;    set a, 0xf615
+;    set b, 0x7349
+;    jsr device_detect
+;    
+;    ifu a, 0
+;      set pc, device_not_found
+;    ...
+;
+;
+; ## Version History:
+;   0.1.1: Fix check for negative (signed) loop counter.
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:device_detect
+  set i, a
+  set j, b
+  hwn z
+  sub z, 1
+
+:device_detect_loop
+  hwq z
+
+  ife a, i
+    ife b, j
+      set pc, device_detect_ret
+
+  sub z, 1
+  ifu z, 0
+    set pc, device_detect_ret
+  set pc, device_detect_loop
+
+:device_detect_ret
+  set a, z
+  set pc, pop

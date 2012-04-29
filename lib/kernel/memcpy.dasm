@@ -1,0 +1,57 @@
+; void* memcpy (void* dst, void* src, size_t num);
+;
+; Copies the values of num words from the location pointed by src
+; directly to the memory block pointed by dst.
+;
+; The function does not check for any terminating null character in source;
+; it always copies exactly num words.
+;
+; It returns the original ptr address in A.
+; It also does bounds checking. We will never copy to/from an address
+; beyond memory capacity.
+;
+; ## Example usage:ptr
+;
+;    ...
+;    set a, 0x8000
+;    set b, [myString]
+;    set c, 0xa
+;    jsr memcpy
+;    ...
+;
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:memcpy
+  set i, a
+  set j, b
+
+; Check for destination bounds overflow.
+:memcpy_check_dst
+  set x, i
+  add x, c
+  ife 0, ex
+     set pc, memcpy_check_src
+
+  set c, 0xffff
+  sub c, i
+  add c, 1
+  
+; Check for source bounds overflow.
+:memcpy_check_src
+  set x, j
+  add x, c
+  ife 0, ex
+     set pc, memcpy_loop
+
+  set c, 0xffff
+  sub c, i
+  add c, 1
+
+:memcpy_loop
+  sti [i], [j]
+  sub c, 1
+  ife c, 0
+    set pc, pop
+  set pc, memcpy_loop

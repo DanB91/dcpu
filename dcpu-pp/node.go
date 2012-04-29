@@ -11,6 +11,7 @@ type Node interface {
 	Base() *NodeBase
 }
 
+// Represents a node that has child nodes.
 type NodeCollection interface {
 	Node
 	Children() []Node
