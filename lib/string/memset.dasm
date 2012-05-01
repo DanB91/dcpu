@@ -1,8 +1,7 @@
 ; void* memset (void* ptr, int value, size_t num);
 ;
 ; Sets the first num words of the block of memory pointed by ptr to the
-; specified value. This performs an overflow check on ptr+num and ensures
-; we do not go beyond memory bounds.
+; specified value.
 ;
 ; It returns the original ptr address in A.
 ;
@@ -17,17 +16,12 @@
 
   set push, a ; Save original address.
 
-  sub c, 1
-  add c, a  ; Set c to end address (ptr + num).
-  ife 1, ex ; Check for overflow.
-     set c, 0xffff
-
 :memset_loop
   set [a], b
-  ife a, c
-    set pc, memset_end
   add a, 1
-  set pc, memset_loop
+  sub c, 1
+  ifg c, 0
+    set pc, memset_loop
 
 :memset_end
   set a, pop ; Restore original address.
