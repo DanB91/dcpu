@@ -3,7 +3,7 @@
 ; Sets the first num words of the block of memory pointed by ptr to the
 ; specified value.
 ;
-; It returns the original ptr address in A.
+; It returns the original ptr address.
 ;
 ;
 ; ## Version History:
