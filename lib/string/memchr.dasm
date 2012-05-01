@@ -17,14 +17,12 @@
 
 :memchr_loop
   ife [a], b
-    set pc, memchr_ret
+    set pc, pop
   add a, 1
   sub c, 1
   ifg c, 0
     set pc, memchr_loop
 
   set a, 0
-
-:memchr_ret
   set pc, pop
 
