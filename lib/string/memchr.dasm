@@ -1,0 +1,30 @@
+; void * memchr ( void * ptr, int value, size_t num );
+;
+; Searches within the first num bytes of the block of memory pointed
+; by ptr for the first occurrence of value (interpreted as an
+; unsigned char), and returns a pointer to it.
+;
+; Returns a pointer to the first occurrence of value in the block of
+; memory pointed by ptr. If the value is not found, the function
+; returns NULL.
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:memchr
+  ife 0, c ; num is zero -- No compare needed.
+    set pc, pop
+
+:memchr_loop
+  ife [a], b
+    set pc, memchr_ret
+  add a, 1
+  sub c, 1
+  ifg c, 0
+    set pc, memchr_loop
+
+  set a, 0
+
+:memchr_ret
+  set pc, pop
+

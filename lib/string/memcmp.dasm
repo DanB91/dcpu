@@ -1,0 +1,37 @@
+; int memcmp ( const void * ptr1, const void * ptr2, size_t num );
+;
+; Compares the first num bytes of the block of memory pointed by ptr1
+; to the first num bytes pointed by ptr2, returning zero if they all
+; match or a value different from zero representing which 
+; is greater if they do not.
+;
+; Returns an integral value indicating the relationship between the content
+; of the memory blocks:
+;
+; - A zero value indicates that the contents of both memory blocks are equal.
+; - A value greater than zero indicates that the first byte that does not
+;   match in both memory blocks has a greater value in ptr1 than in ptr2
+;   as if evaluated as unsigned char values; And a value less than zero
+;   indicates the opposite.
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:memcmp
+  ife 0, c ; Size is zero -- No compare needed.
+    set pc, pop
+
+:memcmp_loop
+  ifn [a], [b]
+    set pc, memcmp_ret
+  add a, 1
+  add b, 1
+  sub c, 1
+  ifg c, 0
+    set pc, memcmp_loop
+
+:memcmp_ret
+  set a, [a]
+  sub a, [b]
+  set pc, pop
+
