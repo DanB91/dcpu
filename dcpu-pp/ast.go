@@ -12,7 +12,7 @@ import (
 
 // An Abstract Syntax Tree.
 type AST struct {
-	Files []string // List of files names from which this tree was built.
+	Files []string // List of file names from which this tree was built.
 	Root  *Block   // Root node.
 }
 

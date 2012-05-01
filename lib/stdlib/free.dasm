@@ -1,0 +1,13 @@
+; void free ( void * ptr );
+;
+; A block of memory previously allocated using a call to malloc, calloc or
+; realloc is deallocated, making it available again for further allocations.
+; 
+; Notice that this function leaves the value of ptr unchanged, hence it still
+; points to the same (now invalid) location, and not to the null pointer.
+;
+; ## Version History:
+;   0.1.0: Initial definition for spec 1.7.
+;
+:free
+  set pc, pop

@@ -1,0 +1,17 @@
+; char * getenv ( const char * name );
+;
+; Retrieves a C string containing the value of the environment variable
+; whose name is specified as argument. If the requested variable is not
+; part of the environment list, the function returns a NULL pointer.
+; 
+; The string pointed by the pointer returned by this function shall
+; not be modified by the program.
+; 
+; The same memory location may be used in subsequent calls to getenv,
+; overwriting the previous content.
+;
+; ## Version History:
+;   0.1.0: Initial definition for spec 1.7.
+;
+:getenv
+  set pc, pop

@@ -1,0 +1,17 @@
+; void abort ( void );
+;
+; Aborts the process with an abnormal program termination.
+; The function generates the SIGABRT signal, which by default causes the
+; program to terminate returning an unsuccessful termination error code
+; to the host environment.
+; 
+; The program is terminated without executing destructors for objects of
+; automatic or static storage duration, and without calling any atexit function.
+; 
+; The function never returns to its caller.
+;
+; ## Version History:
+;   0.1.0: Initial definition for spec 1.7.
+;
+:abort
+  sub pc, 1

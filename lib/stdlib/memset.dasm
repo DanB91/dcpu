@@ -6,15 +6,6 @@
 ;
 ; It returns the original ptr address in A.
 ;
-; ## Example usage:ptr
-;
-;    ...
-;    set a, 0x8000
-;    set b, 0x9120
-;    set c, 0x180
-;    jsr memset
-;    ...
-;
 ;
 ; ## Version History:
 ;   0.1.1: Return original pointer value.

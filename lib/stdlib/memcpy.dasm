@@ -10,15 +10,6 @@
 ; It also does bounds checking. We will never copy to/from an address
 ; beyond memory capacity.
 ;
-; ## Example usage:ptr
-;
-;    ...
-;    set a, 0x8000
-;    set b, [myString]
-;    set c, 0xa
-;    jsr memcpy
-;    ...
-;
 ;
 ; ## Version History:
 ;   0.1.0: Initial implementation for spec 1.7.

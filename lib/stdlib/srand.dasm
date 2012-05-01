@@ -1,0 +1,36 @@
+; void srand ( unsigned int seed );
+;
+; The pseudo-random number generator is initialized using the
+; argument passed as seed.
+; 
+; For every different seed value used in a call to srand, the
+; pseudo-random number generator can be expected to generate
+; a different succession of results in the subsequent calls to rand.
+; 
+; Two different initializations with the same seed, instructs
+; the pseudo-random generator to generate the same succession of
+; results for the subsequent calls to rand in both cases.
+; 
+; If seed is set to 1, the generator is reinitialized to its
+; initial value and produces the same values as before any
+; call to rand or srand.
+; 
+; In order to generate random-like numbers, srand is usually initialized
+; to some distinctive value, like those related with the execution
+; time. For example, the value returned by the function time
+; is different each second, which is distinctive enough for
+; most randoming needs.
+;
+; ## Version History:
+;   0.1.0: Initial definition for spec 1.7.
+;
+:srand
+  set pc, pop
+
+; The current rng seed. This value should be initialized to
+; whatever srand_initial_seed contains.
+:srand_seed dat 0
+
+; When srand is called with value 1, the rng is reset to the default
+; seed, determined at initialization.
+:srand_initial_seed dat 0

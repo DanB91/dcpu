@@ -1,0 +1,41 @@
+; void * realloc ( void * ptr, size_t size );
+; 
+; The size of the memory block pointed to by the ptr parameter is changed
+; to the size words, expanding or reducing the amount of memory available
+; in the block.
+; 
+; The function may move the memory block to a new location, in which case
+; the new location is returned. The content of the memory block
+; is preserved up to the lesser of the new and old sizes, even
+; if the block is moved. If the new size is larger,
+; the value of the newly allocated portion is indeterminate.
+; 
+; In case that ptr is NULL, the function behaves exactly as malloc,
+; assigning a new block of size words and returning a pointer to
+; the beginning of it.
+; 
+; In case that the size is 0, the memory previously allocated in ptr
+; is deallocated as if a call to free was made, and a NULL pointer
+; is returned.
+; 
+; ## Version History:
+;   0.1.0: Initial definition for spec 1.7.
+;
+:realloc
+  ; If ptr is NULL, we simply are an alias for malloc()
+  ifn 0, a
+    set pc, realloc_skip_malloc
+
+  set a, b
+  set pc, malloc
+
+:realloc_skip_malloc
+  ; If size is 0, we are an alias for free()
+  ifn 0, b
+    set pc, realloc_skip_free
+
+  set pc, free
+
+:realloc_skip_free
+  set pc, pop
+

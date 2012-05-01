@@ -1,0 +1,13 @@
+; void * calloc ( size_t num, size_t size );
+;
+; Allocates a block of memory for an array of num elements, each of them
+; size words long, and initializes all its bits to zero.
+;
+; The effective result is the allocation of an zero-initialized memory
+; block of (num * size) words.
+;
+; ## Version History:
+;   0.1.0: Initial definition for spec 1.7.
+;
+:calloc
+  set pc, pop
