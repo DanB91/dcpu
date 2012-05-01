@@ -40,7 +40,7 @@
   set i ,a
   set j, b
 
-  ; Destructive overlap == dst > src && dest < src + n.
+  ; Destructive overlap == dst >= src && dest < src + n.
   ifl i, j
     set pc, memmove_no_overlap
 
