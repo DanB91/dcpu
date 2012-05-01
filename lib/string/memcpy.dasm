@@ -1,15 +1,21 @@
 ; void* memcpy (void* dst, void* src, size_t num);
 ;
-; Copies the values of num words from the location pointed by src
-; directly to the memory block pointed by dst.
+; Copies the values of num bytes from the location pointed by source
+; directly to the memory block pointed by destination.
 ;
-; The function does not check for any terminating null character in source;
-; it always copies exactly num words.
+; The underlying type of the objects pointed by both the source and
+; destination pointers are irrelevant for this function; The result
+; is a binary copy of the data.
 ;
-; It returns the original ptr address in A.
-; It also does bounds checking. We will never copy to/from an address
-; beyond memory capacity.
+; The function does not check for any terminating null character
+; in source - it always copies exactly num bytes.
 ;
+; To avoid overflows, the size of the arrays pointed by both the
+; destination and source parameters, shall be at least num bytes,
+; and should not overlap (for overlapping memory blocks, memmove
+; is a safer approach).
+;
+; Returns destination address.
 ;
 ; ## Version History:
 ;   0.1.0: Initial implementation for spec 1.7.
@@ -18,31 +24,9 @@
   set i, a
   set j, b
 
-; Check for destination bounds overflow.
-:memcpy_check_dst
-  set x, i
-  add x, c
-  ife 0, ex
-     set pc, memcpy_check_src
-
-  set c, 0xffff
-  sub c, i
-  add c, 1
-  
-; Check for source bounds overflow.
-:memcpy_check_src
-  set x, j
-  add x, c
-  ife 0, ex
-     set pc, memcpy_loop
-
-  set c, 0xffff
-  sub c, i
-  add c, 1
-
 :memcpy_loop
   sti [i], [j]
   sub c, 1
-  ife c, 0
-    set pc, pop
-  set pc, memcpy_loop
+  ifg c, 0
+     set pc, memcpy_loop
+  set pc, pop
