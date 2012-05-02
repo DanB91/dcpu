@@ -58,6 +58,10 @@ For example, the `-scramble` and `-strip` switches below control two processors.
       -strip=false: Remove all code comments.
       -v=false: Display version information.v=false: Display version information.
 
+### Dependencies
+
+    $ go get github.com/jteeuwen/dcpu/parser
+
 ### Usage
 
     $ go get github.com/jteeuwen/dcpu/dcpu-pp

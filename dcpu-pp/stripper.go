@@ -3,6 +3,8 @@
 
 package main
 
+import dp "github.com/jteeuwen/dcpu/parser"
+
 func init() {
 	Register("strip", "Remove all code comments.", NewStripper)
 }
@@ -12,24 +14,24 @@ type Stripper struct{}
 
 func NewStripper() Processor { return new(Stripper) }
 
-func (p *Stripper) Process(ast *AST) (err error) {
+func (p *Stripper) Process(ast *dp.AST) (err error) {
 	stripComments(ast.Root)
 	return
 }
 
 // stripComments removes Comment nodes from the supplied list.
-func stripComments(n NodeCollection) {
+func stripComments(n dp.NodeCollection) {
 	list := n.Children()
 
 loop:
 	for i := range list {
 		switch tt := list[i].(type) {
-		case *Comment:
+		case *dp.Comment:
 			copy(list[i:], list[i+1:])
 			list = list[:len(list)-1]
 			goto loop
 
-		case NodeCollection:
+		case dp.NodeCollection:
 			stripComments(tt)
 		}
 	}

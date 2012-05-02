@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	dp "github.com/jteeuwen/dcpu/parser"
 	"os"
 	"path"
 	"runtime"
@@ -19,7 +20,7 @@ const (
 
 func main() {
 	var err error
-	var ast AST
+	var ast dp.AST
 
 	cfg := parseArgs()
 	defer cfg.Output.Close()

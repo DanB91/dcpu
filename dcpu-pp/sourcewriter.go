@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	dp "github.com/jteeuwen/dcpu/parser"
 	"io"
 )
 
@@ -18,36 +19,36 @@ var (
 )
 
 // writeSource writes the given AST out as assembly source code.
-func writeSource(w io.Writer, a *AST) {
+func writeSource(w io.Writer, a *dp.AST) {
 	for _, v := range a.Root.Children() {
 		writeSourceNode(w, v)
 	}
 }
 
-func writeSourceNode(w io.Writer, n Node) {
+func writeSourceNode(w io.Writer, n dp.Node) {
 	switch tt := n.(type) {
-	case *Block:
+	case *dp.Block:
 		writeSourceBlock(w, tt)
-	case *Comment:
+	case *dp.Comment:
 		writeSourceComment(w, tt)
-	case *Expression:
+	case *dp.Expression:
 		writeSourceExpression(w, tt)
-	case *Instruction:
+	case *dp.Instruction:
 		writeSourceInstruction(w, tt)
-	case *Label:
+	case *dp.Label:
 		writeSourceLabel(w, tt)
-	case *Name:
+	case *dp.Name:
 		writeSourceLiteral(w, tt.Data)
-	case *Number:
+	case *dp.Number:
 		writeSourceNumber(w, tt.Data)
-	case *Operator:
+	case *dp.Operator:
 		writeSourceLiteral(w, tt.Data)
-	case *String:
+	case *dp.String:
 		writeSourceString(w, tt)
 	}
 }
 
-func writeSourceBlock(w io.Writer, n *Block) {
+func writeSourceBlock(w io.Writer, n *dp.Block) {
 	w.Write(lbrack)
 
 	for _, v := range n.Children() {
@@ -57,7 +58,7 @@ func writeSourceBlock(w io.Writer, n *Block) {
 	w.Write(rbrack)
 }
 
-func writeSourceInstruction(w io.Writer, n *Instruction) {
+func writeSourceInstruction(w io.Writer, n *dp.Instruction) {
 	w.Write(dblspace)
 
 	chld := n.Children()
@@ -75,21 +76,21 @@ func writeSourceInstruction(w io.Writer, n *Instruction) {
 	w.Write(newline)
 }
 
-func writeSourceExpression(w io.Writer, n *Expression) {
+func writeSourceExpression(w io.Writer, n *dp.Expression) {
 	for _, v := range n.Children() {
 		writeSourceNode(w, v)
 	}
 }
 
-func writeSourceComment(w io.Writer, n *Comment) {
+func writeSourceComment(w io.Writer, n *dp.Comment) {
 	fmt.Fprintf(w, ";%s\n", n.Data)
 }
 
-func writeSourceLabel(w io.Writer, n *Label) {
+func writeSourceLabel(w io.Writer, n *dp.Label) {
 	fmt.Fprintf(w, ":%s\n", n.Data)
 }
 
-func writeSourceString(w io.Writer, n *String) {
+func writeSourceString(w io.Writer, n *dp.String) {
 	fmt.Fprintf(w, "%q", n.Data)
 }
 
@@ -97,6 +98,6 @@ func writeSourceLiteral(w io.Writer, s string) {
 	fmt.Fprintf(w, "%s", s)
 }
 
-func writeSourceNumber(w io.Writer, n Word) {
+func writeSourceNumber(w io.Writer, n dp.Word) {
 	fmt.Fprintf(w, "0x%x", n)
 }

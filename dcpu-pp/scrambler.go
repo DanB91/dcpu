@@ -3,7 +3,10 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	dp "github.com/jteeuwen/dcpu/parser"
+)
 
 func init() {
 	Register("scramble", "Obfuscate label names and label references.", NewScrambler)
@@ -14,9 +17,9 @@ type Scrambler struct{}
 
 func NewScrambler() Processor { return new(Scrambler) }
 
-func (p *Scrambler) Process(ast *AST) (err error) {
-	var labels []*Label
-	var refs []*Name
+func (p *Scrambler) Process(ast *dp.AST) (err error) {
+	var labels []*dp.Label
+	var refs []*dp.Name
 	var i, j int
 
 	findLabels(ast.Root.Children(), &labels)

@@ -3,11 +3,14 @@
 
 package main
 
-import "flag"
+import (
+	"flag"
+	dp "github.com/jteeuwen/dcpu/parser"
+)
 
 // Every post-processor implements this interface.
 type Processor interface {
-	Process(*AST) error
+	Process(*dp.AST) error
 }
 
 // Common constructor for new processors.
@@ -43,7 +46,7 @@ func Register(name, desc string, pf ProcessorFunc) {
 
 // Process traverses all registered processors and
 // passes the AST into them for parsing.
-func Process(ast *AST) (err error) {
+func Process(ast *dp.AST) (err error) {
 	for _, v := range processors {
 		if !v.use {
 			continue

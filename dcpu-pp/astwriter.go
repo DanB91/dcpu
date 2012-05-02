@@ -5,13 +5,14 @@ package main
 
 import (
 	"fmt"
+	dp "github.com/jteeuwen/dcpu/parser"
 	"io"
 )
 
 const PadString = "  "
 
 // writeAst writes the given AST out in human-readable form.
-func writeAst(w io.Writer, a *AST) {
+func writeAst(w io.Writer, a *dp.AST) {
 	fmt.Fprintf(w, "Files:\n")
 
 	for i := range a.Files {
@@ -22,30 +23,30 @@ func writeAst(w io.Writer, a *AST) {
 	writeAstNode(w, a.Root, "")
 }
 
-func writeAstNode(w io.Writer, n Node, pad string) {
+func writeAstNode(w io.Writer, n dp.Node, pad string) {
 	switch tt := n.(type) {
-	case NodeCollection:
+	case dp.NodeCollection:
 		writeAstCollection(w, tt, tt.Children(), pad)
-	case *Comment:
+	case *dp.Comment:
 		writeAstString(w, tt, tt.Data, pad)
-	case *Label:
+	case *dp.Label:
 		writeAstString(w, tt, tt.Data, pad)
-	case *Name:
+	case *dp.Name:
 		writeAstString(w, tt, tt.Data, pad)
-	case *Number:
+	case *dp.Number:
 		writeAstNumber(w, tt, pad)
-	case *Operator:
+	case *dp.Operator:
 		writeAstString(w, tt, tt.Data, pad)
-	case *String:
+	case *dp.String:
 		writeAstString(w, tt, tt.Data, pad)
 	}
 }
 
-func writeAstNodeBase(w io.Writer, n *NodeBase, pad string) {
-	fmt.Fprintf(w, "%s%02d:%04d:%03d", pad, n.file, n.line, n.col)
+func writeAstNodeBase(w io.Writer, n *dp.NodeBase, pad string) {
+	fmt.Fprintf(w, "%s%02d:%04d:%03d", pad, n.File(), n.Line(), n.Col())
 }
 
-func writeAstCollection(w io.Writer, n Node, l []Node, pad string) {
+func writeAstCollection(w io.Writer, n dp.Node, l []dp.Node, pad string) {
 	writeAstNodeBase(w, n.Base(), pad)
 	fmt.Fprintf(w, " %T {\n", n)
 
@@ -56,7 +57,7 @@ func writeAstCollection(w io.Writer, n Node, l []Node, pad string) {
 	fmt.Fprintf(w, "%s}\n", pad)
 }
 
-func writeAstString(w io.Writer, n Node, data, pad string) {
+func writeAstString(w io.Writer, n dp.Node, data, pad string) {
 	writeAstNodeBase(w, n.Base(), pad)
 
 	if len(data) > 20 {
@@ -66,7 +67,7 @@ func writeAstString(w io.Writer, n Node, data, pad string) {
 	}
 }
 
-func writeAstNumber(w io.Writer, n *Number, pad string) {
+func writeAstNumber(w io.Writer, n *dp.Number, pad string) {
 	writeAstNodeBase(w, n.Base(), pad)
 	fmt.Fprintf(w, " %T(0x%04x)\n", n, n.Data)
 }
