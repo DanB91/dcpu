@@ -1,0 +1,33 @@
+; int strcmp ( const char * str1, const char * str2 );
+;
+; Compares the C string str1 to the C string str2.
+; This function starts comparing the first character of each string.
+; If they are equal to each other, it continues with the following pairs
+; until the characters differ or until a terminating null-character
+; is reached.
+;
+; Returns an integral value indicating the relationship between the strings:
+;
+; - A zero value indicates that both strings are equal. 
+; - A value greater than zero indicates that the first character that
+;   does not match has a greater value in str1 than in str2; And a value
+;   less than zero indicates the opposite.
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+:strcmp
+  ifn [a], [b]
+    set pc, strcmp_ret
+  add a, 1
+  add b, 1
+  ife [a], 0
+    set pc, strcmp_ret
+  ife [b], 0
+    set pc, strcmp_ret
+  set pc, strcmp
+
+:strcmp_ret
+  set a, [a]
+  sub a, [b]
+  set pc, pop
+
