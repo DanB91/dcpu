@@ -14,8 +14,17 @@
 ;
 ; ## Dependencies
 ;   strchr.dasm
+;   strlen.dasm
 ;
 ; ## Version History:
+;   0.1.2: Fix checking of characters in str2.
+;          We want to check not just for the first occurance it finds as
+;          this may well lie beyond the index of another occuring token
+;          later on in str2.
+;
+;          Given s1="abcd" and s2="ba", The routine should not exit when
+;          it finds 'b' at position 1. Because 'a' also occurs and it's
+;          positioned lower than 'b'.
 ;   0.1.1: Simplify exit code. No need to juggle values between a/b.
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
@@ -23,15 +32,24 @@
   set push, a
   set j, b
 
+  ; Get length of a
+  jsr strlen
+  set x, a
+
 :strcspn_loop
   set a, peek
   sti b, [j]
   jsr strchr
-  ifn a, 0
+
+  ife b, 0
     set pc, strcspn_ret
-  ifg b, 0
-    set pc, strcspn_loop
+
+  ifl a, x
+    set x, a
+
+  set pc, strcspn_loop
 
 :strcspn_ret
+  set a, x
   sub a, pop
   set pc, pop
