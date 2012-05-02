@@ -1,0 +1,36 @@
+; size_t strspn ( const char * str1, const char * str2 );
+;
+; Returns the length of the initial portion of str1 which
+; consists only of characters that are part of str2.
+;
+; Returns length of the initial portion of str1 containing only
+; characters that appear in str2. Therefore, if all of the characters
+; in str1 are in str2, the function returns the length of the
+; entire str1 string, and if the first character in str1 is
+; not in str2, the function returns zero.
+;
+; ## Dependencies
+;   strchr.dasm
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strspn
+  set push, a
+  set i, a
+  set c, b
+
+:strspn_loop
+  set a, c
+  sti b, [i]
+  jsr strchr
+  ife a, 0
+    set pc, strspn_ret
+  ifg b, 0
+    set pc, strspn_loop
+
+:strspn_ret
+  set a, i
+  sub a, pop
+  sub a, 1
+  set pc, pop
