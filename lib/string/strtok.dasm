@@ -1,0 +1,77 @@
+; char * strtok ( char * str, const char * delimiters );
+;
+; A sequence of calls to this function split str into tokens,
+; which are sequences of contiguous characters separated by any of
+; the characters that are part of delimiters.
+;
+; On a first call, the function expects a C string as argument for
+; str, whose first character is used as the starting location to
+; scan for tokens. In subsequent calls, the function expects a null
+; pointer and uses the position right after the end of last token
+; as the new starting location for scanning.
+;
+; To determine the beginning and the end of a token, the function
+; first scans from the starting location for the first character
+; not contained in delimiters (which becomes the beginning of the
+; token). And then scans starting from this beginning of the token
+; for the first character contained in delimiters, which becomes
+; the end of the token.
+;
+; This end of the token is automatically replaced by a null-character
+; by the function, and the beginning of the token is returned by
+; the function.
+;
+; Once the terminating null character of str has been found in a call
+; to strtok, all subsequent calls to this function with a null pointer
+; as the first argument return a null pointer.
+;
+; ## Dependencies
+;   strcspn.dasm
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strtok
+  ; Do we have a subsequent call on the same string?
+  ife a, 0
+    set a, [strtok_ptr]
+
+  ; If we still have NULL, there is nothing left to do.
+  ife a, 0
+    set pc, pop
+
+  ; Store pointers
+  set x, a
+  set y, b
+
+  ; Skip to first delimiter occurance.
+:strtok_next_occur
+  jsr strcspn
+
+  ; No delimiter found.
+  ife a, 0
+    set pc, pop
+
+  ; If first character is a delimiter. Skip to next instance.
+  ; Otherwise start splitting.
+  ifg a, 1
+    set pc, strtok_split
+
+  set a, x
+  add a, 1
+  set pc, strtok_next_occur
+
+:strtok_split
+  add a, x
+  
+
+:strtok_ret
+  set [strtok_ptr], a ; Store current pointer for future calls.
+  set pc, pop
+
+
+; Internal pointer. Retains state across multiple calls when
+; tokenizing the same string. 
+;
+; Note that this explicitely makes the function unsafe for multi-threading.
+:strtok_ptr dat 0
