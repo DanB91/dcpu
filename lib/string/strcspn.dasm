@@ -1,0 +1,38 @@
+; size_t strcspn ( const char * str1, const char * str2 );
+;
+; Scans str1 for the first occurrence of any of the characters that
+; are part of str2, returning the number of characters of str1 read
+; before this first occurrence.
+;
+; The search includes the terminating null-characters, so the function
+; will return the length of str1 if none of the characters of str2
+; are found in str1.
+;
+; Returns the length of the initial part of str1 not containing any
+; of the characters that are part of str2. This is the length of str1
+; if none of the characters in str2 are found in str1.
+;
+; ## Dependencies
+;   strchr.dasm
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strcspn
+  set push, a
+  set j, b
+
+:strcspn_loop
+  set a, peek
+  sti b, [j]
+  jsr strchr
+  ifn a, 0
+    set pc, strcspn_ret
+  ifg b, 0
+    set pc, strcspn_loop
+
+:strcspn_ret
+  set b, a
+  sub b, pop
+  set a, b
+  set pc, pop
