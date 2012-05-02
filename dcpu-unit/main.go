@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 const (
@@ -19,17 +20,24 @@ const (
 )
 
 func main() {
+	var wg sync.WaitGroup
+
 	cfg := parseArgs()
+	log := NewLog(os.Stdout, cfg.Verbose)
 	tests := collectTests(cfg)
+
+	defer log.Close()
+	defer wg.Wait()
 
 	for {
 		select {
-		case v := <-tests:
-			if len(v) == 0 {
+		case file := <-tests:
+			if len(file) == 0 {
 				return
 			}
 
-			println(v)
+			wg.Add(1)
+			go runTest(file, &wg, log)
 		}
 	}
 }
@@ -70,6 +78,7 @@ func parseArgs() *Config {
 
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
+	flag.BoolVar(&c.Verbose, "V", false, "Verbose test output.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.Parse()
 

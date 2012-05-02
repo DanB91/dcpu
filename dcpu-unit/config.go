@@ -12,6 +12,7 @@ import (
 type Config struct {
 	Include []string // List of paths where we look to resolve source file references.
 	Input   string   // Input source directory.
+	Verbose bool     // Verbose test output.
 }
 
 // NewConfig creates a new, standard configuration instance.
