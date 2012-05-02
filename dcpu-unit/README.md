@@ -19,28 +19,20 @@ As can be seen in this repo's `lib` directory, unit tests can
 be defined for as many components as you need them. Each test comes
 with at least two files which are described below.
 
-### *.test.dasm
+### *.test
 
 These contain the actual test code that should be executed. Just like
 the dcpu-pp pre-processor, this tool automatically resolves references to
 external labels. In principle, one should use these test files to test
 the behaviour of one and only one function.
 
-For example: `lib/string/memchr.test.dasm` runs various tests to
+For example: `lib/string/memchr.test` runs various tests to
 probe the behaviour of the `memchr` function. It pushes in a set of
-values through CPU registers, calls `memchr` and then stops the test.
-
-This tool will then take all current register contents and write them
-to an output buffer. Once all tests in this file are finished, the tool
-compares the output buffer with the one defined in `memchar.cmp`.
-If they are identical, it means the tests were all successful.
-
-If there are differences, it means something went wrong. The tool will
-then spit out a warning message, telling you which test went wrong.
+values through CPU registers, calls `memchr` and then performs the unit test.
 
 Any additional data that is required by the tests, can be defined
 at the end of the source file. With the exception of the `test` instruction,
-the entire `*.test.dasm` file is a valid DASM source file.
+the entire `*.test` file is a valid DASM source file.
 
 ### *.cmp
 
@@ -60,7 +52,7 @@ avoid difficult to debug runtime errors.
 
 ### Test instruction
 
-Example code for a single unit may look like this:
+Example code for a single test unit may look like this:
 
 	set a, data
 	set b, 3
@@ -72,7 +64,7 @@ Example code for a single unit may look like this:
 
 This defines some inputs, the calls `memchr` and issues the special `test`
 instruction. It is this last instruction which denotes the end of a single
-unit. We can have arbirtarily many units in a single test file.
+unit. We can have arbitrarily many units in a single test file.
 
 It should be noted that each unit is considered a single, full program.
 When a new test starts (`test` has just been executed), all state information
@@ -89,7 +81,8 @@ When the `test` instruction is fired, the CPU performs the following steps:
 * If these lines are identical, the CPU is reset and the next unit is run.
 * If these lines are not identical, an appropriate error message is created
   and displayed. At which point, all unit testing stops and the tool exits.
-* If all tests pass successfully, the tool exits cleanly.
+
+If all tests pass successfully, the tool exits cleanly.
 
 ### Dependencies
 
