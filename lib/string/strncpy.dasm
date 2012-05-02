@@ -1,0 +1,37 @@
+; char * strncpy ( char * destination, const char * source, size_t num );
+;
+; Copies the first num characters of source to destination. If the end
+; of the source C string (which is signaled by a null-character) is
+; found before num characters have been copied, destination is padded
+; with zeros until a total of num characters have been written to it.
+;
+; No null-character is implicitly appended to the end of destination,
+; so destination will only be null-terminated if the length of the C
+; string in source is less than num.
+;
+; Returns destination address.
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strncpy
+  set i, a
+  set j, b
+
+:strncpy_loop
+  set b, [j]
+  sti [i], [j]
+  sub c, 1
+  ife b, 0
+    set pc, strncpy_pad
+  ifg c, 0
+    set pc, strncpy_loop
+  set pc, pop
+
+:strncpy_pad
+  set [i], 0
+  add i, 1
+  sub c, 1
+  ifg c, 0
+    set pc, strncpy_pad
+  set pc, pop
