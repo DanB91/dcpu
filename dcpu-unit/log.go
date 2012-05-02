@@ -30,13 +30,24 @@ func (l *Log) Close() error {
 	return l.w.Close()
 }
 
-// Write writes a formatted message into the log.
+// Error writes a formatted error message into the log.
 // This one is always printed. Regardless of the verbosity state.
 //
 // This message is added to a queue and may therefor not immediately
 // persist to the underlying writer.
-func (l *Log) Write(f string, argv ...interface{}) {
-	l.queue <- fmt.Sprintf("* %s\n", fmt.Sprintf(f, argv...))
+func (l *Log) Error(f string, argv ...interface{}) {
+	l.queue <- fmt.Sprintf("[e] %s\n", fmt.Sprintf(f, argv...))
+}
+
+// Write writes a formatted message into the log.
+// This one is printed only when Log.verbose is true.
+//
+// This message is added to a queue and may therefor not immediately
+// persist to the underlying writer.
+func (l *Log) Info(f string, argv ...interface{}) {
+	if l.verbose {
+		l.queue <- fmt.Sprintf("[i] %s\n", fmt.Sprintf(f, argv...))
+	}
 }
 
 // Debug writes a formatted debug message into the log.
@@ -46,7 +57,7 @@ func (l *Log) Write(f string, argv ...interface{}) {
 // persist to the underlying writer.
 func (l *Log) Debug(f string, argv ...interface{}) {
 	if l.verbose {
-		l.queue <- fmt.Sprintf("d %s\n", fmt.Sprintf(f, argv...))
+		l.queue <- fmt.Sprintf("[d] %s\n", fmt.Sprintf(f, argv...))
 	}
 }
 
