@@ -16,6 +16,7 @@
 ;   strchr.dasm
 ;
 ; ## Version History:
+;   0.1.1: Simplify exit code. No need to juggle values between a/b.
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcspn
@@ -32,7 +33,5 @@
     set pc, strcspn_loop
 
 :strcspn_ret
-  set b, a
-  sub b, pop
-  set a, b
+  sub a, pop
   set pc, pop
