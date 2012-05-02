@@ -18,8 +18,8 @@
   set j, b
 
 :strcpy_loop
+  set b, [j]
   sti [i], [j]
-  ifg [i], 0
-     set pc, strcpy_loop
-  set [i], 0 ; Trailing NULL
+  ifn b, 0
+    set pc, strcpy_loop
   set pc, pop
