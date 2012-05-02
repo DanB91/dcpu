@@ -1,0 +1,34 @@
+; char * strpbrk ( const char * str1, const char * str2 ); 
+;
+; Returns a pointer to the first occurrence in str1 of any of the
+; characters that are part of str2, or a null pointer if there
+; are no matches.
+;
+; The search does not include the terminating null-characters.
+;
+; Returns a pointer to the first occurrence in str1 of any of the characters
+; that are part of str2, or a null pointer if none of the characters
+; of str2 is found in str1 before the terminating null-character.
+;
+; If none of the characters of str2 is present in str1, a null
+; pointer is returned.
+;
+; ## Dependencies
+;   strchr.dasm
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strpbrk
+  set c, a
+  set j, b
+
+:strpbrk_loop
+  set a, peek
+  sti b, [j]
+  jsr strchr
+  ifn a, 0
+    set pc, pop
+  ife b, 0
+    set pc, pop
+
