@@ -29,6 +29,7 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcspn
+  set push, x
   set push, a
   set j, b
 
@@ -52,4 +53,5 @@
 :strcspn_ret
   set a, x
   sub a, pop
+  set x, pop
   set pc, pop
