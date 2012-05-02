@@ -1,0 +1,23 @@
+; size_t strlen ( const char * str );
+;
+; Returns the length of str.
+;
+; The length of a C string is determined by the terminating
+; null-character: A C string is as long as the amount of
+; characters between the beginning of the string and the
+; terminating null character.
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strlen
+  set b, a
+  set a, 0
+
+:strlen_loop
+  ife [b], 0
+    set pc, pop
+  add a, 1
+  add b, 1
+  set pc, strlen_loop
+
