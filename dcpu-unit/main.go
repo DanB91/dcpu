@@ -94,8 +94,20 @@ func parseArgs() *Config {
 	}
 
 	// See if have an input file.
-	if flag.NArg() > 0 {
-		c.Input = path.Clean(flag.Arg(0))
+	if flag.NArg() == 0 {
+		fmt.Fprintf(os.Stderr, "No source file.\n")
+		os.Exit(1)
+	}
+
+	c.Input = path.Clean(flag.Arg(0))
+
+	// Ensure we have an existing directory.
+	if stat, err := os.Lstat(c.Input); err != nil {
+		fmt.Fprintf(os.Stderr, "Input path: %v\n", err)
+		os.Exit(1)
+	} else if !stat.IsDir() {
+		fmt.Fprintf(os.Stderr, "Input path %q is not a directory.\n", c.Input)
+		os.Exit(1)
 	}
 
 	// Parse include paths.

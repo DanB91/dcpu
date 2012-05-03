@@ -80,6 +80,15 @@ func parseArgs() *Config {
 
 	c.Input = path.Clean(flag.Arg(0))
 
+	// Ensure we have an existing file.
+	if stat, err := os.Lstat(c.Input); err != nil {
+		fmt.Fprintf(os.Stderr, "Input path: %v\n", err)
+		os.Exit(1)
+	} else if stat.IsDir() {
+		fmt.Fprintf(os.Stderr, "Input path %q is not a file.\n", c.Input)
+		os.Exit(1)
+	}
+
 	// A valid output path?
 	if len(output) > 0 {
 		output = path.Clean(output)
