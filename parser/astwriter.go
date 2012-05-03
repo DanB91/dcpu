@@ -1,18 +1,18 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package main
+package parser
 
 import (
 	"fmt"
-	dp "github.com/jteeuwen/dcpu/parser"
 	"io"
 )
 
-const PadString = "  "
+// The string used for indentation in the AST writer.
+var IndentString = "  "
 
-// writeAst writes the given AST out in human-readable form.
-func writeAst(w io.Writer, a *dp.AST) {
+// WriteAst writes the given AST out in human-readable form.
+func WriteAst(w io.Writer, a *AST) {
 	fmt.Fprintf(w, "Files:\n")
 
 	for i := range a.Files {
@@ -23,41 +23,41 @@ func writeAst(w io.Writer, a *dp.AST) {
 	writeAstNode(w, a.Root, "")
 }
 
-func writeAstNode(w io.Writer, n dp.Node, pad string) {
+func writeAstNode(w io.Writer, n Node, pad string) {
 	switch tt := n.(type) {
-	case dp.NodeCollection:
+	case NodeCollection:
 		writeAstCollection(w, tt, tt.Children(), pad)
-	case *dp.Comment:
+	case *Comment:
 		writeAstString(w, tt, tt.Data, pad)
-	case *dp.Label:
+	case *Label:
 		writeAstString(w, tt, tt.Data, pad)
-	case *dp.Name:
+	case *Name:
 		writeAstString(w, tt, tt.Data, pad)
-	case *dp.Number:
+	case *Number:
 		writeAstNumber(w, tt, pad)
-	case *dp.Operator:
+	case *Operator:
 		writeAstString(w, tt, tt.Data, pad)
-	case *dp.String:
+	case *String:
 		writeAstString(w, tt, tt.Data, pad)
 	}
 }
 
-func writeAstNodeBase(w io.Writer, n *dp.NodeBase, pad string) {
+func writeAstNodeBase(w io.Writer, n *NodeBase, pad string) {
 	fmt.Fprintf(w, "%s%02d:%04d:%03d", pad, n.File(), n.Line(), n.Col())
 }
 
-func writeAstCollection(w io.Writer, n dp.Node, l []dp.Node, pad string) {
+func writeAstCollection(w io.Writer, n Node, l []Node, pad string) {
 	writeAstNodeBase(w, n.Base(), pad)
 	fmt.Fprintf(w, " %T {\n", n)
 
 	for _, v := range l {
-		writeAstNode(w, v, pad+PadString)
+		writeAstNode(w, v, pad+IndentString)
 	}
 
 	fmt.Fprintf(w, "%s}\n", pad)
 }
 
-func writeAstString(w io.Writer, n dp.Node, data, pad string) {
+func writeAstString(w io.Writer, n Node, data, pad string) {
 	writeAstNodeBase(w, n.Base(), pad)
 
 	if len(data) > 20 {
@@ -67,7 +67,7 @@ func writeAstString(w io.Writer, n dp.Node, data, pad string) {
 	}
 }
 
-func writeAstNumber(w io.Writer, n *dp.Number, pad string) {
+func writeAstNumber(w io.Writer, n *Number, pad string) {
 	writeAstNodeBase(w, n.Base(), pad)
 	fmt.Fprintf(w, " %T(0x%04x)\n", n, n.Data)
 }

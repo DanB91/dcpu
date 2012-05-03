@@ -5,6 +5,7 @@ package main
 
 import (
 	dp "github.com/jteeuwen/dcpu/parser"
+	"os"
 	"sync"
 )
 
@@ -28,4 +29,5 @@ func runTest(file string, includes []string, wg *sync.WaitGroup, log *Log) {
 		return
 	}
 
+	dp.WriteAst(os.Stdout, &ast)
 }

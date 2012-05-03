@@ -36,9 +36,9 @@ func main() {
 	}
 
 	if cfg.DumpAST {
-		writeAst(cfg.Output, &ast)
+		dp.WriteAst(cfg.Output, &ast)
 	} else {
-		writeSource(cfg.Output, &ast)
+		dp.WriteSource(cfg.Output, &ast)
 	}
 }
 
