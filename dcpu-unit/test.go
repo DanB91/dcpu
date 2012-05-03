@@ -34,19 +34,7 @@ func runTest(file string, inc []string, wg *sync.WaitGroup, status chan<- error)
 		return
 	}
 
-	units := t.splitUnits(ast)
-	_ = units
-}
-
-// splitUnits returns a list of individual test units.
-// These are basically subsets of the supplied AST, but include any
-// additional data as defined in the source. 
-//
-// They are treated as independant programs.
-func (t *Test) splitUnits(ast *dp.AST) []Unit {
-	var list []Unit
-
-	return list
+	_ = ast
 }
 
 // readAST reads the test source and constructs a complete AST.
