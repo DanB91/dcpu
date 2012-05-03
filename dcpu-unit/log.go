@@ -12,23 +12,13 @@ import (
 type Log struct {
 	w     io.WriteCloser
 	queue chan string
-	level int
 }
 
 // NewLog constructs a new Log instance for the given writer.
-func NewLog(w io.WriteCloser, level int) *Log {
-	if level < 0 {
-		level = 0
-	}
-
-	if level > 3 {
-		level = 3
-	}
-
+func NewLog(w io.WriteCloser) *Log {
 	l := new(Log)
 	l.w = w
 	l.queue = make(chan string)
-	l.level = level
 	go l.poll()
 	return l
 }
@@ -42,10 +32,8 @@ func (l *Log) Close() error {
 //
 // This message is added to a queue and may therefor not immediately
 // persist to the underlying writer.
-func (l *Log) Write(level int, f string, argv ...interface{}) {
-	if level <= l.level {
-		l.queue <- fmt.Sprintf("[i] %s\n", fmt.Sprintf(f, argv...))
-	}
+func (l *Log) Write(f string, argv ...interface{}) {
+	l.queue <- fmt.Sprintf("%s\n", fmt.Sprintf(f, argv...))
 }
 
 // poll checks the queue for pending messages and pushes them

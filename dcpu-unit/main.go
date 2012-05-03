@@ -23,7 +23,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	cfg := parseArgs()
-	log := NewLog(os.Stdout, cfg.LogLevel)
+	log := NewLog(os.Stdout)
 	tests := collectTests(cfg)
 
 	defer log.Close()
@@ -37,7 +37,7 @@ func main() {
 			}
 
 			wg.Add(1)
-			go runTest(file, &wg, log)
+			go runTest(file, cfg.Include, &wg, log)
 		}
 	}
 }
@@ -78,7 +78,6 @@ func parseArgs() *Config {
 
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
-	flag.IntVar(&c.LogLevel, "l", 0, "Log level. Determines verbosity of program: 0, 1, 2")
 	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.Parse()
 
