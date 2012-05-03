@@ -23,7 +23,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	cfg := parseArgs()
-	log := NewLog(os.Stdout)
+	log := NewLog(os.Stdout, os.Stderr)
 	tests := collectTests(cfg)
 
 	defer log.Close()
@@ -37,7 +37,8 @@ func main() {
 			}
 
 			wg.Add(1)
-			go runTest(file, cfg.Include, &wg, log)
+			test := NewTest(file, cfg.Include, log)
+			go test.Run(&wg)
 		}
 	}
 }

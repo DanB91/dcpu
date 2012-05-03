@@ -5,29 +5,51 @@ package main
 
 import (
 	dp "github.com/jteeuwen/dcpu/parser"
-	"os"
 	"sync"
 )
 
-// runTest loads up the test sources, compiles it and performs
-// the unit tests defined in it.
-func runTest(file string, includes []string, wg *sync.WaitGroup, log *Log) {
-	var err error
-	var ast dp.AST
+// Test represents a single unit test case.
+// It covers one test file which may contain multiple unit tests.
+type Test struct {
+	*Log              // Output log for errors and status messages.
+	includes []string // Include paths.
+	file     string   // Test source file.
+}
 
+// NewTest creates a new test for the given inputs.
+func NewTest(file string, inc []string, log *Log) *Test {
+	t := new(Test)
+	t.Log = log
+	t.includes = inc
+	t.file = file
+	return t
+}
+
+// Run loads up the test sources, compiles it and performs
+// the unit tests defined in it.
+func (t *Test) Run(wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	log.Write("[*] %s...", file)
+	t.Printf("[*] %s...", t.file)
 
-	if err = readSource(&ast, file); err != nil {
-		log.Write("[e] %s", err)
+	ast, err := t.readAST()
+	if err != nil {
+		t.Errorf("[e] %s", err)
 		return
 	}
 
-	if err = resolveIncludes(&ast, includes); err != nil {
-		log.Write("[e] %s", err)
-		return
+	_ = ast
+}
+
+// readAST reads the test source and constructs a complete AST.
+// This includes importing externally referenced files.
+func (t *Test) readAST() (*dp.AST, error) {
+	var ast dp.AST
+
+	err := readSource(&ast, t.file)
+	if err != nil {
+		return nil, err
 	}
 
-	dp.WriteAst(os.Stdout, &ast)
+	return &ast, resolveIncludes(&ast, t.includes)
 }
