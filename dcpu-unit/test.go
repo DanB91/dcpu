@@ -5,6 +5,8 @@ package main
 
 import (
 	dp "github.com/jteeuwen/dcpu/parser"
+	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -30,7 +32,7 @@ func runTest(file string, inc []string, wg *sync.WaitGroup, status chan<- error)
 
 	ast, err := t.readAST()
 	if err != nil {
-		status <- err
+		status <- errors.New(fmt.Sprintf("%s: %v", file, err))
 		return
 	}
 
