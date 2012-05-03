@@ -23,10 +23,9 @@ func main() {
 	var wg sync.WaitGroup
 
 	cfg := parseArgs()
-	log := NewLog(os.Stdout, os.Stderr)
 	tests := collectTests(cfg)
+	status := make(chan error)
 
-	defer log.Close()
 	defer wg.Wait()
 
 	for {
@@ -37,8 +36,11 @@ func main() {
 			}
 
 			wg.Add(1)
-			test := NewTest(file, cfg.Include, log)
-			go test.Run(&wg)
+			go runTest(file, cfg.Include, &wg, status)
+
+		case err := <-status:
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			return
 		}
 	}
 }
