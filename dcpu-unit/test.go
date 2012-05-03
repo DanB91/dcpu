@@ -14,5 +14,5 @@ type Test struct {
 // the unit tests defined in it.
 func runTest(file string, wg *sync.WaitGroup, log *Log) {
 	defer wg.Done()
-	log.Info("%s...", file)
+	log.Write(1, "%s...", file)
 }

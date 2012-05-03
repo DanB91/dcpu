@@ -10,9 +10,9 @@ import (
 
 // Config holds configuration and state data for the unit tester.
 type Config struct {
-	Include []string // List of paths where we look to resolve source file references.
-	Input   string   // Input source directory.
-	Verbose bool     // Verbose test output.
+	Include  []string // List of paths where we look to resolve source file references.
+	Input    string   // Input source directory.
+	LogLevel int      // Verbosity level of program.
 }
 
 // NewConfig creates a new, standard configuration instance.
