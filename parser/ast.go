@@ -108,13 +108,12 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 
 			switch tok.Type {
 			case TokEndLine:
-				if len(expr.children) == 0 {
-					return a.errorf(tok, "Expected expression")
+				if len(expr.children) > 0 {
+					// Correct expression source location
+					expr.line = expr.children[0].Line()
+					expr.col = expr.children[0].Col()
 				}
 
-				// Correct expression source location
-				expr.line = expr.children[0].Line()
-				expr.col = expr.children[0].Col()
 				instr.children = append(instr.children, expr)
 				return
 

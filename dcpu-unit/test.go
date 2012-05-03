@@ -27,4 +27,5 @@ func runTest(file string, includes []string, wg *sync.WaitGroup, log *Log) {
 		log.Write("[e] %s", err)
 		return
 	}
+
 }
