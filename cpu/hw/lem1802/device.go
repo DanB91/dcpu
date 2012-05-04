@@ -18,7 +18,7 @@ const (
 )
 
 const (
-	ScreenSize  = 386 // Screen size in words.
+	ScreenSize  = 384 // Screen size in words.
 	FontSize    = 256 // Font size in words.
 	PaletteSize = 16  // Size of palette in words.
 )
