@@ -2,6 +2,12 @@
 
 This package implements a simple, generic keyboard.
 
+It is not backed by a real keyboard. This may be done using
+something like Termbox, SDL, GLFW, etc. To make this work,
+the Device.poll() method should be implemented to track input
+events, map them to Keys as defined in the keyboard spec and
+add them to the buffer.
+
 ### Usage
 
     go get github.com/jteeuwen/dcpu/hw/keyboard
