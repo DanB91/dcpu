@@ -12,7 +12,7 @@ which should make the writing of larger programs a little less painful.
   For me this is at: `/usr/share/gtksourceview-3.0/language-specs/`. 
 * _parser_: This holds a package that parses assembly source and turns it
   into an Abstract Syntax Tree.
-* _cpu_: A CPU emulator imlpementation. It adds the necessary instructions
+* _cpu_: A CPU emulator implementation. It adds the necessary instructions
   to make unit tests behave properly. As such, it may not be ideal to use
   as a standalone emulator.
 * _cpu/hw/*_: List of hardware components that can be hooked into the CPU.
