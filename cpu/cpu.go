@@ -391,8 +391,7 @@ func (c *CPU) Step() (err error) {
 // to the appropriate storage bit along with its address. 
 //
 // isTarget deterines if this operand is  the write target.
-// This is necessary to properly decode the PUSH/POP operands (0x18)
-// and the literal 0x20-0x3f.
+// This is necessary to properly decode the PUSH/POP operands (0x18).
 func (c *CPU) decodeOperand(w Word, isTarget bool) *Word {
 	// literal value 0xffff-0x1e (-1..30)
 	if w >= 0x20 && w <= 0x3f {
