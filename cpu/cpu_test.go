@@ -298,7 +298,7 @@ func TestJsr(t *testing.T) {
 	doTest(t, c, 0, 1)
 }
 
-func TestInt(t *testing.T) {
+func TestIntRfi(t *testing.T) {
 	c := NewCPU()
 	s := c.Store
 	s.Mem[0] = enc(EXT, IAS, 0x26) // IAS my_handler
