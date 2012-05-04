@@ -3,11 +3,34 @@
 
 package lem1802
 
-import "github.com/jteeuwen/dcpu/cpu"
+import (
+	"bytes"
+	"errors"
+	"github.com/jteeuwen/dcpu/cpu"
+	"image"
+	_ "image/png"
+	"io"
+)
 
-// defaultFont defines the default character set for the LEM1802 monitor.
-// 128 characters at 2 words/character. Each word splits into two rows
-// of eight bits. Giving a 4x8 grid for each character.
+// DefaultFont defines the default character set for the LEM1802 monitor.
+// 128 characters at 2 words/character. 
+func DefaultFont() []cpu.Word {
+	b := bytes.NewBuffer(lem1802font_png)
+	font, _ := LoadFont(b)
+	return font
+}
+
+// LoadFont loads a PNG image from the given stream and interprets it as a font.
+//
+// The supplied image should be 128x32 pixels where each
+// glyph occupies 4x8 pixels. This gives 128 glyphs.
+// 
+// The loader expects a black background with
+// glyphs drawn in white. To be more precise, the glyphs need a red channel
+// with a value > 0.
+//
+// Each word splits into two rows of eight bits.
+// Giving a 4x8 grid for each character.
 //
 // For example, the character 'F' is encoded as follows:
 //
@@ -20,103 +43,58 @@ import "github.com/jteeuwen/dcpu/cpu"
 //              00010010 (0x12)
 //     word 2 = 00000010 (0x02)
 //              00000000 (0x00)
-//
-var DefaultFont = []cpu.Word{
-	0x48a8, 0xf000, // a
-	0xff84, 0x7000, // b
-	0x7088, 0x5000, // c
-	0x7088, 0xff00, // d
-	0x70a8, 0xb000, // e
-	0x10fc, 0x1200, // f
-	0x90a8, 0x7800, // g
-	0xff04, 0xf800, // h
-	0x04fd, 0x0000, // i
-	0x4080, 0x7d00, // j
-	0xff20, 0xd800, // k
-	0x01ff, 0x0000, // l
-	0xf830, 0xf800, // m
-	0xf808, 0xf000, // n
-	0x6090, 0x6000, // o
-	0xf828, 0x1000, // p
-	0x1028, 0xf800, // q
-	0xf808, 0x1000, // r
-	0x90a8, 0x4800, // s
-	0x087c, 0x8800, // t
-	0x7880, 0xf800, // u
-	0x38c0, 0x3800, // v
-	0xf860, 0xf800, // w
-	0xd820, 0xd800, // x
-	0x98a0, 0x7800, // y
-	0xc8a8, 0x9800, // z
+func LoadFont(r io.Reader) (font []cpu.Word, err error) {
+	var img image.Image
 
-	0xfc12, 0xfc00, // A
-	0xfe92, 0x6c00, // B
-	0x7c82, 0x4400, // C
-	0xfe82, 0x7c00, // D
-	0xfe92, 0x8200, // E
-	0xfe12, 0x0200, // F
-	0x7c82, 0xf400, // G
-	0xfe10, 0xfe00, // H
-	0x82fe, 0x8200, // I
-	0x4080, 0x7e00, // J
-	0xfe10, 0xee00, // K
-	0xfe80, 0x8000, // L
-	0xfe0c, 0xfe00, // M
-	0xfe02, 0xfc00, // N
-	0x7c82, 0x7c00, // O
-	0xfe12, 0x0c00, // P
-	0x7c82, 0xfc00, // Q
-	0xfe12, 0xec00, // R
-	0x4c92, 0x6400, // S
-	0x02fe, 0x0200, // T
-	0x7e80, 0xfe00, // U
-	0x3ec0, 0x3e00, // V
-	0xfe60, 0xfe00, // W
-	0xee10, 0xee00, // X
-	0x0ef0, 0x0e00, // Y
-	0xe292, 0x8e00, // Z
+	img, _, err = image.Decode(r)
+	if err != nil {
+		return
+	}
 
-	0x7c92, 0x7c00, // 0
-	0x84fe, 0x8000, // 1
-	0xc4b2, 0xbc00, // 2
-	0x4492, 0x6c00, // 3
-	0x1e10, 0xfe00, // 4
-	0x4e8a, 0x7200, // 5
-	0x7c92, 0x6400, // 6
-	0xc232, 0x0e00, // 7
-	0x6c92, 0x6c00, // 8
-	0x4c92, 0x7c00, // 9
+	bounds := img.Bounds()
+	size := bounds.Size()
 
-	0x0002, 0x0400, // `
-	0x0402, 0x0402, // ~
-	0x00be, 0x0000, // !
-	0x7cb2, 0xbc00, // @
-	0x7c28, 0x7c00, // #
-	0x4cd6, 0x6400, // $
-	0xc238, 0x8600, // %
-	0x0402, 0x0400, // ^
-	0x6c92, 0x6ca0, // &
-	0x2810, 0x2800, // *
-	0x3844, 0x8200, // (
-	0x8244, 0x3800, // )
-	0x8080, 0x8000, // _
-	0x1010, 0x1000, // -
-	0x1038, 0x1000, // +
-	0x2828, 0x2800, // =
-	0x106c, 0x8200, // {
-	0x826c, 0x1000, // }
-	0xfe82, 0x0000, // [
-	0x82fe, 0x0000, // ]
-	0x00ee, 0x0000, // |
-	0x0638, 0xc000, // \
-	0xc038, 0x0600, // /
-	0x0048, 0x0000, // :
-	0x8048, 0x0000, // ;
-	0x0600, 0x0600, // "
-	0x0402, 0x0000, // '
-	0x1028, 0x4400, // <
-	0x4428, 0x1000, // >
-	0x8040, 0x0000, // ,
-	0x0080, 0x0000, // .
-	0x04b2, 0x0c00, // ?
+	if size.X != 128 || size.Y != 32 {
+		return nil, errors.New("Invalid image size. Expected 128x32")
+	}
+
+	var index int
+	var char [4]cpu.Word
+
+	font = make([]cpu.Word, 256)
+
+	for y := bounds.Min.Y; y < bounds.Max.Y; y += 8 {
+		for x := bounds.Min.X; x < bounds.Max.X; x += 4 {
+			char[0] = translate(img, x+0, y)
+			char[1] = translate(img, x+1, y)
+			char[2] = translate(img, x+2, y)
+			char[3] = translate(img, x+3, y)
+
+			font[index+0] = char[0]<<8 | char[1]
+			font[index+1] = char[2]<<8 | char[3]
+			index += 2
+		}
+	}
+
+	return
+}
+
+// translate retrieves the red component for each pixel in
+// the given column. It then constructs an 8 bit value from
+// the 8 red components.
+func translate(img image.Image, x, y int) cpu.Word {
+	var c [8]uint32
+	c[0], _, _, _ = img.At(x, y+0).RGBA()
+	c[1], _, _, _ = img.At(x, y+1).RGBA()
+	c[2], _, _, _ = img.At(x, y+2).RGBA()
+	c[3], _, _, _ = img.At(x, y+3).RGBA()
+	c[4], _, _, _ = img.At(x, y+4).RGBA()
+	c[5], _, _, _ = img.At(x, y+5).RGBA()
+	c[6], _, _, _ = img.At(x, y+6).RGBA()
+	c[7], _, _, _ = img.At(x, y+7).RGBA()
+
+	return cpu.Word(((c[0]&1)<<0 | (c[1]&1)<<1 |
+		(c[2]&1)<<2 | (c[3]&1)<<3 |
+		(c[4]&1)<<4 | (c[5]&1)<<5 |
+		(c[6]&1)<<6 | (c[7]&1)<<7) & 0xff)
 }

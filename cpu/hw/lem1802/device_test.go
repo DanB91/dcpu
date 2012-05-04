@@ -8,6 +8,4 @@ import (
 )
 
 func Test(t *testing.T) {
-	d := New(nil)
-	_ = d
 }
