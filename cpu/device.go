@@ -10,16 +10,13 @@ type IntFunc func(Word)
 // DeviceBuilder serves as a common constructor type for
 // devices. All devices should implement this.
 //
-// The channel it receives is to be used as a CPU interrupt.
-// Whenever the device is ready to be used, it sends a mask value
-// over this channel. The CPU will then determine if the interrupt
-// should be handled or not based on this mask.
+// The function it receives is used to send interrupts to the CPU.
 type DeviceBuilder func(IntFunc) Device
 
 // Device represents an arbitrary hardware module that
 // can be plugged into the DCPU system.
 //
-// Code can communicate with it through use of interupts.
+// Code can communicate with it through use of interrupts.
 type Device interface {
 	// 32 bit code, identifying the hardware manufacturer.
 	Manufacturer() uint32
