@@ -3,7 +3,7 @@
 
 package lem1802
 
-import cpu "github.com/jteeuwen/dcpu"
+import "github.com/jteeuwen/dcpu/cpu"
 
 // defaultFont defines the default character set for the LEM1802 monitor.
 // 128 characters at 2 words/character. Each word splits into two rows

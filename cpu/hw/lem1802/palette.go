@@ -3,7 +3,7 @@
 
 package lem1802
 
-import cpu "github.com/jteeuwen/dcpu"
+import "github.com/jteeuwen/dcpu/cpu"
 
 // DefaultPalette defines the default colour palette for the LEM1802 monitor.
 var DefaultPalette = []cpu.Word{

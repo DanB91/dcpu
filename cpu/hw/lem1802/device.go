@@ -13,6 +13,8 @@ const (
 	MemMapFont
 	MemMapPalette
 	SetBorderColor
+	MemDumpFont
+	MemDumpPalette
 )
 
 const (
@@ -35,8 +37,8 @@ type Lem1802 struct {
 func New(f cpu.IntFunc) cpu.Device {
 	return &Lem1802{
 		f:       f,
-		font:    defaultFont,
-		palette: defaultPalette,
+		font:    DefaultFont,
+		palette: DefaultPalette,
 		border:  0,
 	}
 }
@@ -56,20 +58,27 @@ func (d *Lem1802) Handler(s *cpu.Storage) {
 
 	case MemMapFont:
 		if s.B == 0 {
-			d.font = defaultFont
+			d.font = DefaultFont
 		} else {
 			d.font = s.Mem[s.B : s.B+FontSize]
 		}
 
 	case MemMapPalette:
 		if s.B == 0 {
-			d.palette = defaultPalette
+			d.palette = DefaultPalette
 		} else {
 			d.palette = s.Mem[s.B : s.B+PaletteSize]
 		}
 
 	case SetBorderColor:
 		d.border = s.B & 0xf
+
+	case MemDumpFont:
+		copy(s.Mem[s.B:], DefaultFont)
+
+	case MemDumpPalette:
+		copy(s.Mem[s.B:], DefaultPalette)
+
 	}
 }
 
