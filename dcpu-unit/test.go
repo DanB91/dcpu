@@ -4,9 +4,9 @@
 package main
 
 import (
-	dp "github.com/jteeuwen/dcpu/parser"
 	"errors"
 	"fmt"
+	dp "github.com/jteeuwen/dcpu/parser"
 	"sync"
 )
 
