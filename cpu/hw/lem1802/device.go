@@ -4,7 +4,7 @@
 package lem1802
 
 import (
-	cpu "github.com/jteeuwen/dcpu"
+	"github.com/jteeuwen/dcpu/cpu"
 )
 
 // Interrupt messages supported by this device.

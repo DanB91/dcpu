@@ -4,7 +4,7 @@
 package keyboard
 
 import (
-	cpu "github.com/jteeuwen/dcpu"
+	"github.com/jteeuwen/dcpu/cpu"
 )
 
 // Keyboard - Generic hardware Keyboard.
