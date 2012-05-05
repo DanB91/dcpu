@@ -132,7 +132,7 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		h.busy = true
 
 		if h.flags&NonBlocking == 0 {
-			s.A = h.media.Read(s.B, s.Mem[s.X: s.X+s.C])
+			s.A = h.media.Read(s.B, s.Mem[s.X:s.X+s.C])
 			h.busy = false
 			return
 		}
@@ -140,7 +140,7 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		s.A = ErrorNone
 
 		go func() {
-			s.A = h.media.Read(s.B, s.Mem[s.X: s.X+s.C])
+			s.A = h.media.Read(s.B, s.Mem[s.X:s.X+s.C])
 			h.busy = false
 			h.lastint = TypeReadComplete
 			h.int(h.id)

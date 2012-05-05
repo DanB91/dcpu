@@ -17,7 +17,7 @@ const (
 
 // Clock - Generic hardware clock.
 type Clock struct {
-	int     cpu.IntFunc // Interrupt function we can call on the CPU.
+	int    cpu.IntFunc // Interrupt function we can call on the CPU.
 	ticker *time.Ticker
 	ticks  cpu.Word
 	id     cpu.Word
