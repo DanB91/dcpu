@@ -12,6 +12,7 @@ type Media interface {
 	SectorCount() cpu.Word
 	WriteLocked() bool
 	Read(address cpu.Word, sectors []cpu.Word) (err cpu.Word)
+	Write(address cpu.Word, sectors []cpu.Word) (err cpu.Word)
 }
 
 // Implements the HMD2043 disk drive controller.
@@ -156,6 +157,23 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 			return
 		}
 
+		h.busy = true
+
+		if h.flags&NonBlocking == 0 {
+			s.A = h.media.Write(s.B, s.Mem[s.X:s.X+s.C])
+			h.busy = false
+			return
+		}
+
+		s.A = ErrorNone
+
+		go func() {
+			s.A = h.media.Write(s.B, s.Mem[s.X:s.X+s.C])
+			h.busy = false
+			h.lastint = TypeWriteComplete
+			h.int(h.id)
+		}()
+
 	case QueryMediaQuality:
 		if h.media == nil {
 			s.A, s.B, s.C, s.X = ErrorNoMedia, 0, 0, 0
@@ -170,8 +188,8 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 
 // Returns true if the given media is supported by our drive.
 //
-// TODO: Find some metric to determine of the media is OK or not.
-// The HMU1440 spec defines no manufacturer or device ids.
+// TODO: Find some metric to determine if the media is OK or not.
+// The HMU1440 spec defines no manufacturer or device ids we can check.
 func isSupported(m Media) bool {
 	return true
 }
