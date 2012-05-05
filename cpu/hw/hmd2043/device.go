@@ -8,11 +8,11 @@ import "github.com/jteeuwen/dcpu/cpu"
 // Media represents a single media device that can be
 // plugged into the HMD2043 drive.
 type Media interface {
-	WordsPerSector() cpu.Word
+	SectorSize() cpu.Word
 	SectorCount() cpu.Word
 	WriteLocked() bool
-	Read(address cpu.Word, sectors []cpu.Word) (err cpu.Word)
-	Write(address cpu.Word, sectors []cpu.Word) (err cpu.Word)
+	Read(address cpu.Word, sectors []cpu.Word) error
+	Write(address cpu.Word, sectors []cpu.Word) error
 }
 
 // Implements the HMD2043 disk drive controller.
@@ -100,7 +100,7 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		}
 
 		s.A = ErrorNone
-		s.B = h.media.WordsPerSector()
+		s.B = h.media.SectorSize()
 		s.C = h.media.SectorCount()
 		s.X = 0
 
@@ -131,9 +131,13 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		}
 
 		h.busy = true
+		s.A = ErrorNone
 
 		if h.flags&NonBlocking == 0 {
-			s.A = h.media.Read(s.B, s.Mem[s.X:s.X+s.C])
+			err := h.media.Read(s.B, s.Mem[s.X:s.X+s.C])
+			if err != nil {
+				s.A = ErrorInvalidSector
+			}
 			h.busy = false
 			return
 		}
@@ -141,7 +145,7 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		s.A = ErrorNone
 
 		go func() {
-			s.A = h.media.Read(s.B, s.Mem[s.X:s.X+s.C])
+			h.media.Read(s.B, s.Mem[s.X:s.X+s.C])
 			h.busy = false
 			h.lastint = TypeReadComplete
 			h.int(h.id)
@@ -160,7 +164,10 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		h.busy = true
 
 		if h.flags&NonBlocking == 0 {
-			s.A = h.media.Write(s.B, s.Mem[s.X:s.X+s.C])
+			err := h.media.Write(s.B, s.Mem[s.X:s.X+s.C])
+			if err != nil {
+				s.A = ErrorInvalidSector
+			}
 			h.busy = false
 			return
 		}
@@ -168,7 +175,7 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		s.A = ErrorNone
 
 		go func() {
-			s.A = h.media.Write(s.B, s.Mem[s.X:s.X+s.C])
+			h.media.Write(s.B, s.Mem[s.X:s.X+s.C])
 			h.busy = false
 			h.lastint = TypeWriteComplete
 			h.int(h.id)

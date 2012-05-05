@@ -47,7 +47,7 @@ Specification:
     Tracks: 80
     Sectors per track: 18
     Total sectors: 1440
-    
+
     Note: sectors are spread across both data surfaces; specifically, even bits 
     of a sector are stored on the "top" data surface, odd bits on the "bottom" 
     data surface. This doubles effective read/write speed.
