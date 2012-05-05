@@ -6,6 +6,10 @@ This is a floppy that can be plugged into the HMD2043 drive.
 It is backed by a memory mapped file, so we can have its data
 persisted across different sessions.
 
+Create a blank backing file is easy enough:
+
+    $ dd if=/dev/zero of=myfile.fdd ibs=1024 count=1440
+
 ### Dependencies
 
 	go get launchpad.net/gommap
