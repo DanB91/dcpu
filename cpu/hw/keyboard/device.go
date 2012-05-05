@@ -18,14 +18,14 @@ const (
 type Keyboard struct {
 	buf  []cpu.Word
 	keys []uint8
-	f    cpu.IntFunc
+	int  cpu.IntFunc
 	id   cpu.Word
 }
 
 // New creates and initializes a new device instance.
 func New(f cpu.IntFunc) cpu.Device {
 	k := new(Keyboard)
-	k.f = f
+	k.int = f
 	go k.poll()
 	return k
 }
