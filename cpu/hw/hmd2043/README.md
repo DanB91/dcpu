@@ -1,7 +1,7 @@
 ## HMD2043 - Harold Media Drive
 
 This package implements a general purpose media controller/drive.
-It shuold be noted that this package does not care about
+It should be noted that this package does not care about
 transfer speeds, Spindle speed or what have you.
 
 The point of this implementation is to supply the actual storage behaviour
