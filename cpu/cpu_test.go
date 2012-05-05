@@ -333,7 +333,7 @@ func TestIasIag(t *testing.T) {
 func TestHwn(t *testing.T) {
 	c := NewCPU()
 	s := c.Store
-	c.Register(NewTestDevice)
+	c.RegisterDevice(NewTestDevice)
 	s.Mem[0] = enc(EXT, HWN, 0) // HWN A
 	s.Mem[1] = _exit
 	doTest(t, c, 1, 0)
@@ -342,7 +342,7 @@ func TestHwn(t *testing.T) {
 func TestHwq(t *testing.T) {
 	c := NewCPU()
 	s := c.Store
-	c.Register(NewTestDevice)
+	c.RegisterDevice(NewTestDevice)
 	s.Mem[0] = enc(SET, 0, 0x21) // SET A, 0
 	s.Mem[1] = enc(EXT, HWQ, 0)  // HWQ A
 	s.Mem[2] = _exit
@@ -352,7 +352,7 @@ func TestHwq(t *testing.T) {
 func TestHwi(t *testing.T) {
 	c := NewCPU()
 	s := c.Store
-	c.Register(NewTestDevice)
+	c.RegisterDevice(NewTestDevice)
 	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 0x1
 	s.Mem[1] = enc(SET, 1, 0x1f) // SET B, 0x100
 	s.Mem[2] = 0x100
