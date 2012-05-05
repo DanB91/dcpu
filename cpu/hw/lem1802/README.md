@@ -5,6 +5,8 @@ It is a simple, low energy monitor as defined [here][1].
 
 [1]: http://dcpu.com/highnerd/lem1802.txt
 
+It is not backed by a real screen at this point.
+This can be done through SDL, GLFW, Termbox, etc if one so wishes.
 
 ### Usage
 
