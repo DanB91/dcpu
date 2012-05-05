@@ -54,6 +54,6 @@ const (
 		 - x+y is a 32 bit word identifying the manufacturer.
 	*/
 	HWI  = 0x12 // HWI a | sends an interrupt to hardware a
-	TEST = 0x1e // (Non-standard) TEST instruction, used to perform unit tests.
+	TEST = 0x1e // (Non-standard) TEST instruction. Used to perform unit tests.
 	EXIT = 0x1f // (Non-standard) Exit instruction. Stops the world.
 )
