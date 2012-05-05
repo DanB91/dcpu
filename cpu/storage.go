@@ -7,8 +7,8 @@ package cpu
 // done in words.
 type Word uint16
 
-// signed returns signed version of the given word.
-func signed(w Word) SWord {
+// Signed returns signed version of the given word.
+func Signed(w Word) SWord {
 	sign := int32(w >> 15)
 	val := int32(w & 0x7fff)
 	return SWord(val + (sign * -0xffff))

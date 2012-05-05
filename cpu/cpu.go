@@ -212,7 +212,7 @@ func (c *CPU) Step() (err error) {
 		s.EX = Word(u32 >> 16)
 
 	case MLI:
-		i32 := signed(*va) * signed(*vb)
+		i32 := Signed(*va) * Signed(*vb)
 		*va = Word(i32 & 0x7fff)
 		s.EX = Word(i32 >> 16)
 
@@ -231,7 +231,7 @@ func (c *CPU) Step() (err error) {
 			break
 		}
 
-		sa, sb := signed(*va), signed(*vb)
+		sa, sb := Signed(*va), Signed(*vb)
 		*va = Word(sa / sb)
 		s.EX = Word((sa << 16) / sb)
 
@@ -239,7 +239,7 @@ func (c *CPU) Step() (err error) {
 		if *vb == 0 {
 			*va = 0
 		} else {
-			*va = Word(signed(*va) % signed(*vb))
+			*va = Word(Signed(*va) % Signed(*vb))
 		}
 
 	case AND:
@@ -256,7 +256,7 @@ func (c *CPU) Step() (err error) {
 		s.EX = Word(((uint32(*va) << 16) >> uint32(*vb)))
 
 	case ASR:
-		sa := signed(*va)
+		sa := Signed(*va)
 		*va = Word(sa >> *vb)
 		s.EX = Word((int32(sa) << 16) >> uint32(*vb))
 
@@ -291,7 +291,7 @@ func (c *CPU) Step() (err error) {
 		}
 
 	case IFA:
-		if signed(*va) <= signed(*vb) {
+		if Signed(*va) <= Signed(*vb) {
 			c.skipBranch()
 		}
 
@@ -301,7 +301,7 @@ func (c *CPU) Step() (err error) {
 		}
 
 	case IFU:
-		if signed(*va) >= signed(*vb) {
+		if Signed(*va) >= Signed(*vb) {
 			c.skipBranch()
 		}
 
