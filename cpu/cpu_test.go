@@ -318,10 +318,10 @@ func TestIasIag(t *testing.T) {
 	c := NewCPU()
 	s := c.Store
 	c.Register(NewTestDevice)
-	s.Mem[0] = enc(SET, 0, 0x22)  // SET A, 1
-	s.Mem[1] = enc(EXT, IAS, 0)   // IAS A
-	s.Mem[2] = enc(SET, 0, 0x23)  // SET A, 2
-	s.Mem[3] = enc(EXT, IAG, 0)   // IAG A
+	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 1
+	s.Mem[1] = enc(EXT, IAS, 0)  // IAS A
+	s.Mem[2] = enc(SET, 0, 0x23) // SET A, 2
+	s.Mem[3] = enc(EXT, IAG, 0)  // IAG A
 	s.Mem[4] = _exit
 	doTest(t, c, 1, 0)
 }
