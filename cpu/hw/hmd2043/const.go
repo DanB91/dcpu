@@ -26,7 +26,7 @@ const (
 
 // Device flags
 const (
-	NonBlocking = iota
+	NonBlocking = 1 << iota
 	MediaStatusInterrupt
 )
 

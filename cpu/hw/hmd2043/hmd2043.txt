@@ -94,7 +94,7 @@ Interrupt behaviour:
     0x0004: QUERY_INTERRUPT_TYPE
             The device will indicate the type of interrupt that it last raised 
             by placing one of the following values into the B register:
-            
+
             0x0000: NONE - No interrupts have been raised yet.
             
             0x0001: MEDIA_STATUS - Media status changed.
