@@ -29,15 +29,16 @@ func DefaultFont() []cpu.Word {
 // glyphs drawn in white. To be more precise, the glyphs need a red channel
 // with a value > 0.
 //
-// Each word splits into two rows of eight bits.
-// Giving a 4x8 grid for each character.
+// Characters are stored in the returned slice as two words per glyph.
+// Each word splits into two rows of eight bits. Giving a 4x8 grid for
+// each character.
 //
-// For example, the character 'F' is encoded as follows:
+// For example, the character `F` is encoded as follows:
 //
 //     word 1 = 0xfe12 = 1111111000010010
 //     word 2 = 0x0200 = 0000001000000000
 //
-// When split into octets:
+// When split into octets, you can see the 1's make up the `F` shape.
 //
 //     word 1 = 11111110 (0xfe)
 //              00010010 (0x12)
