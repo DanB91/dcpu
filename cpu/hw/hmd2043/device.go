@@ -183,6 +183,11 @@ func (h *HMD2043) Handler(s *cpu.Storage) {
 		if h.busy {
 			return
 		}
+
+		// TODO: Find some metric to determine if the type of media.
+		// The HMU1440 spec defines no manufacturer or device ids we can check.
+		// Assume AuthenticHITMedia for now. 
+		s.A, s.B = ErrorNone, AuthenticHITMedia
 	}
 }
 

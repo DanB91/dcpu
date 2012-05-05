@@ -37,3 +37,9 @@ const (
 	TypeReadComplete
 	TypeWriteComplete
 )
+
+// Media identifiers
+const (
+	AuthenticHITMedia = 0x7ff
+	OtherMedia        = 0xffff
+)
