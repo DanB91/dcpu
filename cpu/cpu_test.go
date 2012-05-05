@@ -19,7 +19,12 @@ func NewTestDevice(f IntFunc) Device {
 func (d *TestDevice) Manufacturer() uint32 { return 0x12345678 }
 func (d *TestDevice) Id() uint32           { return 0x87654321 }
 func (d *TestDevice) Revision() uint16     { return 0xabcd }
-func (d *TestDevice) Handler(*Storage)     {}
+func (d *TestDevice) Handler(s *Storage) {
+	switch s.A {
+	case 0x1: // SetMem
+		s.Mem[s.B] = 0xbeef
+	}
+}
 
 var _exit = enc(EXT, EXIT, 0x20) // EXIT 0
 
@@ -317,7 +322,6 @@ func TestIntRfi(t *testing.T) {
 func TestIasIag(t *testing.T) {
 	c := NewCPU()
 	s := c.Store
-	c.Register(NewTestDevice)
 	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 1
 	s.Mem[1] = enc(EXT, IAS, 0)  // IAS A
 	s.Mem[2] = enc(SET, 0, 0x23) // SET A, 2
@@ -343,4 +347,18 @@ func TestHwq(t *testing.T) {
 	s.Mem[1] = enc(EXT, HWQ, 0)  // HWQ A
 	s.Mem[2] = _exit
 	doTest(t, c, 0x4321, 0)
+}
+
+func TestHwi(t *testing.T) {
+	c := NewCPU()
+	s := c.Store
+	c.Register(NewTestDevice)
+	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 0x1
+	s.Mem[1] = enc(SET, 1, 0x1f) // SET B, 0x100
+	s.Mem[2] = 0x100
+	s.Mem[3] = enc(EXT, HWI, 0x21) // HWI 0  ; 0 = TestDevice
+	s.Mem[4] = enc(SET, 0, 0x1e)   // SET A, [0x100]
+	s.Mem[5] = 0x100
+	s.Mem[6] = _exit
+	doTest(t, c, 0xbeef, 0)
 }
