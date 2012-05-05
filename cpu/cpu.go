@@ -112,10 +112,6 @@ func (c *CPU) Run(entrypoint Word) (err error) {
 	for {
 		select {
 		case <-time.After(c.ClockSpeed):
-			if sz := len(c.intQueue); !c.queueInterrupts && sz > 0 {
-				c.triggerInterrupt(<-c.intQueue)
-			}
-
 			err = c.Step()
 
 			if err != nil {
@@ -176,6 +172,18 @@ func (c *CPU) skipBranch() {
 // Step performs a single cycle.
 func (c *CPU) Step() (err error) {
 	var va, vb *Word
+
+	// Handle any queued interrupts.
+	// The way this is handled, is not entirely as defined in
+	// the spec. We can only handle one interrupt per clock cycle.
+	// 
+	// However, this implementation allows one queued interrupt,
+	// as well as at least one non-ququed interrupt to be triggered
+	// in a single cycle. Notably when we are about to execute
+	// a non-cached HWI or INT.
+	if sz := len(c.intQueue); !c.queueInterrupts && sz > 0 {
+		c.triggerInterrupt(<-c.intQueue)
+	}
 
 	s := c.Store
 	op, a, b := c.nextInstruction()
