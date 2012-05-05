@@ -26,7 +26,7 @@ const (
 // LEM1802 - Low Energy Monitor.
 // http://dcpu.com/highnerd/lem1802.txt
 type Lem1802 struct {
-	f       cpu.IntFunc
+	int     cpu.IntFunc
 	buffer  []cpu.Word
 	font    []cpu.Word
 	palette []cpu.Word
@@ -36,7 +36,7 @@ type Lem1802 struct {
 // New creates and initializes a new device instance.
 func New(f cpu.IntFunc) cpu.Device {
 	return &Lem1802{
-		f:       f,
+		int:     f,
 		font:    DefaultFont(),
 		palette: DefaultPalette,
 		border:  0,
