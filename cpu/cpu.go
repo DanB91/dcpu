@@ -54,14 +54,14 @@ func (c *CPU) CountDevices() int { return len(c.devices) }
 // Register adds a new device. If capacity has been reached,
 // this is silently ignored. We can have a maximum of MaxUint16 number
 // of devices at any given time.
-func (c *CPU) Register(db DeviceBuilder) {
+func (c *CPU) RegisterDevice(db DeviceBuilder) {
 	if len(c.devices) < 1<<16-1 {
 		c.devices = append(c.devices, db(func(w Word) { c.interrupt(w) }))
 	}
 }
 
-// ClearDevs removes all registered devices.
-func (c *CPU) ClearDevs() { c.devices = nil }
+// ClearDevices removes all registered devices.
+func (c *CPU) ClearDevices() { c.devices = nil }
 
 // Clears CPU state.
 func (c *CPU) Reset() {
