@@ -17,7 +17,7 @@ const (
 
 // Clock - Generic hardware clock.
 type Clock struct {
-	f      cpu.IntFunc
+	int     cpu.IntFunc // Interrupt function we can call on the CPU.
 	ticker *time.Ticker
 	ticks  cpu.Word
 	id     cpu.Word
@@ -26,7 +26,7 @@ type Clock struct {
 // New creates and initializes a new device instance.
 func New(f cpu.IntFunc) cpu.Device {
 	c := new(Clock)
-	c.f = f
+	c.int = f
 	c.ticker = time.NewTicker(time.Duration(1e9) / 60)
 	go c.poll()
 	return c
@@ -63,7 +63,7 @@ func (c *Clock) poll() {
 			c.ticks++
 
 			if c.id > 0 {
-				c.f(c.id)
+				c.int(c.id)
 			}
 		}
 	}
