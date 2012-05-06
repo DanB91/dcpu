@@ -5,6 +5,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/jteeuwen/dcpu/asm"
@@ -150,13 +151,16 @@ func (t *Test) loadCompareSet() (err error) {
 			if err == io.EOF {
 				err = nil
 			}
-			break
+			return
+		}
+
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 || line[0] == '#' {
+			continue
 		}
 
 		t.compare = append(t.compare, string(line))
 	}
 
-	// First line has column headers. Skip it.
-	t.compare = t.compare[1:]
 	return
 }
