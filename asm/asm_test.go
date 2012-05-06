@@ -14,6 +14,7 @@ import (
 func doTest(t *testing.T, src string, sbin ...cpu.Word) {
 	var ast parser.AST
 	var dbin []cpu.Word
+	var dbg *DebugInfo
 
 	buf := bytes.NewBufferString(src)
 	err := ast.Parse(buf, "")
@@ -22,10 +23,12 @@ func doTest(t *testing.T, src string, sbin ...cpu.Word) {
 		t.Fatal(err)
 	}
 
-	dbin, err = Assemble(&ast)
+	dbin, dbg, err = Assemble(&ast)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Printf("%s\n", dbg)
 
 	if len(dbin) != len(sbin) {
 		fmt.Printf("%04x\n", dbin)

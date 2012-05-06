@@ -14,17 +14,20 @@ type assembler struct {
 	code   []cpu.Word            // Final program.
 	labels map[string]cpu.Word   // Map of defined labels with their address.
 	refs   map[cpu.Word]*dp.Name // Indices into `code` holding unresolved label references.
+	debug  *DebugInfo            // Maps binary instructions to original source locations.
 }
 
 func encode(a, b, c cpu.Word) cpu.Word { return a | (b << 5) | (c << 10) }
 
-// Assemble takes the given AST and attempts to assemble
-// it into a compiled program.
-func Assemble(ast *dp.AST) (prog []cpu.Word, err error) {
+// Assemble takes the given AST and attempts to assemble it into a compiled program.
+//
+// It returns either an error, or the program along with debug symbols.
+func Assemble(ast *dp.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 	var asm assembler
 	asm.ast = ast
 	asm.labels = make(map[string]cpu.Word)
 	asm.refs = make(map[cpu.Word]*dp.Name)
+	asm.debug = NewDebugInfo(ast.Files)
 
 	// Compile program.
 	if err = asm.buildNodes(ast.Root.Children()); err != nil {
@@ -39,12 +42,13 @@ func Assemble(ast *dp.AST) (prog []cpu.Word, err error) {
 			continue
 		}
 
-		return nil, NewBuildError(
+		return nil, nil, NewBuildError(
 			ast.Files[v.File()], v.Line(), v.Col(),
 			"Unknown label reference %q.", v.Data)
 	}
 
 	prog = asm.code
+	dbg = asm.debug
 	return
 }
 
@@ -102,21 +106,24 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 
 	var va, vb cpu.Word
 	var argv []cpu.Word
+	var dargv []dp.Node
 
 	switch op.argc {
 	case 2:
-		vb, err = a.buildOperand(&argv, nodes[2].(*dp.Expression).Children()[0])
+		vb, err = a.buildOperand(&argv, &dargv, nodes[2].(*dp.Expression).Children()[0])
 		if err != nil {
 			return
 		}
 
 		fallthrough
 	case 1:
-		va, err = a.buildOperand(&argv, nodes[1].(*dp.Expression).Children()[0])
+		va, err = a.buildOperand(&argv, &dargv, nodes[1].(*dp.Expression).Children()[0])
 		if err != nil {
 			return
 		}
 	}
+
+	a.debug.Emit(name)
 
 	if op.ext {
 		a.code = append(a.code, encode(cpu.EXT, op.code, va))
@@ -124,12 +131,13 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 		a.code = append(a.code, encode(op.code, va, vb))
 	}
 
+	a.debug.Emit(dargv...)
 	a.code = append(a.code, argv...)
 	return
 }
 
 // buildOperand compiles the given instruction operand.
-func (a *assembler) buildOperand(argv *[]cpu.Word, node dp.Node) (val cpu.Word, err error) {
+func (a *assembler) buildOperand(argv *[]cpu.Word, dargv *[]dp.Node, node dp.Node) (val cpu.Word, err error) {
 	switch tt := node.(type) {
 	case *dp.Name:
 		if reg, ok := registers[tt.Data]; ok {
@@ -141,11 +149,13 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, node dp.Node) (val cpu.Word, 
 				return addr + 0x21, nil
 			}
 
+			*dargv = append(*dargv, tt)
 			*argv = append(*argv, addr)
 			return 0x1f, nil
 		}
 
 		a.refs[cpu.Word(len(a.code)+1+len(*argv))] = tt
+		*dargv = append(*dargv, tt)
 		*argv = append(*argv, 0)
 		return 0x1f, nil
 
@@ -154,11 +164,12 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, node dp.Node) (val cpu.Word, 
 			return tt.Data + 0x21, nil
 		}
 
+		*dargv = append(*dargv, tt)
 		*argv = append(*argv, tt.Data)
 		return 0x1f, nil
 
 	case *dp.Block:
-		return a.buildBlock(argv, tt)
+		return a.buildBlock(argv, dargv, tt)
 
 	default:
 		return 0, NewBuildError(
@@ -171,7 +182,7 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, node dp.Node) (val cpu.Word, 
 }
 
 // buildBlock builds a block expression.
-func (a *assembler) buildBlock(argv *[]cpu.Word, b *dp.Block) (val cpu.Word, err error) {
+func (a *assembler) buildBlock(argv *[]cpu.Word, dargv *[]dp.Node, b *dp.Block) (val cpu.Word, err error) {
 	nodes := b.Children()
 
 	switch len(nodes) {
@@ -183,15 +194,18 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, b *dp.Block) (val cpu.Word, err
 			}
 
 			if addr, ok := a.labels[tt.Data]; ok {
+				*dargv = append(*dargv, tt)
 				*argv = append(*argv, addr)
 				return 0x1e, nil
 			}
 
 			a.refs[cpu.Word(len(a.code)+1+len(*argv))] = tt
+			*dargv = append(*dargv, tt)
 			*argv = append(*argv, 0)
 			return 0x1e, nil
 
 		case *dp.Number:
+			*dargv = append(*dargv, tt)
 			*argv = append(*argv, tt.Data)
 			return 0x1e, nil
 
@@ -204,11 +218,12 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, b *dp.Block) (val cpu.Word, err
 
 	case 3:
 		var va, vb cpu.Word
-		if va, err = a.buildBlockOperand(argv, nodes[0]); err != nil {
+
+		if va, err = a.buildBlockOperand(argv, dargv, nodes[0]); err != nil {
 			return
 		}
 
-		if vb, err = a.buildBlockOperand(argv, nodes[2]); err != nil {
+		if vb, err = a.buildBlockOperand(argv, dargv, nodes[2]); err != nil {
 			return
 		}
 
@@ -227,7 +242,7 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, b *dp.Block) (val cpu.Word, err
 	return
 }
 
-func (a *assembler) buildBlockOperand(argv *[]cpu.Word, node dp.Node) (cpu.Word, error) {
+func (a *assembler) buildBlockOperand(argv *[]cpu.Word, dargv *[]dp.Node, node dp.Node) (cpu.Word, error) {
 	switch tt := node.(type) {
 	case *dp.Name:
 		if reg, ok := registers[tt.Data]; ok {
@@ -246,15 +261,18 @@ func (a *assembler) buildBlockOperand(argv *[]cpu.Word, node dp.Node) (cpu.Word,
 		}
 
 		if addr, ok := a.labels[tt.Data]; ok {
+			*dargv = append(*dargv, tt)
 			*argv = append(*argv, addr)
 			return 0, nil
 		}
 
 		a.refs[cpu.Word(len(a.code)+1+len(*argv))] = tt
+		*dargv = append(*dargv, tt)
 		*argv = append(*argv, 0)
 		return 0, nil
 
 	case *dp.Number:
+		*dargv = append(*dargv, tt)
 		*argv = append(*argv, tt.Data)
 		return 0, nil
 	}
@@ -279,11 +297,13 @@ func (a *assembler) buildData(nodes []dp.Node) (err error) {
 
 		switch tt := expr.Children()[0].(type) {
 		case *dp.String:
+			a.debug.Emit(tt)
 			for _, r = range tt.Data {
 				a.code = append(a.code, cpu.Word(r))
 			}
 
 		case *dp.Number:
+			a.debug.Emit(tt)
 			a.code = append(a.code, tt.Data)
 		}
 	}
