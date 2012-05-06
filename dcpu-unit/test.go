@@ -24,10 +24,11 @@ const unitString = `Unit test %d mismatch:
 // Test represents a single unit test case.
 // It covers one test file which may contain multiple unit tests.
 type Test struct {
-	includes []string // Include paths.
-	compare  []string // Lines of compare data.
-	file     string   // Test source file.
-	count    int      // Unit counter.
+	dbg      *asm.DebugInfo // Debug symbols for compiled program.
+	includes []string       // Include paths.
+	compare  []string       // Lines of compare data.
+	file     string         // Test source file.
+	count    int            // Unit counter.
 }
 
 // NewTest creates a new test cases.
@@ -115,7 +116,8 @@ func (t *Test) parse() (*dp.AST, error) {
 // compile compiles the given AST and returns a CPU instance ready to run the code.
 func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 	var bin []cpu.Word
-	if bin, err = asm.Assemble(ast); err != nil {
+
+	if bin, t.dbg, err = asm.Assemble(ast); err != nil {
 		return
 	}
 
