@@ -19,9 +19,6 @@ As can be seen in this repo's `lib` directory, unit tests can
 be defined for as many components as you need them. Each test comes
 with at least two files which are described below.
 
-This tool runs as many tests concurrently as it can.
-You can set `GOMAXPROCS` to turn this into a parallel operation as well.
-
 ### *.test
 
 These contain the actual test code that should be executed. Just like

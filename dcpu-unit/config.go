@@ -12,11 +12,15 @@ import (
 type Config struct {
 	Include []string // List of paths where we look to resolve source file references.
 	Input   string   // Input source directory.
+	Clock   int64    // Clockspeed at which to run the tests.
+	Trace   bool     // Print trace data for each instruction as it is executed.
+	Verbose bool     // Print additional debug output.
 }
 
 // NewConfig creates a new, standard configuration instance.
 func NewConfig() *Config {
 	c := new(Config)
+	c.Clock = 1000 // 100khz.
 
 	wd, err := os.Getwd()
 	if err == nil {

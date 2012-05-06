@@ -17,5 +17,7 @@ set c, 0
 jsr memchr
 test
 
+exit
+
 :data dat 1, 2, 3, 4, 5
 

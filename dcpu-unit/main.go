@@ -6,12 +6,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/jteeuwen/dcpu/cpu"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 )
 
 const (
@@ -20,13 +20,10 @@ const (
 )
 
 func main() {
-	var wg sync.WaitGroup
+	var err error
 
 	cfg := parseArgs()
 	tests := collectTests(cfg)
-	status := pollErrors()
-
-	defer wg.Wait()
 
 	for {
 		select {
@@ -35,26 +32,25 @@ func main() {
 				return
 			}
 
-			wg.Add(1)
-			go runTest(file, cfg.Include, &wg, status)
+			t := NewTest(file, cfg.Include)
+
+			if cfg.Trace {
+				err = t.Run(trace, cfg.Clock, cfg.Verbose)
+			} else {
+				err = t.Run(nil, cfg.Clock, cfg.Verbose)
+			}
+
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s: %v\n", file, err)
+				return
+			}
 		}
 	}
 }
 
-func pollErrors() chan error {
-	c := make(chan error)
-
-	go func() {
-		for {
-			select {
-			case err := <-c:
-				fmt.Fprintf(os.Stderr, "%s\n", err)
-				return
-			}
-		}
-	}()
-
-	return c
+func trace(pc, op, a, b cpu.Word, s *cpu.Storage) {
+	fmt.Fprintf(os.Stdout, "%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x\n",
+		pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
 }
 
 // collectTests traverses the input directory and finds all
@@ -91,9 +87,12 @@ func parseArgs() *Config {
 
 	c := NewConfig()
 
+	flag.Int64Var(&c.Clock, "c", c.Clock, "Clock speed in nanoseconds at which to run the tests.")
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
+	flag.BoolVar(&c.Trace, "t", false, "Print trace output for each instruction as it is executed.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
+	flag.BoolVar(&c.Verbose, "V", false, "Print additional debug output.")
 	flag.Parse()
 
 	if version {
