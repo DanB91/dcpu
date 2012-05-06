@@ -35,8 +35,8 @@ To install all tools in one go, do the following:
     $ cd dcpu
     $ go install -a -ldflags="-s" ./...
 
-The `dcpu-pp` and `dcpu-unit` programs will not be installed whereever
-your $GOBIN is set to and they are ready for use.
+The `dcpu-pp` and `dcpu-unit` programs will now be installed where ever
+your `$GOBIN` is set to. They are now ready for use.
 
 The `-a` switch ensures everything is freshly built (including the linked
 Go core packages). The `-ldflags="-s"` switch causes binaries to be built
