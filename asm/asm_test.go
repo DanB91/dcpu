@@ -21,10 +21,15 @@ var _exit = encode(cpu.EXT, cpu.EXIT, 0x21)
 var tests = []testCase{
 	{
 		`set a, 1
-		 set b, 0xfffe
-		 add a, b
+		 set b, [0xfffe]
+		 add a, [a]
+		 set [0xa], [sp+1] ; moo
 		 exit`,
 		[]cpu.Word{
+			encode(cpu.SET, 0, 0x22),
+			encode(cpu.SET, 1, 0x1f),
+			0xfffe,
+			encode(cpu.ADD, 0, 1),
 			_exit,
 		},
 	},

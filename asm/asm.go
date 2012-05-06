@@ -6,13 +6,15 @@ package asm
 import (
 	"github.com/jteeuwen/dcpu/cpu"
 	dp "github.com/jteeuwen/dcpu/parser"
+	"os"
 )
 
 // assembler holds some assembler state.
 type assembler struct {
-	ast    *dp.AST             // Source AST.
-	code   []cpu.Word          // Final program.
-	labels map[string]cpu.Word // Map of defined labels with their address.
+	ast    *dp.AST               // Source AST.
+	code   []cpu.Word            // Final program.
+	labels map[string]cpu.Word   // Map of defined labels with their address.
+	refs   map[cpu.Word]*dp.Name // Indices into `code` holding unresolved label references.
 }
 
 func encode(a, b, c cpu.Word) cpu.Word { return a | (b << 5) | (c << 10) }
@@ -23,13 +25,11 @@ func Assemble(ast *dp.AST) (prog []cpu.Word, err error) {
 	var asm assembler
 	asm.ast = ast
 	asm.labels = make(map[string]cpu.Word)
+	asm.refs = make(map[cpu.Word]*dp.Name)
 
+	dp.WriteAst(os.Stdout, ast)
 	if err = asm.buildNodes(ast.Root.Children()); err != nil {
 		return
-	}
-
-	for k, v := range asm.labels {
-		println(k, v)
 	}
 
 	prog = asm.code
@@ -76,12 +76,82 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 		)
 	}
 
-	if len(nodes) == 1 {
-		// No arguments -- There are only two instructions with
-		// this signature. Both are non-standard, extended instructions.
-		a.code = append(a.code, encode(cpu.EXT, op.code, 0x21))
-		return
+	if len(nodes)-1 != op.argc {
+		return NewBuildError(
+			a.ast.Files[name.File()], name.Line(), name.Col(),
+			"Invalid argument count for %q. Want %d", name.Data, op.argc,
+		)
+	}
+
+	var va, vb cpu.Word
+
+	switch op.argc {
+	case 2:
+		vb, err = a.buildOperand(nodes[2].(*dp.Expression).Children()[0])
+		if err != nil {
+			return
+		}
+
+		fallthrough
+	case 1:
+		va, err = a.buildOperand(nodes[1].(*dp.Expression).Children()[0])
+		if err != nil {
+			return
+		}
+	}
+
+	if op.ext {
+		a.code = append(a.code, encode(cpu.EXT, op.code, va))
+	} else {
+		a.code = append(a.code, encode(op.code, va, vb))
 	}
 
 	return
+}
+
+// buildOperand compiles the given instruction operand.
+func (a *assembler) buildOperand(node dp.Node) (val cpu.Word, err error) {
+	switch tt := node.(type) {
+	case *dp.Name:
+		return a.buildName(tt)
+
+	case *dp.Number:
+		return a.buildNumber(tt)
+
+	case *dp.Block:
+
+	default:
+		return 0, NewBuildError(
+			a.ast.Files[tt.File()], tt.Line(), tt.Col(),
+			"Unexpected node %T. Want Name, Number or Block.", tt,
+		)
+	}
+
+	return
+}
+
+// buildName builds a name operand.
+func (a *assembler) buildName(name *dp.Name) (val cpu.Word, err error) {
+	if reg, ok := registers[name.Data]; ok {
+		return reg, nil
+	}
+
+	if addr, ok := a.labels[name.Data]; ok {
+		return addr, nil
+	}
+
+	// Undefined label. Save it for later and reserve
+	// a new word for the address we will be resolving.
+	a.refs[cpu.Word(len(a.code))] = name
+	a.code = append(a.code, 0)
+	return 0, nil
+}
+
+// buildNumber builds a numerical operand.
+func (a *assembler) buildNumber(num *dp.Number) (val cpu.Word, err error) {
+	if num.Data == 0xffff || num.Data <= 0x1e {
+		return num.Data + 0x20, nil
+	}
+
+	return 0, nil
 }

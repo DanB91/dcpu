@@ -5,6 +5,7 @@ package parser
 
 import (
 	"bytes"
+	"github.com/jteeuwen/dcpu/cpu"
 	"io"
 	"strconv"
 	"unicode/utf8"
@@ -177,7 +178,7 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 				}
 
 				expr.children = append(expr.children,
-					NewNumber(file, tok.Line, tok.Col, Word(r)),
+					NewNumber(file, tok.Line, tok.Col, cpu.Word(r)),
 				)
 
 			case TokBlockStart:

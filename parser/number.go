@@ -3,16 +3,19 @@
 
 package parser
 
-import "strconv"
+import (
+	"github.com/jteeuwen/dcpu/cpu"
+	"strconv"
+)
 
 // Number holds a numerical value.
 type Number struct {
 	*NodeBase
-	Data Word
+	Data cpu.Word
 }
 
 // NewNumber creates and returns a new Number instance.
-func NewNumber(file, line, col int, data Word) *Number {
+func NewNumber(file, line, col int, data cpu.Word) *Number {
 	return &Number{
 		NodeBase: NewNodeBase(file, line, col),
 		Data:     data,
@@ -32,6 +35,6 @@ func (n *Number) Parse(data []byte) (err error) {
 		v, err = strconv.ParseUint(string(data), 0, 64)
 	}
 
-	n.Data = Word(v)
+	n.Data = cpu.Word(v)
 	return
 }
