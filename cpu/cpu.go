@@ -25,12 +25,17 @@ const MaxIntQueue = 0xff
 // This signature represents a Debug trace handler.
 type TraceFunc func(pc, op, a, b Word, store *Storage)
 
+// This handler is called whenever a TEST instruction fires.
+// It can be hooked by a program to perform some custom actions.
+type TestFunc func(*Storage) error
+
 // A CPU can run a single program.
 type CPU struct {
 	Store           *Storage      // Memory and registers
 	devices         []Device      // List of hardware devices.
 	intQueue        chan Word     // Interrupt queue.
-	Trace           TraceFunc     // Allow tracing of instructions as they are executed. For debug only.
+	Trace           TraceFunc     // When set, allows tracing of instructions as they are executed. For debug only.
+	Test            TestFunc      // When set, this is called whenever a TEST instruction fires.
 	ClockSpeed      time.Duration // Speed of CPU clock.
 	size            Word          // Size of last instruction (in words).
 	queueInterrupts bool          // Use interrupt queueing or not.
@@ -386,6 +391,11 @@ func (c *CPU) Step() (err error) {
 			}
 
 		case TEST:
+			if c.Test != nil {
+				if err = c.Test(s); err != nil {
+					return
+				}
+			}
 
 		case EXIT:
 			return io.EOF

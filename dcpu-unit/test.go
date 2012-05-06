@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 	dp "github.com/jteeuwen/dcpu/parser"
@@ -44,7 +45,8 @@ func runTest(file string, inc []string, wg *sync.WaitGroup, status chan<- error)
 		return
 	}
 
-	_ = bin
+	fmt.Printf("%04x\n", bin)
+	
 }
 
 // readAST reads the test source and constructs a complete AST.
