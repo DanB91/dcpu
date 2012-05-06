@@ -92,6 +92,22 @@ If all tests pass successfully, the tool exits cleanly.
 
     $ go get github.com/jteeuwen/dcpu/dcpu-unit
 
+A sample session might look as follows:
+
+    $ cd myproject/src
+	$ dcpu-unit -V -i ../lib
+	> ../lib/string/memchr.test...
+	  - Unit 0...  OK
+	  - Unit 1...  OK
+	  - Unit 2...
+	../lib/string/memchr.test: Unit test 2 mismatch:
+		       A    B    C    X    Y    Z    I    J   EX   SP   IA
+	  Want: 0013 0003 fffe 0000 0000 0000 0000 0000 0000 ffff 0000
+	  Have: 0018 0003 fffe 0000 0000 0000 0000 0000 0000 ffff 0000
+
+Omiting the `-V` flag will dispense with the verbose output and only
+prints an actual error when it occurs.
+
 ### License
 
 DCPU, 0x10c and related materials are Copyright 2012 Mojang.
