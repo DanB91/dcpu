@@ -46,7 +46,7 @@ var opcodes = map[string]opcode{
 	"iaq":  {0x0c, 1, true},
 	"hwn":  {0x10, 1, true},
 	"hwq":  {0x11, 1, true},
-	"hwi ": {0x12, 1, true},
+	"hwi":  {0x12, 1, true},
 	"test": {0x1e, 0, true},
 	"exit": {0x1f, 0, true},
 }
