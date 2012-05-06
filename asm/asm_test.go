@@ -5,7 +5,7 @@ package asm
 
 import (
 	"bytes"
-	"fmt"
+	//"fmt"
 	"github.com/jteeuwen/dcpu/cpu"
 	"github.com/jteeuwen/dcpu/parser"
 	"testing"
@@ -85,8 +85,8 @@ func doTest(t *testing.T, index int, tc *testCase) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("%04x\n", bin)
-	fmt.Printf("%04x\n", tc.bin)
+	//fmt.Printf("%04x\n", bin)
+	//fmt.Printf("%04x\n", tc.bin)
 
 	if len(bin) != len(tc.bin) {
 		t.Fatalf("test %d: Size mismatch. Expect %d, got %d",
