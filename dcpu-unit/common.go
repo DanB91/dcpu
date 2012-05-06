@@ -7,14 +7,14 @@ import dp "github.com/jteeuwen/dcpu/parser"
 
 // Instructions and registers according to spec v1.7
 //
-// With an additional 'test' instruction for this tool.
+// With additional 'test' and 'exit' instructions for this tool.
 
 var (
 	instructions = []string{
 		"set", "add", "sub", "mul", "mli", "div", "dvi", "mod", "mdi", "and",
 		"bor", "xor", "shr", "asr", "shl", "ifb", "ifc", "ife", "ifn", "ifg",
 		"ifa", "ifl", "ifu", "adx", "sbx", "sti", "std", "jsr", "int", "iag",
-		"ias", "rfi", "iaq", "hwn", "hwq", "hwi", "dat", "test",
+		"ias", "rfi", "iaq", "hwn", "hwq", "hwi", "dat", "test", "exit",
 	}
 
 	regs = []string{

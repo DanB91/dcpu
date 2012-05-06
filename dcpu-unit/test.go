@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-const unitString = `Unit test %d mismatch:
+const unitString = `Line %d, col %d:
            A    B    C    X    Y    Z    I    J   EX   SP   IA
   Want: %s
   Have: %s`
@@ -64,15 +64,15 @@ func (t *Test) Run(trace cpu.TraceFunc, speed int64, verbose bool) (err error) {
 
 	c.Trace = trace
 	c.ClockSpeed = time.Duration(speed)
-	c.Test = func(s *cpu.Storage) error {
-		return t.handleTest(s, verbose)
+	c.Test = func(pc cpu.Word, s *cpu.Storage) error {
+		return t.handleTest(pc, s, verbose)
 	}
 
 	return c.Run(0)
 }
 
 // handleTest is called whenever a TEST instruction fires in a test program.
-func (t *Test) handleTest(s *cpu.Storage, verbose bool) (err error) {
+func (t *Test) handleTest(pc cpu.Word, s *cpu.Storage, verbose bool) (err error) {
 	if verbose {
 		fmt.Fprintf(os.Stdout, "  - Unit %d...", t.count)
 	}
@@ -88,7 +88,11 @@ func (t *Test) handleTest(s *cpu.Storage, verbose bool) (err error) {
 		if verbose {
 			fmt.Fprintln(os.Stdout)
 		}
-		return errors.New(fmt.Sprintf(unitString, t.count, t.compare[t.count], line))
+
+		symbol := t.dbg.Data[pc]
+
+		return errors.New(fmt.Sprintf(unitString,
+			symbol.Line, symbol.Col, t.compare[t.count], line))
 	}
 
 	t.count++

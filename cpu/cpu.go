@@ -27,7 +27,7 @@ type TraceFunc func(pc, op, a, b Word, store *Storage)
 
 // This handler is called whenever a TEST instruction fires.
 // It can be hooked by a program to perform some custom actions.
-type TestFunc func(*Storage) error
+type TestFunc func(pc Word, s *Storage) error
 
 // A CPU can run a single program.
 type CPU struct {
@@ -392,7 +392,7 @@ func (c *CPU) Step() (err error) {
 
 		case TEST:
 			if c.Test != nil {
-				if err = c.Test(s); err != nil {
+				if err = c.Test(s.PC-c.size, s); err != nil {
 					return
 				}
 			}
