@@ -86,6 +86,8 @@ If all tests pass successfully, the tool exits cleanly.
 
 ### Dependencies
 
+    $ go get github.com/jteeuwen/dcpu/asm
+    $ go get github.com/jteeuwen/dcpu/cpu
     $ go get github.com/jteeuwen/dcpu/parser
 
 ### Usage
