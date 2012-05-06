@@ -6,7 +6,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jteeuwen/dcpu/cpu"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,7 +15,7 @@ import (
 
 const (
 	AppName    = "dcpu-unit"
-	AppVersion = "0.1.1"
+	AppVersion = "0.2.0"
 )
 
 func main() {
@@ -34,11 +33,7 @@ func main() {
 
 			t := NewTest(file, cfg.Include)
 
-			if cfg.Trace {
-				err = t.Run(trace, cfg.Clock, cfg.Verbose)
-			} else {
-				err = t.Run(nil, cfg.Clock, cfg.Verbose)
-			}
+			err = t.Run(cfg)
 
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s: %v\n", file, err)
@@ -46,11 +41,6 @@ func main() {
 			}
 		}
 	}
-}
-
-func trace(pc, op, a, b cpu.Word, s *cpu.Storage) {
-	fmt.Fprintf(os.Stdout, "%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x\n",
-		pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
 }
 
 // collectTests traverses the input directory and finds all

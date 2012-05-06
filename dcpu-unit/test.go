@@ -13,14 +13,18 @@ import (
 	dp "github.com/jteeuwen/dcpu/parser"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
-const unitString = `Line %d, col %d:
+const (
+	unitString = `Line %d, col %d:
            A    B    C    X    Y    Z    I    J   EX   SP   IA
   Want: %s
   Have: %s`
+	traceString = "%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n"
+)
 
 // Test represents a single unit test case.
 // It covers one test file which may contain multiple unit tests.
@@ -44,8 +48,8 @@ func NewTest(file string, inc []string) *Test {
 // the unit tests defined in it.
 //
 // Any errors are returned through the status channel.
-func (t *Test) Run(trace cpu.TraceFunc, speed int64, verbose bool) (err error) {
-	if verbose {
+func (t *Test) Run(cfg *Config) (err error) {
+	if cfg.Verbose {
 		fmt.Fprintf(os.Stdout, "> %s...\n", t.file)
 	}
 
@@ -63,13 +67,29 @@ func (t *Test) Run(trace cpu.TraceFunc, speed int64, verbose bool) (err error) {
 		return
 	}
 
-	c.Trace = trace
-	c.ClockSpeed = time.Duration(speed)
+	if cfg.Trace {
+		c.Trace = func(pc, op, a, b cpu.Word, s *cpu.Storage) {
+			t.trace(pc, op, a, b, s)
+		}
+	}
+
+	c.ClockSpeed = time.Duration(cfg.Clock)
 	c.Test = func(pc cpu.Word, s *cpu.Storage) error {
-		return t.handleTest(pc, s, verbose)
+		return t.handleTest(pc, s, cfg.Verbose)
 	}
 
 	return c.Run(0)
+}
+
+// trace prints trace output for each instruction as it is executed.
+// It yields current PC, opcode, operands, all register contents and
+// appends the original line of sourcecode
+func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage) {
+	line := t.getSourceLine(pc)
+
+	fmt.Fprintf(os.Stdout, traceString,
+		pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z,
+		s.I, s.J, s.SP, s.EX, s.IA, line)
 }
 
 // handleTest is called whenever a TEST instruction fires in a test program.
@@ -163,4 +183,45 @@ func (t *Test) loadCompareSet() (err error) {
 	}
 
 	return
+}
+
+// getSourceLine fetches the line of sourcecode from the
+// file defined by the given PC value. This data is stored in the
+// debug symbol table.
+func (t *Test) getSourceLine(pc cpu.Word) string {
+	symbol := t.dbg.Data[pc]
+	file := t.dbg.Files[symbol.File]
+
+	fd, err := os.Open(file)
+	if err != nil {
+		return ""
+	}
+
+	defer fd.Close()
+
+	r := bufio.NewReader(fd)
+
+	var count int
+	var line []byte
+
+	_, file = filepath.Split(file)
+
+	for {
+		if line, _, err = r.ReadLine(); err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			return ""
+		}
+
+		if count < symbol.Line-1 {
+			count++
+			continue
+		}
+
+		line = bytes.TrimSpace(line)
+		return fmt.Sprintf("%s:%d | %s", file, symbol.Line, line)
+	}
+
+	return ""
 }

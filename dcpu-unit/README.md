@@ -84,6 +84,44 @@ When the `test` instruction is fired, the CPU performs the following steps:
 
 If all tests pass successfully, the tool exits cleanly.
 
+### Runtime tracing
+
+The `-t` flag will print runtime trace output for each instruction
+as it is executed. This allows fine grained insight into what is happening.
+This covers the current PC, opcode and operands, all register contents
+and the original source file and line that created this instruction.
+
+Here is an example of trace output for a test program.
+
+	./dcpu-unit -i ../lib/ -t ../lib/
+	0000: 0001 001c 001f | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:1 | set pc, main
+	0007: 0001 0000 0023 | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:7 | set a, data
+	0008: 0001 0001 0024 | 0002 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:8 | set b, 3
+	0009: 0001 0002 0021 | 0002 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:9 | set c, 0
+	000a: 0000 0001 001f | 0002 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:10 | jsr memchr
+	000e: 0012 0001 0003 | 0002 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
+	0010: 0012 0008 0001 | 0002 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:19 | ife [a], b
+	0012: 0002 0000 0022 | 0002 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:21 | add a, 1
+	0013: 0003 0002 0022 | 0003 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:22 | sub c, 1
+	0014: 0014 0002 0021 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:23 | ifg c, 0
+	0015: 0001 001c 0031 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:24 | set pc, memchr_loop
+	0010: 0012 0008 0001 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:19 | ife [a], b
+	0012: 0002 0000 0022 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:21 | add a, 1
+	0013: 0003 0002 0022 | 0004 0003 ffff 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:22 | sub c, 1
+	0014: 0014 0002 0021 | 0004 0003 fffe 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:23 | ifg c, 0
+	0015: 0001 001c 0031 | 0004 0003 fffe 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:24 | set pc, memchr_loop
+	0010: 0012 0008 0001 | 0004 0003 fffe 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:19 | ife [a], b
+	0011: 0001 001c 0018 | 0004 0003 fffe 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.dasm:20 | set pc, pop
+	000c: 0000 001e 0000 | 0004 0003 fffe 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:11 | test
+
+
+### Clock speed
+
+The `-c N` flag defines the cpu's clock speed in nanoseconds.
+Set this to a higher value to slow the CPU down. Combined with `-t`, this
+can be a powerful debugging tool.
+
+
 ### Dependencies
 
     $ go get github.com/jteeuwen/dcpu/asm
@@ -93,31 +131,6 @@ If all tests pass successfully, the tool exits cleanly.
 ### Usage
 
     $ go get github.com/jteeuwen/dcpu/dcpu-unit
-
-A sample session might look as follows:
-
-    $ cd myproject/src
-	$ dcpu-unit -V -i ../lib
-	> ../lib/string/memchr.test...
-	  - Unit 0...  OK
-	  - Unit 1...  OK
-	  - Unit 2...
-	../lib/string/memchr.test: Unit test 2 mismatch:
-		       A    B    C    X    Y    Z    I    J   EX   SP   IA
-	  Want: 0013 0003 fffe 0000 0000 0000 0000 0000 0000 ffff 0000
-	  Have: 0018 0003 fffe 0000 0000 0000 0000 0000 0000 ffff 0000
-
-Omiting the `-V` flag will dispense with the verbose output and only
-prints an actual error when it occurs.
-
-The `-t` flag will print runtime trace output for each instruction
-as it is executed. This allows fine grained insight into what is happening.
-
-The `-c N` flag defines the cpu's clock speed in nanoseconds.
-Set this to a higher value to slow the CPU down. Combined with `-t`, this
-can be a powerful debugging tool.
-
-Invoke the program with the `-h` flag to see all options.
 
 ### License
 

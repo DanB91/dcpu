@@ -1,0 +1,26 @@
+ set pc, main
+
+:d1 dat 1, 2, 3, 4, 5
+:d2 dat 1, 2, 3, 6, 7
+
+:main
+ set a, d1
+ set b, d2
+ set c, 0
+ jsr memcmp
+ test
+
+ set a, d1
+ set b, d2
+ set c, 3
+ jsr memcmp
+ test
+
+ set a, d1
+ set b, d2
+ set c, 4
+ jsr memcmp
+ test
+
+ exit
+
