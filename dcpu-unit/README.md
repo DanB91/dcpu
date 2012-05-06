@@ -108,6 +108,15 @@ A sample session might look as follows:
 Omiting the `-V` flag will dispense with the verbose output and only
 prints an actual error when it occurs.
 
+The `-t` flag will print runtime trace output for each instruction
+as it is executed. This allows fine grained insight into what is happening.
+
+The `-c N` flag defines the cpu's clock speed in nanoseconds.
+Set this to a higher value to slow the CPU down. Combined with `-t`, this
+can be a powerful debugging tool.
+
+Invoke the program with the `-h` flag to see all options.
+
 ### License
 
 DCPU, 0x10c and related materials are Copyright 2012 Mojang.
