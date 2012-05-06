@@ -53,7 +53,7 @@ func doTest(t *testing.T, c *CPU, result, overflow Word) {
 }
 
 func TestSet(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0x30
 	s.Mem[1] = 0x30
@@ -62,7 +62,7 @@ func TestSet(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0xffff
 	s.Mem[1] = 0xffff
@@ -72,7 +72,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestSub(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0x0, 0x21) // SET A, 0
 	s.Mem[1] = enc(SUB, 0x0, 0x22) // SUB A, 1
@@ -81,7 +81,7 @@ func TestSub(t *testing.T) {
 }
 
 func TestMul(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0x18
 	s.Mem[1] = 0x18
@@ -91,7 +91,7 @@ func TestMul(t *testing.T) {
 }
 
 func TestMli(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0x18
 	s.Mem[1] = 0x18
@@ -101,7 +101,7 @@ func TestMli(t *testing.T) {
 }
 
 func TestDiv(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0x60
 	s.Mem[1] = 0x60
@@ -111,7 +111,7 @@ func TestDiv(t *testing.T) {
 }
 
 func TestMod(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x30) // SET A, 0xf
 	s.Mem[1] = enc(MOD, 0, 0x23) // MOD A, 0x2
@@ -120,7 +120,7 @@ func TestMod(t *testing.T) {
 }
 
 func TestAnd(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x24) // SET A, 0x3
 	s.Mem[1] = enc(AND, 0, 0x22) // AND A, 0x1
@@ -129,7 +129,7 @@ func TestAnd(t *testing.T) {
 }
 
 func TestBor(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 0x1
 	s.Mem[1] = enc(BOR, 0, 0x23) // OR A, 0x2
@@ -138,7 +138,7 @@ func TestBor(t *testing.T) {
 }
 
 func TestXor(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(XOR, 0, 0x27) // XOR A, 0x6
@@ -147,7 +147,7 @@ func TestXor(t *testing.T) {
 }
 
 func TestShr(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x31) // SET A, 0x10
 	s.Mem[1] = enc(SHR, 0, 0x22) // SHR A, 0x1
@@ -156,7 +156,7 @@ func TestShr(t *testing.T) {
 }
 
 func TestAsr(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x31) // SET A, 0x10
 	s.Mem[1] = enc(ASR, 0, 0x22) // ASR A, 0x1
@@ -165,7 +165,7 @@ func TestAsr(t *testing.T) {
 }
 
 func TestShl(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x31) // SET A, 0x10
 	s.Mem[1] = enc(SHL, 0, 0x22) // SHL A, 0x1
@@ -174,7 +174,7 @@ func TestShl(t *testing.T) {
 }
 
 func TestIfb(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(IFB, 0, 0x25) // IFB A, 0x4
@@ -184,7 +184,7 @@ func TestIfb(t *testing.T) {
 }
 
 func TestIfc(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(IFC, 0, 0x25) // IFC A, 0x4
@@ -194,7 +194,7 @@ func TestIfc(t *testing.T) {
 }
 
 func TestIfe(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(IFE, 0, 0x25) // IFE A, 0x4
@@ -204,7 +204,7 @@ func TestIfe(t *testing.T) {
 }
 
 func TestIfn(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(IFN, 0, 0x25) // IFN A, 0x4
@@ -214,7 +214,7 @@ func TestIfn(t *testing.T) {
 }
 
 func TestIfg(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(IFG, 0, 0x25) // IFG A, 0x4
@@ -224,7 +224,7 @@ func TestIfg(t *testing.T) {
 }
 
 func TestIfl(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x25) // SET A, 0x4
 	s.Mem[1] = enc(IFL, 0, 0x25) // IFL A, 0x4
@@ -234,7 +234,7 @@ func TestIfl(t *testing.T) {
 }
 
 func TestNestedIf(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x21) // SET A, 0x0
 	s.Mem[1] = enc(IFG, 0, 0x22) // IFG A, 0x1
@@ -246,7 +246,7 @@ func TestNestedIf(t *testing.T) {
 }
 
 func TestADX(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0xffff
 	s.Mem[1] = 0xffff
@@ -259,7 +259,7 @@ func TestADX(t *testing.T) {
 }
 
 func TestSBX(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0xffff
 	s.Mem[1] = 0xffff
@@ -270,7 +270,7 @@ func TestSBX(t *testing.T) {
 }
 
 func TestSTI(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 1, 0x22) // SET B, 0x1
 	s.Mem[1] = enc(STI, 0, 1)    // STI A, B
@@ -281,7 +281,7 @@ func TestSTI(t *testing.T) {
 }
 
 func TestSTD(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 1, 0x22) // SET B, 0x1
 	s.Mem[1] = enc(STD, 0, 1)    // STD A, B
@@ -292,7 +292,7 @@ func TestSTD(t *testing.T) {
 }
 
 func TestJsr(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x1f) // SET A, 0xffff
 	s.Mem[1] = 0xffff
@@ -304,7 +304,7 @@ func TestJsr(t *testing.T) {
 }
 
 func TestIntRfi(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(EXT, IAS, 0x26) // IAS my_handler
 	s.Mem[1] = enc(EXT, INT, 0x1f) // INT 0xbeef
@@ -320,7 +320,7 @@ func TestIntRfi(t *testing.T) {
 }
 
 func TestIasIag(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 1
 	s.Mem[1] = enc(EXT, IAS, 0)  // IAS A
@@ -331,7 +331,7 @@ func TestIasIag(t *testing.T) {
 }
 
 func TestHwn(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	c.RegisterDevice(NewTestDevice)
 	s.Mem[0] = enc(EXT, HWN, 0) // HWN A
@@ -340,7 +340,7 @@ func TestHwn(t *testing.T) {
 }
 
 func TestHwq(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	c.RegisterDevice(NewTestDevice)
 	s.Mem[0] = enc(SET, 0, 0x21) // SET A, 0
@@ -350,7 +350,7 @@ func TestHwq(t *testing.T) {
 }
 
 func TestHwi(t *testing.T) {
-	c := NewCPU()
+	c := New()
 	s := c.Store
 	c.RegisterDevice(NewTestDevice)
 	s.Mem[0] = enc(SET, 0, 0x22) // SET A, 0x1

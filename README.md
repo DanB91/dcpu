@@ -26,6 +26,26 @@ which should make the writing of larger programs a little less painful.
   want it to do. Refer to its README for more info.
 * _lib/_: This directory holds often used assembly code and unit tests.
 
+
+### Usage
+
+To install all tools in one go, do the following:
+
+    $ git clone https://github.com/jteeuwen/dcpu.git
+    $ cd dcpu
+    $ go install -a -ldflags="-s" ./...
+
+The `dcpu-pp` and `dcpu-unit` programs will not be installed whereever
+your $GOBIN is set to and they are ready for use.
+
+The `-a` switch ensures everything is freshly built (including the linked
+Go core packages). The `-ldflags="-s"` switch causes binaries to be built
+without all the debug symbols. This speeds them up a little and drastically
+reduces their file size. The `./...` bit simply means: Build any and all
+packages in this directory and all sub directories. The Go tool will
+automatically figure out the dependency tree and build things in the right
+order.
+
 ### License
 
 DCPU, 0x10c and related materials are Copyright 2012 Mojang.

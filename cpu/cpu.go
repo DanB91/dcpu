@@ -36,8 +36,8 @@ type CPU struct {
 	queueInterrupts bool          // Use interrupt queueing or not.
 }
 
-// NewCPU creates and initializes a new CPU instance.
-func NewCPU() *CPU {
+// New creates and initializes a new CPU instance.
+func New() *CPU {
 	c := new(CPU)
 	c.ClockSpeed = 1000 // 100khz
 	c.Store = new(Storage)

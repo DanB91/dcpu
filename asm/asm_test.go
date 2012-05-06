@@ -18,57 +18,6 @@ type testCase struct {
 
 var _exit = encode(cpu.EXT, cpu.EXIT, 0)
 
-var tests = []testCase{
-	{
-		`set a, 1
-		 set b, 0xfffe
-		 add b, [0x100]
-		 add a, [a]
-		 ;moo
-		 exit`,
-		[]cpu.Word{
-			encode(cpu.SET, 0, 0x22),
-			encode(cpu.SET, 1, 0x1f),
-			0xfffe,
-			encode(cpu.ADD, 1, 0x1e),
-			0x100,
-			encode(cpu.ADD, 0, 8),
-			_exit,
-		},
-	},
-	{
-		`  set a, [sp+end]
-		   xor [0xfffe], a
-		 :end
-		   exit`,
-		[]cpu.Word{
-			encode(cpu.SET, 0, 0x1a),
-			0x4,
-			encode(cpu.XOR, 0x1e, 0),
-			0xfffe,
-			_exit,
-		},
-	},
-	{
-		`jsr 3
-		 jsr a
-		 jsr [z]
-		 exit`,
-		[]cpu.Word{
-			encode(cpu.EXT, cpu.JSR, 0x24),
-			encode(cpu.EXT, cpu.JSR, 0),
-			encode(cpu.EXT, cpu.JSR, 0xd),
-			_exit,
-		},
-	},
-}
-
-func Test(t *testing.T) {
-	for i := range tests {
-		doTest(t, i, &tests[i])
-	}
-}
-
 func doTest(t *testing.T, index int, tc *testCase) {
 	var ast parser.AST
 	var bin []cpu.Word
