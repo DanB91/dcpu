@@ -49,6 +49,7 @@ var opcodes = map[string]opcode{
 	"hwi":  {0x12, 1, true},
 	"test": {0x1e, 0, true},
 	"exit": {0x1f, 0, true},
+	"dat":  {0, 0, false}, // Pseudo-instruction
 }
 
 var registers = map[string]cpu.Word{

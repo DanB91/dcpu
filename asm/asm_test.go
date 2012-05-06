@@ -154,3 +154,16 @@ func TestHwi(t *testing.T) {
 		encode(cpu.EXT, cpu.EXIT, 0),
 	)
 }
+
+func TestDat(t *testing.T) {
+	doTest(t,
+		`:end
+		    set pc, end
+		 :dat
+		    dat 0x170, "Hello, universe", 0
+		`,
+		encode(cpu.SET, 0x1c, 0x21),
+		0x170, 'H', 'e', 'l', 'l', 'o', ',', ' ',
+		'u', 'n', 'i', 'v', 'e', 'r', 's', 'e', 0,
+	)
+}

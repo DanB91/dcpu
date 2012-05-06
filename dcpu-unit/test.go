@@ -4,8 +4,8 @@
 package main
 
 import (
-	"errors"
-	"fmt"
+	"github.com/jteeuwen/dcpu/asm"
+	"github.com/jteeuwen/dcpu/cpu"
 	dp "github.com/jteeuwen/dcpu/parser"
 	"sync"
 )
@@ -21,8 +21,10 @@ type Test struct {
 	file     string   // Test source file.
 }
 
-// Run loads up the test sources, compiles it and performs
+// runTest loads up the test sources, compiles it and performs
 // the unit tests defined in it.
+//
+// Any errors are returned through the status channel.
 func runTest(file string, inc []string, wg *sync.WaitGroup, status chan<- error) {
 	defer wg.Done()
 
@@ -32,11 +34,17 @@ func runTest(file string, inc []string, wg *sync.WaitGroup, status chan<- error)
 
 	ast, err := t.readAST()
 	if err != nil {
-		status <- errors.New(fmt.Sprintf("%s: %v", file, err))
+		status <- err
 		return
 	}
 
-	_ = ast
+	var bin []cpu.Word
+	if bin, err = asm.Assemble(ast); err != nil {
+		status <- err
+		return
+	}
+
+	_ = bin
 }
 
 // readAST reads the test source and constructs a complete AST.

@@ -24,7 +24,7 @@ func main() {
 
 	cfg := parseArgs()
 	tests := collectTests(cfg)
-	status := make(chan error)
+	status := pollErrors()
 
 	defer wg.Wait()
 
@@ -37,12 +37,24 @@ func main() {
 
 			wg.Add(1)
 			go runTest(file, cfg.Include, &wg, status)
-
-		case err := <-status:
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-			return
 		}
 	}
+}
+
+func pollErrors() chan error {
+	c := make(chan error)
+
+	go func() {
+		for {
+			select {
+			case err := <-c:
+				fmt.Fprintf(os.Stderr, "%s\n", err)
+				return
+			}
+		}
+	}()
+
+	return c
 }
 
 // collectTests traverses the input directory and finds all

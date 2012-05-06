@@ -79,6 +79,11 @@ func (a *assembler) buildNodes(nodes []dp.Node) (err error) {
 // buildInstruction compiles the given instruction.
 func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 	name := nodes[0].(*dp.Name)
+
+	if name.Data == "dat" {
+		return a.buildData(nodes)
+	}
+
 	op, ok := opcodes[name.Data]
 
 	if !ok {
@@ -258,4 +263,30 @@ func (a *assembler) buildBlockOperand(argv *[]cpu.Word, node dp.Node) (cpu.Word,
 		a.ast.Files[node.File()], node.Line(), node.Col(),
 		"Unexpected node %T. Want Name or Number.", node,
 	)
+}
+
+// buildData compiles the given data section
+func (a *assembler) buildData(nodes []dp.Node) (err error) {
+	var r rune
+	nodes = nodes[1:] // Skip 'dat' instruction.
+
+	for i := range nodes {
+		expr, ok := nodes[i].(*dp.Expression)
+
+		if !ok {
+			continue
+		}
+
+		switch tt := expr.Children()[0].(type) {
+		case *dp.String:
+			for _, r = range tt.Data {
+				a.code = append(a.code, cpu.Word(r))
+			}
+
+		case *dp.Number:
+			a.code = append(a.code, tt.Data)
+		}
+	}
+
+	return
 }
