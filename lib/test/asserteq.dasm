@@ -5,7 +5,7 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :asserteq
-  ifn a, b
+  ife a, b
     panic asserteq_str
   set pc, pop
 

@@ -4,7 +4,6 @@
 package cpu
 
 import (
-	"errors"
 	"io"
 	"time"
 )
@@ -19,6 +18,15 @@ type OverloadError struct{}
 func (e OverloadError) Error() string {
 	return "Interrupt overload: System on fire!"
 }
+
+// TestError occurs when a PANIC instruction fires.
+// It has a string message along with some current execution state.
+type TestError struct {
+	Msg string
+	PC  Word
+}
+
+func (e TestError) Error() string { return e.Msg }
 
 // Maximum interrupt queue size.
 const MaxIntQueue = 0xff
@@ -398,7 +406,7 @@ func (c *CPU) Step() (err error) {
 			if len(str) == 0 {
 				str = "Unknown error"
 			}
-			return errors.New(str)
+			return &TestError{str, s.PC - c.size}
 
 		case EXIT:
 			return io.EOF
