@@ -1,9 +1,0 @@
-; int abs ( int n );
-;
-; Returns the absolute value of parameter n.
-;
-; ## Version History:
-;   0.1.0: Initial definition for spec 1.7.
-;
-:abs
-  set pc, pop
