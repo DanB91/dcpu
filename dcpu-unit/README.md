@@ -60,27 +60,20 @@ and the original source file and line that created this instruction.
 
 Here is an example of trace output for a test program.
 
-	./dcpu-unit -i ../lib/ -t ../lib/
-	0000: 0001 001c 001f | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:1 | set pc, main
-	0007: 0001 0000 0023 | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:7 | set a, data
-	0008: 0001 0001 0024 | 0002 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:8 | set b, 3
-	0009: 0001 0002 0021 | 0002 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:9 | set c, 0
-	000a: 0000 0001 001f | 0002 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:10 | jsr memchr
-	000e: 0012 0001 0003 | 0002 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
-	0010: 0012 0008 0001 | 0002 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:19 | ife [a], b
-	0012: 0002 0000 0022 | 0002 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:21 | add a, 1
-	0013: 0003 0002 0022 | 0003 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:22 | sub c, 1
-	0014: 0014 0002 0021 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:23 | ifg c, 0
-	0015: 0001 001c 0031 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:24 | set pc, memchr_loop
-	0010: 0012 0008 0001 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:19 | ife [a], b
-	0012: 0002 0000 0022 | 0003 0003 ffff 0000 0000 0000 0000 0000 | fffe ffff 0000 | memchr.dasm:21 | add a, 1
-	0013: 0003 0002 0022 | 0004 0003 ffff 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:22 | sub c, 1
-	0014: 0014 0002 0021 | 0004 0003 fffe 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:23 | ifg c, 0
-	0015: 0001 001c 0031 | 0004 0003 fffe 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:24 | set pc, memchr_loop
-	0010: 0012 0008 0001 | 0004 0003 fffe 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:19 | ife [a], b
-	0011: 0001 001c 0018 | 0004 0003 fffe 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.dasm:20 | set pc, pop
-	000c: 0000 001e 0000 | 0004 0003 fffe 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.test:11 | test
-
+    $ cd /path/to/dcpu/lib
+    $ dcpu-unit -V -t .
+	> string/memchr_test.dasm...
+	0000: 0001 0000 001f | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:1 | set a, data
+	0002: 0001 0001 0024 | 000b 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:2 | set b, 3
+	0003: 0001 0002 0021 | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:3 | set c, 0
+	0004: 0000 0001 001f | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:4 | jsr memchr
+	0010: 0012 0002 0021 | 000b 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:15 | ife c, 0 ; num is zero -- No compare needed.
+	0011: 0001 001c 0018 | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.dasm:16 | set pc, pop
+	0006: 0001 0001 001f | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:6 | set b, data
+	0008: 0000 0001 001f | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:7 | jsr asserteq
+	001a: 0013 0000 0001 | 000b 000b 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | asserteq.dasm:8 | ifn a, b
+	001d: 0001 001c 0018 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | asserteq.dasm:10 | set pc, pop
+	000a: 0000 001f 0000 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:9 | exit
 
 ### Clock speed
 
