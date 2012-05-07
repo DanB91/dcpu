@@ -66,11 +66,6 @@ This defines some inputs, the calls `memchr` and issues the special `test`
 instruction. It is this last instruction which denotes the end of a single
 unit. We can have arbitrarily many units in a single test file.
 
-It should be noted that each unit is considered a single, full program.
-When a new test starts (`test` has just been executed), all state information
-in the CPU is reset to its defaults. This includes registers and memory.
-This ensures consistent behaviour.
-
 When the `test` instruction is fired, the CPU performs the following steps:
 
 * Fetch the current register states.
