@@ -45,7 +45,7 @@ Example code for a single test unit may look like this:
 	:data
 	 dat 1, 2, 3, 4, 5
 
-This defines some inputs, the calls `memchr` and compares the value in the
+This defines some inputs, then calls `memchr` and compares the value in the
 A register with something we expect it to be. `asserteq` panic if this
 is not the case.
 
