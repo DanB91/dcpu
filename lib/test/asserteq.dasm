@@ -1,0 +1,13 @@
+; ASSERTEQ compares the values in registers A and B.
+; If they are not equal, it panics and stops the runtime.
+; 
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:asserteq
+  ifn a, b
+    panic asserteq_str
+  set pc, pop
+
+:asserteq_str
+  dat "Assertion failed: A != B", 0

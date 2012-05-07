@@ -12,7 +12,7 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memchr
-  ife 0, c ; num is zero -- No compare needed.
+  ife c, 0 ; num is zero -- No compare needed.
     set pc, pop
 
 :memchr_loop

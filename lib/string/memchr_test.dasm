@@ -1,0 +1,12 @@
+ set a, data
+ set b, 3
+ set c, 0
+ jsr memchr
+ 
+ set b, data
+ jsr asserteq
+
+ exit
+
+:data
+ dat 1, 2, 3, 4, 5

@@ -42,3 +42,24 @@ func (s *Storage) Clear() {
 	s.EX = 0
 	s.IA = 0
 }
+
+// readString reads a string from the given memory address.
+func (s *Storage) readString(addr Word) string {
+	if int(addr) >= len(s.Mem) {
+		return ""
+	}
+
+	runes := make([]rune, 0, 128)
+
+	for ; int(addr) < len(s.Mem); addr++ {
+		ch := s.Mem[addr] & 0xff
+
+		if ch == 0 {
+			break
+		}
+
+		runes = append(runes, rune(ch))
+	}
+
+	return string(runes)
+}

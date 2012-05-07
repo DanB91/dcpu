@@ -14,12 +14,13 @@ const (
 	DIV = 0x06 // DIV b, a | sets b to b/a, sets EX to ((b<<16)/a)&0xffff. if a==0, sets b and EX to 0 instead. (treats b, a as unsigned)
 	DVI = 0x07 // DVI b, a | like DIV, but treat b, a as signed
 	MOD = 0x08 // MOD b, a | sets b to b%a. if a==0, sets b to 0 instead.
-	AND = 0x09 // AND b, a | sets b to b&a
-	BOR = 0x0a // BOR b, a | sets b to b|a
-	XOR = 0x0b // XOR b, a | sets b to b^a
-	SHR = 0x0c // SHR b, a | sets b to b>>>a, sets EX to ((b<<16)>>a)&0xffff  (logical shift)
-	ASR = 0x0d // ASR b, a | sets b to b>>a, sets EX to ((b<<16)>>>a)&0xffff  (arithmetic shift) (treats b as signed)
-	SHL = 0x0e // SHL b, a | sets b to b<<a, sets EX to ((b<<a)>>16)&0xffff
+	MDI = 0x09 // MDI b, asets b to b%a. if a==0, sets b to 0 instead. Treats a, b as signed.
+	AND = 0x0a // AND b, a | sets b to b&a
+	BOR = 0x0b // BOR b, a | sets b to b|a
+	XOR = 0x0c // XOR b, a | sets b to b^a
+	SHR = 0x0d // SHR b, a | sets b to b>>>a, sets EX to ((b<<16)>>a)&0xffff  (logical shift)
+	ASR = 0x0e // ASR b, a | sets b to b>>a, sets EX to ((b<<16)>>>a)&0xffff  (arithmetic shift) (treats b as signed)
+	SHL = 0x0f // SHL b, a | sets b to b<<a, sets EX to ((b<<a)>>16)&0xffff
 	IFB = 0x10 // IFB b, a | performs next instruction only if (b&a)!=0
 	IFC = 0x11 // IFC b, a | performs next instruction only if (b&a)==0
 	IFE = 0x12 // IFE b, a | performs next instruction only if b==a 
@@ -53,7 +54,7 @@ const (
 		 - type c is the hardware revision
 		 - x+y is a 32 bit word identifying the manufacturer.
 	*/
-	HWI  = 0x12 // HWI a | sends an interrupt to hardware a
-	TEST = 0x1e // (Non-standard) TEST instruction. Used to perform unit tests.
-	EXIT = 0x1f // (Non-standard) Exit instruction. Stops the world.
+	HWI   = 0x12 // HWI a | sends an interrupt to hardware a
+	PANIC = 0x1e // (Non-standard) Panic stops the world and yields an error. Thrown by failed assertions.
+	EXIT  = 0x1f // (Non-standard) Exit instruction. Stops the world.
 )

@@ -15,7 +15,7 @@ import (
 
 const (
 	AppName    = "dcpu-unit"
-	AppVersion = "0.2.0"
+	AppVersion = "0.3.1"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 			err = t.Run(cfg)
 
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s: %v\n", file, err)
+				fmt.Fprintf(os.Stderr, "%v\n", err)
 				return
 			}
 		}
@@ -52,14 +52,15 @@ func collectTests(cfg *Config) <-chan string {
 		defer close(c)
 
 		filepath.Walk(cfg.Input, func(file string, info os.FileInfo, err error) error {
-			if info.IsDir() || path.Ext(file) != ".test" {
+			if info.IsDir() {
 				return nil
 			}
 
-			// We need a matching compare file.
-			stat, err := os.Stat(file[:len(file)-5] + ".cmp")
-			if err != nil || stat.IsDir() {
-				return nil
+			_, name := filepath.Split(file)
+			ok, err := filepath.Match("*_test.dasm", name)
+
+			if !ok || err != nil {
+				return err
 			}
 
 			c <- file

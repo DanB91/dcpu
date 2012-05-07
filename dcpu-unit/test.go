@@ -6,7 +6,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
@@ -14,16 +13,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
-)
-
-const (
-	unitString = `Line %d, col %d:
-           A    B    C    X    Y    Z    I    J   EX   SP   IA
-  Want: %s
-  Have: %s`
-	traceString = "%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n"
 )
 
 // Test represents a single unit test case.
@@ -31,9 +21,7 @@ const (
 type Test struct {
 	dbg      *asm.DebugInfo // Debug symbols for compiled program.
 	includes []string       // Include paths.
-	compare  []string       // Lines of compare data.
 	file     string         // Test source file.
-	count    int            // Unit counter.
 }
 
 // NewTest creates a new test cases.
@@ -53,10 +41,6 @@ func (t *Test) Run(cfg *Config) (err error) {
 		fmt.Fprintf(os.Stdout, "> %s...\n", t.file)
 	}
 
-	if err = t.loadCompareSet(); err != nil {
-		return
-	}
-
 	var ast *dp.AST
 	if ast, err = t.parse(); err != nil {
 		return
@@ -74,10 +58,6 @@ func (t *Test) Run(cfg *Config) (err error) {
 	}
 
 	c.ClockSpeed = time.Duration(cfg.Clock)
-	c.Test = func(pc cpu.Word, s *cpu.Storage) error {
-		return t.handleTest(pc, s, cfg.Verbose)
-	}
-
 	return c.Run(0)
 }
 
@@ -85,44 +65,10 @@ func (t *Test) Run(cfg *Config) (err error) {
 // It yields current PC, opcode, operands, all register contents and
 // appends the original line of sourcecode
 func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage) {
-	line := t.getSourceLine(pc)
-
-	fmt.Fprintf(os.Stdout, traceString,
+	fmt.Fprintf(os.Stdout,
+		"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n",
 		pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z,
-		s.I, s.J, s.SP, s.EX, s.IA, line)
-}
-
-// handleTest is called whenever a TEST instruction fires in a test program.
-func (t *Test) handleTest(pc cpu.Word, s *cpu.Storage, verbose bool) (err error) {
-	if verbose {
-		fmt.Fprintf(os.Stdout, "  - Unit %d...", t.count)
-	}
-
-	if t.count >= len(t.compare) {
-		return errors.New(fmt.Sprintf("Missing compare data for unit %d.", t.count))
-	}
-
-	line := fmt.Sprintf("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
-		s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.EX, s.SP, s.IA)
-
-	if line != t.compare[t.count] {
-		if verbose {
-			fmt.Fprintln(os.Stdout)
-		}
-
-		symbol := t.dbg.Data[pc]
-
-		return errors.New(fmt.Sprintf(unitString,
-			symbol.Line, symbol.Col, t.compare[t.count], line))
-	}
-
-	t.count++
-
-	if verbose {
-		fmt.Fprintln(os.Stdout, "  OK")
-	}
-
-	return
+		s.I, s.J, s.SP, s.EX, s.IA, t.getSourceLine(pc))
 }
 
 // parse reads the test source and constructs a complete AST.
@@ -148,40 +94,6 @@ func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 
 	c = cpu.New()
 	copy(c.Store.Mem[:], bin)
-	return
-}
-
-// loadCompareSet loads the compare file for this unit test.
-func (t *Test) loadCompareSet() (err error) {
-	file := strings.Replace(t.file, ".test", ".cmp", 1)
-
-	var fd *os.File
-	if fd, err = os.Open(file); err != nil {
-		return
-	}
-
-	defer fd.Close()
-
-	r := bufio.NewReader(fd)
-
-	var line []byte
-
-	for {
-		if line, _, err = r.ReadLine(); err != nil {
-			if err == io.EOF {
-				err = nil
-			}
-			return
-		}
-
-		line = bytes.TrimSpace(line)
-		if len(line) == 0 || line[0] == '#' {
-			continue
-		}
-
-		t.compare = append(t.compare, string(line))
-	}
-
 	return
 }
 

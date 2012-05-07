@@ -4,6 +4,7 @@
 package cpu
 
 import (
+	"errors"
 	"io"
 	"time"
 )
@@ -25,17 +26,12 @@ const MaxIntQueue = 0xff
 // This signature represents a Debug trace handler.
 type TraceFunc func(pc, op, a, b Word, store *Storage)
 
-// This handler is called whenever a TEST instruction fires.
-// It can be hooked by a program to perform some custom actions.
-type TestFunc func(pc Word, s *Storage) error
-
 // A CPU can run a single program.
 type CPU struct {
 	Store           *Storage      // Memory and registers
 	devices         []Device      // List of hardware devices.
 	intQueue        chan Word     // Interrupt queue.
 	Trace           TraceFunc     // When set, allows tracing of instructions as they are executed. For debug only.
-	Test            TestFunc      // When set, this is called whenever a TEST instruction fires.
 	ClockSpeed      time.Duration // Speed of CPU clock.
 	size            Word          // Size of last instruction (in words).
 	queueInterrupts bool          // Use interrupt queueing or not.
@@ -255,6 +251,13 @@ func (c *CPU) Step() (err error) {
 			*va = Word(Signed(*va) % Signed(*vb))
 		}
 
+	case MDI:
+		if *vb == 0 {
+			*va = 0
+		} else {
+			*va = Word(Signed(*va) % Signed(*vb))
+		}
+
 	case AND:
 		*va &= *vb
 
@@ -390,12 +393,12 @@ func (c *CPU) Step() (err error) {
 				c.devices[*vb].Handler(s)
 			}
 
-		case TEST:
-			if c.Test != nil {
-				if err = c.Test(s.PC-c.size, s); err != nil {
-					return
-				}
+		case PANIC:
+			str := s.readString(*vb)
+			if len(str) == 0 {
+				str = "Unknown error"
 			}
+			return errors.New(str)
 
 		case EXIT:
 			return io.EOF
