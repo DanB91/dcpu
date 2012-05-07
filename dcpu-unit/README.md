@@ -50,6 +50,13 @@ A register with something we expect it to be. `asserteq` panic if this
 is not the case.
 
 If all tests pass successfully, the tool exits cleanly.
+A failed test yields output as shown here:
+
+    $ dcpu-unit -V  .
+	[E] string/memchr_test.dasm: Assertion failed: A != B
+		Call stack:
+		- memchr_test.dasm:7 | jsr asserteq
+		- memchr_test.dasm:4 | jsr memchr
 
 ### Runtime tracing
 

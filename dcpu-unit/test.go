@@ -74,7 +74,7 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 	file := t.dbg.Files[s.File]
 	_, file = filepath.Split(file)
 
-	fmt.Fprintf(&b, "[E] %s:%d %s\n", file, s.Line, e.Msg)
+	fmt.Fprintf(&b, "[E] %s: %s\n", t.file, e.Msg)
 	fmt.Fprintln(&b, "    Call stack:")
 
 	for i := len(t.callstack) - 1; i >= 0; i-- {
