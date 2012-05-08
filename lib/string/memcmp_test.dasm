@@ -13,7 +13,8 @@
  set a, d2
  jsr asserteq
 
-; Successful compare of full data sets.
+
+; Successful compare: a < b
  set a, d1
  set b, d2
  set c, 5
@@ -21,6 +22,17 @@
 
  set b, 0xffff
  jsr asserteq
+
+
+; Successful compare: a > b
+ set a, d2
+ set b, d1
+ set c, 5
+ jsr memcmp
+
+ set b, 1
+ jsr asserteq
+
 
 ; Lists are equal
  set a, d1
