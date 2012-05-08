@@ -172,8 +172,19 @@ func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 // hasExit determines if the given program has at least one
 // unconditional EXIT instruction.
 func hasExit(bin []cpu.Word) bool {
+	var size int
+	var op, a, b cpu.Word
+
 	for i, w := range bin {
-		op, a := w&0x1f, (w>>5)&0x1f
+		op, a, b, size = w&0x1f, (w>>5)&0x1f, (w>>10)&0x3f, 1
+
+		if op != cpu.EXT && (a == 0x1e || a == 0x1f || (a >= 0x10 && a <= 0x17)) {
+			size++
+		}
+
+		if b == 0x1e || b == 0x1f || (b >= 0x10 && b <= 0x17) {
+			size++
+		}
 
 		if !(op == cpu.EXT && a == cpu.EXIT) {
 			continue
@@ -183,7 +194,7 @@ func hasExit(bin []cpu.Word) bool {
 			return true
 		}
 
-		op = bin[i-1] & 0x1f
+		op = bin[i-size] & 0x1f
 
 		if op < cpu.IFB || op > cpu.IFU {
 			return true
