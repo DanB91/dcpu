@@ -108,17 +108,19 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 
 	switch op.argc {
 	case 2:
-		vb, err = a.buildOperand(&argv, &symbols, nodes[2].(*dp.Expression).Children()[0], false)
-		if err != nil {
-			return
-		}
-
-		fallthrough
-	case 1:
 		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*dp.Expression).Children()[0], true)
 		if err != nil {
 			return
 		}
+
+		vb, err = a.buildOperand(&argv, &symbols, nodes[2].(*dp.Expression).Children()[0], false)
+
+	case 1:
+		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*dp.Expression).Children()[0], false)
+	}
+
+	if err != nil {
+		return
 	}
 
 	a.debug.Emit(name)
