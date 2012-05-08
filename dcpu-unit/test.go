@@ -115,6 +115,16 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 	if op == cpu.EXT && a == cpu.JSR {
 		t.callstack = append(t.callstack, t.dbg.Data[pc])
 	}
+
+	if op == cpu.SET && a == 0x1c /*PC*/ && b == 0x18 /*POP*/ {
+		sz := len(t.callstack)
+
+		if sz == 0 {
+			return
+		}
+
+		t.callstack = t.callstack[:sz-1]
+	}
 }
 
 // parse reads the test source and constructs a complete AST.

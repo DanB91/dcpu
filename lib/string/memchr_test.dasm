@@ -1,8 +1,18 @@
+; Zero length search
  set a, data
  set b, 3
  set c, 0
  jsr memchr
- 
+
+ set b, data
+ jsr asserteq
+
+; Non existing value
+ set a, data
+ set b, 10
+ set c, 5
+ jsr memchr
+
  set b, data
  jsr asserteq
 
