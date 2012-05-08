@@ -189,6 +189,7 @@ func hasExit(bin []cpu.Word) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
