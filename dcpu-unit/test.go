@@ -172,32 +172,36 @@ func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 // hasExit determines if the given program has at least one
 // unconditional EXIT instruction.
 func hasExit(bin []cpu.Word) bool {
+	var op1, op2, a, b cpu.Word
 	var size int
-	var op, a, b cpu.Word
 
-	for i, w := range bin {
-		op, a, b, size = w&0x1f, (w>>5)&0x1f, (w>>10)&0x3f, 1
+	for i := 0; i < len(bin); i++ {
+		w := bin[i]
+		op1, a, b = w&0x1f, (w>>5)&0x1f, (w>>10)&0x3f
 
-		if op != cpu.EXT && (a == 0x1e || a == 0x1f || (a >= 0x10 && a <= 0x17)) {
+		// Not an EXIT. Skip with next word.
+		if !(op1 == cpu.EXT && a == cpu.EXIT) {
+			continue
+		}
+
+		// If the previous instruction is not a branching instruction,
+		// we have found a non-conditional EXIT.
+		op2 = bin[i-size] & 0x1f
+
+		if op2 < cpu.IFB || op2 > cpu.IFU {
+			return true
+		}
+
+		// Determine size of instruction.
+		// Some of them occupy multiple words.
+		size = 1
+
+		if op1 != cpu.EXT && (a == 0x1e || a == 0x1f || (a >= 0x10 && a <= 0x17)) {
 			size++
 		}
 
 		if b == 0x1e || b == 0x1f || (b >= 0x10 && b <= 0x17) {
 			size++
-		}
-
-		if !(op == cpu.EXT && a == cpu.EXIT) {
-			continue
-		}
-
-		if i == 0 {
-			return true
-		}
-
-		op = bin[i-size] & 0x1f
-
-		if op < cpu.IFB || op > cpu.IFU {
-			return true
 		}
 	}
 
