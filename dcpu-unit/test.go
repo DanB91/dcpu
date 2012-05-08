@@ -176,8 +176,7 @@ func hasExit(bin []cpu.Word) bool {
 	var size int
 
 	for i := 0; i < len(bin); i++ {
-		w := bin[i]
-		op1, a, b = w&0x1f, (w>>5)&0x1f, (w>>10)&0x3f
+		op1, a, b = cpu.Decode(bin[i])
 
 		// Not an EXIT. Skip with next word.
 		if !(op1 == cpu.EXT && a == cpu.EXIT) {
@@ -186,7 +185,7 @@ func hasExit(bin []cpu.Word) bool {
 
 		// If the previous instruction is not a branching instruction,
 		// we have found a non-conditional EXIT.
-		op2 = bin[i-size] & 0x1f
+		op2, _, _ = cpu.Decode(bin[i-size])
 
 		if op2 < cpu.IFB || op2 > cpu.IFU {
 			return true

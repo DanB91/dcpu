@@ -8,31 +8,21 @@ import (
 	"time"
 )
 
-// The OverloadError occurs when we exceed the capacity
-// of the interrupt queue. The CPU should catch fire here and
-// do all manner of strange things to your memory/registers.
-//
-// For the sake of testing, we simply return an error.
-type OverloadError struct{}
-
-func (e OverloadError) Error() string {
-	return "Interrupt overload: System on fire!"
-}
-
-// TestError occurs when a PANIC instruction fires.
-// It has a string message along with some current execution state.
-type TestError struct {
-	Msg string
-	PC  Word
-}
-
-func (e TestError) Error() string { return e.Msg }
-
 // Maximum interrupt queue size.
 const MaxIntQueue = 0xff
 
 // This signature represents a Debug trace handler.
 type TraceFunc func(pc, op, a, b Word, store *Storage)
+
+// Encode encodes the given opcode and operands into an instruction.
+func Encode(a, b, c Word) Word {
+	return a | (b << 5) | (c << 10)
+}
+
+// Decode decodes the given word into an opcode and operands.
+func Decode(w Word) (op, a, b Word) {
+	return w & 0x1f, (w >> 5) & 0x1f, (w >> 10) & 0x3f
+}
 
 // A CPU can run a single program.
 type CPU struct {
@@ -139,8 +129,7 @@ func (c *CPU) Run(entrypoint Word) (err error) {
 // supplied word pointers.
 func (c *CPU) nextInstruction() (op, a, b Word) {
 	s := c.Store
-	w := s.Mem[s.PC]
-	op, a, b = w&0x1f, (w>>5)&0x1f, (w>>10)&0x3f
+	op, a, b = Decode(s.Mem[s.PC])
 	c.size = wordCount(op, a, b)
 	s.PC++
 	return
@@ -149,8 +138,7 @@ func (c *CPU) nextInstruction() (op, a, b Word) {
 // skip skips a single instruction
 func (c *CPU) skip() Word {
 	s := c.Store
-	w := s.Mem[s.PC]
-	op, a, b := w&0x1f, (w>>5)&0x1f, (w>>10)&0x3f
+	op, a, b := Decode(s.Mem[s.PC])
 	s.PC += wordCount(op, a, b)
 	return op
 }

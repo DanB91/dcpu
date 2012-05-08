@@ -17,8 +17,6 @@ type assembler struct {
 	debug  *DebugInfo            // Maps binary instructions to original source locations.
 }
 
-func encode(a, b, c cpu.Word) cpu.Word { return a | (b << 5) | (c << 10) }
-
 // Assemble takes the given AST and attempts to assemble it into a compiled program.
 //
 // It returns either an error, or the program along with debug symbols.
@@ -126,9 +124,9 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 	a.debug.Emit(name)
 
 	if op.ext {
-		a.code = append(a.code, encode(cpu.EXT, op.code, va))
+		a.code = append(a.code, cpu.Encode(cpu.EXT, op.code, va))
 	} else {
-		a.code = append(a.code, encode(op.code, va, vb))
+		a.code = append(a.code, cpu.Encode(op.code, va, vb))
 	}
 
 	a.debug.Emit(dargv...)
