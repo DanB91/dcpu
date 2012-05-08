@@ -50,15 +50,6 @@ func doTest(t *testing.T, c *CPU, result, overflow Word) {
 	}
 }
 
-func Test(t *testing.T) {
-	c := New()
-	s := c.Store
-	s.Mem[0] = Encode(SET, 0, 0x1f) // SET A, 0x30
-	s.Mem[1] = 0x30
-	s.Mem[2] = _exit
-	doTest(t, c, 0x30, 0)
-}
-
 func TestSet(t *testing.T) {
 	c := New()
 	s := c.Store

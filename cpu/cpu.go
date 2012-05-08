@@ -14,6 +14,8 @@ const MaxIntQueue = 0xff
 // This signature represents a Debug trace handler.
 type TraceFunc func(pc, op, a, b Word, store *Storage)
 
+// Instruction encoding: aaaaaabbbbbooooo
+
 // Encode encodes the given opcode and operands into an instruction.
 func Encode(a, b, c Word) Word {
 	return a | (b << 5) | (c << 10)
