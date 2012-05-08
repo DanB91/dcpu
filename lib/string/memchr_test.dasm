@@ -1,4 +1,5 @@
 ; Zero length search
+; Expect `data` as return value
  set a, data
  set b, 3
  set c, 0
@@ -8,12 +9,24 @@
  jsr asserteq
 
 ; Non existing value
+; Expect 0 (NULL) as return value.
  set a, data
  set b, 10
  set c, 5
  jsr memchr
 
+ set b, 0
+ jsr asserteq
+
+; Existing value.
+; Expect data+2 as return value.
+ set a, data
+ set b, 3
+ set c, 5
+ jsr memchr
+
  set b, data
+ add b, 2
  jsr asserteq
 
  exit

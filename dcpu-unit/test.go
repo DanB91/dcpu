@@ -77,6 +77,10 @@ func (t *Test) Run(cfg *Config) (err error) {
 func (t *Test) formatTestError(e *cpu.TestError) error {
 	var b bytes.Buffer
 
+	if int(e.PC) >= len(t.dbg.Data) {
+		return errors.New(fmt.Sprintf("No debug symbols available for address %04x.", e.PC))
+	}
+
 	s := t.dbg.Data[e.PC]
 	file := t.dbg.Files[s.File]
 	_, file = filepath.Split(file)
@@ -101,17 +105,6 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 // It yields current PC, opcode, operands, all register contents and
 // appends the original line of sourcecode
 func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
-	if verbose {
-		symbol := t.dbg.Data[pc]
-		file := t.dbg.Files[symbol.File]
-		line := t.getSourceLine(file, symbol.Line)
-
-		fmt.Fprintf(os.Stdout,
-			"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n",
-			pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z,
-			s.I, s.J, s.SP, s.EX, s.IA, line)
-	}
-
 	if op == cpu.EXT && a == cpu.JSR {
 		t.callstack = append(t.callstack, t.dbg.Data[pc])
 	}
@@ -124,6 +117,24 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 		}
 
 		t.callstack = t.callstack[:sz-1]
+	}
+
+	if verbose {
+		if int(pc) >= len(t.dbg.Data) {
+			fmt.Fprintf(os.Stdout,
+				"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x\n",
+				pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
+			return
+		}
+
+		symbol := t.dbg.Data[pc]
+		file := t.dbg.Files[symbol.File]
+		line := t.getSourceLine(file, symbol.Line)
+
+		fmt.Fprintf(os.Stdout,
+			"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n",
+			pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z,
+			s.I, s.J, s.SP, s.EX, s.IA, line)
 	}
 }
 
@@ -148,9 +159,37 @@ func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 		return
 	}
 
+	if !hasExit(bin) {
+		return nil, errors.New(fmt.Sprintf(
+			"%s: Program has no unconditional EXIT. This means the test will run indefinitely.", t.file))
+	}
+
 	c = cpu.New()
 	copy(c.Store.Mem[:], bin)
 	return
+}
+
+// hasExit determines if the given program has at least one
+// unconditional EXIT instruction.
+func hasExit(bin []cpu.Word) bool {
+	for i, w := range bin {
+		op, a := w&0x1f, (w>>5)&0x1f
+
+		if !(op == cpu.EXT && a == cpu.EXIT) {
+			continue
+		}
+
+		if i == 0 {
+			return true
+		}
+
+		op = bin[i-1] & 0x1f
+
+		if op < cpu.IFB || op > cpu.IFU {
+			return true
+		}
+	}
+	return false
 }
 
 // getSourceLine fetches the line of sourcecode from the
