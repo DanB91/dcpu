@@ -104,18 +104,18 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 
 	var va, vb cpu.Word
 	var argv []cpu.Word
-	var dargv []dp.Node
+	var symbols []dp.Node
 
 	switch op.argc {
 	case 2:
-		vb, err = a.buildOperand(&argv, &dargv, nodes[2].(*dp.Expression).Children()[0])
+		vb, err = a.buildOperand(&argv, &symbols, nodes[2].(*dp.Expression).Children()[0], false)
 		if err != nil {
 			return
 		}
 
 		fallthrough
 	case 1:
-		va, err = a.buildOperand(&argv, &dargv, nodes[1].(*dp.Expression).Children()[0])
+		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*dp.Expression).Children()[0], true)
 		if err != nil {
 			return
 		}
@@ -129,13 +129,17 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 		a.code = append(a.code, cpu.Encode(op.code, va, vb))
 	}
 
-	a.debug.Emit(dargv...)
+	a.debug.Emit(symbols...)
 	a.code = append(a.code, argv...)
 	return
 }
 
 // buildOperand compiles the given instruction operand.
-func (a *assembler) buildOperand(argv *[]cpu.Word, dargv *[]dp.Node, node dp.Node) (val cpu.Word, err error) {
+//
+// The `first` parameter determines if we are parsing the A or B parameter
+// in something like 'set A, B'. This makes a difference when encoding
+// small literal numbers.
+func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.Node, first bool) (val cpu.Word, err error) {
 	switch tt := node.(type) {
 	case *dp.Name:
 		if reg, ok := registers[tt.Data]; ok {
@@ -143,31 +147,31 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, dargv *[]dp.Node, node dp.Nod
 		}
 
 		if addr, ok := a.labels[tt.Data]; ok {
-			if addr == 0xffff || addr <= 0x1e {
+			if !first && (addr == 0xffff || addr <= 0x1e) {
 				return addr + 0x21, nil
 			}
 
-			*dargv = append(*dargv, tt)
+			*symbols = append(*symbols, tt)
 			*argv = append(*argv, addr)
 			return 0x1f, nil
 		}
 
 		a.refs[cpu.Word(len(a.code)+1+len(*argv))] = tt
-		*dargv = append(*dargv, tt)
+		*symbols = append(*symbols, tt)
 		*argv = append(*argv, 0)
 		return 0x1f, nil
 
 	case *dp.Number:
-		if tt.Data == 0xffff || tt.Data <= 0x1e {
+		if !first && (tt.Data == 0xffff || tt.Data <= 0x1e) {
 			return tt.Data + 0x21, nil
 		}
 
-		*dargv = append(*dargv, tt)
+		*symbols = append(*symbols, tt)
 		*argv = append(*argv, tt.Data)
 		return 0x1f, nil
 
 	case *dp.Block:
-		return a.buildBlock(argv, dargv, tt)
+		return a.buildBlock(argv, symbols, tt)
 
 	default:
 		return 0, NewBuildError(
@@ -180,7 +184,7 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, dargv *[]dp.Node, node dp.Nod
 }
 
 // buildBlock builds a block expression.
-func (a *assembler) buildBlock(argv *[]cpu.Word, dargv *[]dp.Node, b *dp.Block) (val cpu.Word, err error) {
+func (a *assembler) buildBlock(argv *[]cpu.Word, symbols *[]dp.Node, b *dp.Block) (val cpu.Word, err error) {
 	nodes := b.Children()
 
 	switch len(nodes) {
@@ -192,18 +196,18 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, dargv *[]dp.Node, b *dp.Block) 
 			}
 
 			if addr, ok := a.labels[tt.Data]; ok {
-				*dargv = append(*dargv, tt)
+				*symbols = append(*symbols, tt)
 				*argv = append(*argv, addr)
 				return 0x1e, nil
 			}
 
 			a.refs[cpu.Word(len(a.code)+1+len(*argv))] = tt
-			*dargv = append(*dargv, tt)
+			*symbols = append(*symbols, tt)
 			*argv = append(*argv, 0)
 			return 0x1e, nil
 
 		case *dp.Number:
-			*dargv = append(*dargv, tt)
+			*symbols = append(*symbols, tt)
 			*argv = append(*argv, tt.Data)
 			return 0x1e, nil
 
@@ -217,11 +221,11 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, dargv *[]dp.Node, b *dp.Block) 
 	case 3:
 		var va, vb cpu.Word
 
-		if va, err = a.buildBlockOperand(argv, dargv, nodes[0]); err != nil {
+		if va, err = a.buildBlockOperand(argv, symbols, nodes[0]); err != nil {
 			return
 		}
 
-		if vb, err = a.buildBlockOperand(argv, dargv, nodes[2]); err != nil {
+		if vb, err = a.buildBlockOperand(argv, symbols, nodes[2]); err != nil {
 			return
 		}
 
@@ -240,7 +244,7 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, dargv *[]dp.Node, b *dp.Block) 
 	return
 }
 
-func (a *assembler) buildBlockOperand(argv *[]cpu.Word, dargv *[]dp.Node, node dp.Node) (cpu.Word, error) {
+func (a *assembler) buildBlockOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.Node) (cpu.Word, error) {
 	switch tt := node.(type) {
 	case *dp.Name:
 		if reg, ok := registers[tt.Data]; ok {
@@ -259,18 +263,18 @@ func (a *assembler) buildBlockOperand(argv *[]cpu.Word, dargv *[]dp.Node, node d
 		}
 
 		if addr, ok := a.labels[tt.Data]; ok {
-			*dargv = append(*dargv, tt)
+			*symbols = append(*symbols, tt)
 			*argv = append(*argv, addr)
 			return 0, nil
 		}
 
 		a.refs[cpu.Word(len(a.code)+1+len(*argv))] = tt
-		*dargv = append(*dargv, tt)
+		*symbols = append(*symbols, tt)
 		*argv = append(*argv, 0)
 		return 0, nil
 
 	case *dp.Number:
-		*dargv = append(*dargv, tt)
+		*symbols = append(*symbols, tt)
 		*argv = append(*argv, tt.Data)
 		return 0, nil
 	}

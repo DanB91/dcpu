@@ -15,7 +15,7 @@ import (
 
 const (
 	AppName    = "dcpu-unit"
-	AppVersion = "0.3.3"
+	AppVersion = "0.3.4"
 )
 
 func main() {
