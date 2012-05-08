@@ -11,7 +11,7 @@ yielding appropriate error context.
 These tests can be written using the routines defined in `lib/test/`.
 The assertion functions perform various comparisons on input
 values and panic when these fail. This uses the custom `PANIC` instruction.
-It simply prints a sipplied error string and exits the tool.
+It simply prints a supplied error string and exits the tool.
 
 ### *_test.dasm
 
@@ -56,7 +56,6 @@ A failed test yields output as shown here:
 	[E] string/memchr_test.dasm: Assertion failed: A != B
 		Call stack:
 		- memchr_test.dasm:7 | jsr asserteq
-		- memchr_test.dasm:4 | jsr memchr
 
 ### Runtime tracing
 
