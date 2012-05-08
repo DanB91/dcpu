@@ -1,0 +1,13 @@
+; ASSERTLE compares the values in registers A and B.
+; Panics and stops the runtime if A > B.
+; 
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:assertle
+  ifg a, b
+     panic assertle_str
+  set pc, pop
+
+:assertle_str
+  dat "Assertion failed: A > B", 0

@@ -1,0 +1,13 @@
+; ASSERTGT compares the values in registers A and B.
+; Panics and stops the runtime if A <= B.
+; 
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:assertgt
+  ifg a, b
+    set pc, pop
+  panic assertgt_str
+
+:assertgt_str
+  dat "Assertion failed: A <= B", 0

@@ -1,0 +1,37 @@
+; Zero length compare
+ set a, d1
+ set b, d2
+ set c, 0
+ jsr memcmp
+
+ set x, b
+
+ set b, d1
+ jsr asserteq
+
+ set b, x
+ set a, d2
+ jsr asserteq
+
+; Successful compare of full data sets.
+ set a, d1
+ set b, d2
+ set c, 5
+ jsr memcmp
+
+ set b, 0xffff
+ jsr asserteq
+
+; Lists are equal
+ set a, d1
+ set b, d2
+ set c, 3
+ jsr memcmp
+
+ set b, 0
+ jsr asserteq
+
+ exit
+
+:d1 dat 1, 2, 3, 4, 5
+:d2 dat 1, 2, 3, 5, 6

@@ -18,17 +18,18 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memcmp
-  ife 0, c ; Size is zero -- No compare needed.
+  ife c, 0 ; Size is zero -- No compare needed.
     set pc, pop
 
 :memcmp_loop
   ifn [a], [b]
     set pc, memcmp_ret
+  sub c, 1
+  ife c, 0
+    set pc, memcmp_ret
   add a, 1
   add b, 1
-  sub c, 1
-  ifg c, 0
-    set pc, memcmp_loop
+  set pc ,memcmp_loop
 
 :memcmp_ret
   set a, [a]
