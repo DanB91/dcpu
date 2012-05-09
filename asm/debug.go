@@ -3,11 +3,7 @@
 
 package asm
 
-import (
-	"bytes"
-	"fmt"
-	dp "github.com/jteeuwen/dcpu/parser"
-)
+import dp "github.com/jteeuwen/dcpu/parser"
 
 // SourceInfo defines file/line/col locations in original source.
 type SourceInfo struct {
@@ -33,15 +29,4 @@ func (d *DebugInfo) Emit(n ...dp.Node) {
 	for i := range n {
 		d.Data = append(d.Data, &SourceInfo{n[i].File(), n[i].Line(), n[i].Col()})
 	}
-}
-
-func (d *DebugInfo) String() string {
-	var b bytes.Buffer
-
-	for k, v := range d.Data {
-		fmt.Fprintf(&b, "%04x: %s:%d:%d\n",
-			k, d.Files[v.File], v.Line, v.Col)
-	}
-
-	return b.String()
 }

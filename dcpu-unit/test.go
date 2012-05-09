@@ -122,7 +122,7 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 	if verbose {
 		if int(pc) >= len(t.dbg.Data) {
 			fmt.Fprintf(os.Stdout,
-				"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x\n",
+				"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | <unknown>\n",
 				pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
 			return
 		}
