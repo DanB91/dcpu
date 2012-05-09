@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	AppName    = "dcpu-unit"
+	AppName    = "dcpu-test"
 	AppVersion = "0.3.8"
 )
 
