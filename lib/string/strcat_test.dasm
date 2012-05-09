@@ -1,0 +1,15 @@
+; Zero length set.
+ set a, d1
+ set b, d2
+ jsr strcat
+
+ set b, d3
+ set c, 6
+ jsr memcmp
+
+ exit
+
+:d1 dat "abc", 0, 0, 0, 0
+:d2 dat "def", 0
+:d3 dat "abcdef", 0
+
