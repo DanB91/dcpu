@@ -20,10 +20,11 @@ import (
 // Test represents a single unit test case.
 // It covers one test file which may contain multiple unit tests.
 type Test struct {
-	dbg       *asm.DebugInfo    // Debug symbols for compiled program.
-	includes  []string          // Include paths.
-	callstack []*asm.SourceInfo // callstack for the test program.
-	file      string            // Test source file.
+	dbg       *asm.DebugInfo      // Debug symbols for compiled program.
+	cache     map[cpu.Word]string // Cache of source lines for trace output.
+	includes  []string            // Include paths.
+	callstack []string            // callstack for the test program.
+	file      string              // Test source file.
 }
 
 // NewTest creates a new test cases.
@@ -31,6 +32,7 @@ func NewTest(file string, inc []string) *Test {
 	t := new(Test)
 	t.file = file
 	t.includes = inc
+	t.cache = make(map[cpu.Word]string)
 	return t
 }
 
@@ -79,19 +81,12 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 		return errors.New(fmt.Sprintf("No debug symbols available for address %04x.", e.PC))
 	}
 
-	s := t.dbg.Data[e.PC]
-	file := t.dbg.Files[s.File]
-	_, file = filepath.Split(file)
-
 	var b bytes.Buffer
 	fmt.Fprintf(&b, "[E] %s: %s\n", t.file, e.Msg)
 	fmt.Fprintln(&b, "    Call stack:")
 
 	for i := len(t.callstack) - 1; i >= 0; i-- {
-		s = t.callstack[i]
-		file = t.dbg.Files[s.File]
-
-		fmt.Fprintf(&b, "    - %s\n", t.getSourceLine(file, s.Line))
+		fmt.Fprintf(&b, "    - %s\n", t.callstack[i])
 	}
 
 	return errors.New(b.String())
@@ -105,10 +100,10 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 // appends the original line of sourcecode
 func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 	if op == cpu.EXT && a == cpu.JSR {
-		t.callstack = append(t.callstack, t.dbg.Data[pc])
-	}
+		line := t.getSourceLine(pc)
+		t.callstack = append(t.callstack, line)
 
-	if op == cpu.SET && a == 0x1c /*PC*/ && b == 0x18 /*POP*/ {
+	} else if op == cpu.SET && a == 0x1c /*PC*/ && b == 0x18 /*POP*/ {
 		sz := len(t.callstack)
 
 		if sz == 0 {
@@ -126,9 +121,7 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 			return
 		}
 
-		symbol := t.dbg.Data[pc]
-		file := t.dbg.Files[symbol.File]
-		line := t.getSourceLine(file, symbol.Line)
+		line := t.getSourceLine(pc)
 
 		fmt.Fprintf(os.Stdout,
 			"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n",
@@ -209,7 +202,14 @@ func hasExit(bin []cpu.Word) bool {
 // getSourceLine fetches the line of sourcecode from the
 // file defined by the given PC value. This data is stored in the
 // debug symbol table.
-func (t *Test) getSourceLine(file string, lineno int) string {
+func (t *Test) getSourceLine(pc cpu.Word) string {
+	if line, ok := t.cache[pc]; ok {
+		return line
+	}
+
+	symbol := t.dbg.Data[pc]
+	file := t.dbg.Files[symbol.File]
+
 	fd, err := os.Open(file)
 	if err != nil {
 		return ""
@@ -232,13 +232,14 @@ func (t *Test) getSourceLine(file string, lineno int) string {
 			return ""
 		}
 
-		if count < lineno-1 {
+		if count < symbol.Line-1 {
 			count++
 			continue
 		}
 
 		line = bytes.TrimSpace(line)
-		return fmt.Sprintf("%s:%d | %s", file, lineno, line)
+		t.cache[pc] = fmt.Sprintf("%s:%d | %s", file, symbol.Line, line)
+		return t.cache[pc]
 	}
 
 	return ""
