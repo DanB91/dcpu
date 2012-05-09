@@ -1,0 +1,26 @@
+; Zero length
+ set a, d1
+ set b, d2
+ set c, 0
+ jsr memcpy
+
+ set b, d1
+ jsr asserteq
+
+; Copy some stuff
+ set a, d1
+ set b, d2
+ set c, 3
+ jsr memcpy
+ 
+ set c, 3
+ jsr memcmp
+ 
+ set b, 0
+ jsr asserteq
+
+
+ exit
+
+:d1 dat 1, 2, 3, 4, 5
+:d2 dat 6, 7, 8, 9, 0

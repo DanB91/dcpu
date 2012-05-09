@@ -1,0 +1,45 @@
+; Zero length
+ set a, d1
+ set b, d1
+ set c, 0
+ jsr memmove
+
+ set b, d1
+ jsr asserteq
+
+; Copy overlapping regions
+ set a, d1
+ add a, 2
+ set b, d1
+ set c, 3
+ jsr memmove
+
+ set a, d1
+ set b, d2
+ set c, 5
+ jsr memcmp
+
+ set b, 0
+ jsr asserteq
+
+; Copy non-overlapping regions
+ set a, d1
+ set b, d1
+ add b, 2
+ set c, 3
+ jsr memmove
+
+ set a, d1
+ set b, d3
+ set c, 5
+ jsr memcmp
+
+ set b, 0
+ jsr asserteq
+
+ exit
+
+:d1 dat 1, 2, 3, 4, 5
+:d2 dat 1, 2, 1, 2, 3
+:d3 dat 1, 2, 3, 2, 3
+

@@ -21,7 +21,7 @@
 ;
 :memmove
   ; size is zero -- Nothing to copy.
-  ife 0, c
+  ife c, 0
     set pc, pop
 
   ; a and b are the same locations -- Nothing to copy.
@@ -29,7 +29,7 @@
     set pc, pop
 
   ; Copying only one word is special cased.
-  ifg 1, c
+  ifg c, 1
     set pc, memmove_range
 
   set [a], [b]
