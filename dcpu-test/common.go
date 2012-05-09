@@ -7,7 +7,7 @@ import dp "github.com/jteeuwen/dcpu/parser"
 
 // Instructions and registers according to spec v1.7
 //
-// With additional 'test' and 'exit' instructions for this tool.
+// With additional 'panic' and 'exit' instructions for this tool.
 
 var (
 	instructions = []string{
