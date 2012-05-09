@@ -20,8 +20,7 @@ which should make the writing of larger programs a little less painful.
 * _cpu/hw/*_: List of hardware components that can be hooked into the CPU.
 * _dcpu-pp_: This is a commandline tool that offers some pre-processing
   magic for `.dasm` source code. Refer to its README for more info.
-* _dcpu-unit_: This program contains a custom assembler and emulator
-  for the DCPU platform. It runs unit tests as defined in the `lib` 
+* _dcpu-test_: This program runs unit tests as defined in the `lib` 
   directory. We use this to verify newly written code does what we
   want it to do. Refer to its README for more info.
 * _lib/_: This directory holds often used assembly code and unit tests.
