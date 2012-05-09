@@ -75,8 +75,6 @@ func (t *Test) Run(cfg *Config) (err error) {
 //      - memchr_test.dasm:4 | jsr memchr
 //
 func (t *Test) formatTestError(e *cpu.TestError) error {
-	var b bytes.Buffer
-
 	if int(e.PC) >= len(t.dbg.Data) {
 		return errors.New(fmt.Sprintf("No debug symbols available for address %04x.", e.PC))
 	}
@@ -85,6 +83,7 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 	file := t.dbg.Files[s.File]
 	_, file = filepath.Split(file)
 
+	var b bytes.Buffer
 	fmt.Fprintf(&b, "[E] %s: %s\n", t.file, e.Msg)
 	fmt.Fprintln(&b, "    Call stack:")
 

@@ -125,14 +125,13 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 		return
 	}
 
-	a.debug.Emit(name)
-
 	if op.ext {
 		a.code = append(a.code, cpu.Encode(cpu.EXT, op.code, va))
 	} else {
 		a.code = append(a.code, cpu.Encode(op.code, va, vb))
 	}
 
+	a.debug.Emit(name)
 	a.debug.Emit(symbols...)
 	a.code = append(a.code, argv...)
 	return
