@@ -15,7 +15,7 @@ import (
 
 const (
 	AppName    = "dcpu-unit"
-	AppVersion = "0.3.6"
+	AppVersion = "0.3.7"
 )
 
 func main() {
@@ -50,6 +50,19 @@ func collectTests(cfg *Config) <-chan string {
 
 	go func() {
 		defer close(c)
+
+		stat, _ := os.Lstat(cfg.Input)
+		if !stat.IsDir() {
+			_, name := filepath.Split(cfg.Input)
+			ok, err := filepath.Match("*_test.dasm", name)
+
+			if !ok || err != nil {
+				return
+			}
+
+			c <- cfg.Input
+			return
+		}
 
 		filepath.Walk(cfg.Input, func(file string, info os.FileInfo, err error) error {
 			if info.IsDir() {
@@ -107,11 +120,8 @@ func parseArgs() *Config {
 	c.Input = path.Clean(flag.Arg(0))
 
 	// Ensure we have an existing directory.
-	if stat, err := os.Lstat(c.Input); err != nil {
+	if _, err := os.Lstat(c.Input); err != nil {
 		fmt.Fprintf(os.Stderr, "Input path: %v\n", err)
-		os.Exit(1)
-	} else if !stat.IsDir() {
-		fmt.Fprintf(os.Stderr, "Input path %q is not a directory.\n", c.Input)
 		os.Exit(1)
 	}
 
