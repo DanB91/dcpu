@@ -108,6 +108,8 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 	var argv []cpu.Word
 	var symbols []dp.Node
 
+	symbols = append(symbols, name)
+
 	switch op.argc {
 	case 2:
 		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*dp.Expression).Children()[0], true)
@@ -131,7 +133,6 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 		a.code = append(a.code, cpu.Encode(op.code, va, vb))
 	}
 
-	a.debug.Emit(name)
 	a.debug.Emit(symbols...)
 	a.code = append(a.code, argv...)
 	return
