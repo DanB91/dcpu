@@ -2,7 +2,7 @@
 
 This app is a DCPU Assembly pre-processor. It parses the given input file(s) and
 spits out either a single assembly source file or an AST. The output can
-optionally be transformed by a number of predefined processorts which each
+optionally be transformed by a number of predefined processors which each
 perform a specific function.
 
 ### External references
