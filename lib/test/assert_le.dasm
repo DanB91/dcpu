@@ -1,0 +1,13 @@
+; ASSERT_LE compares the values in registers A and B.
+; Panics and stops the runtime if A > B.
+; 
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:assert_le
+  ifg a, b
+     panic assert_le_str
+  set pc, pop
+
+:assert_le_str
+  dat "Assertion failed: A > B", 0

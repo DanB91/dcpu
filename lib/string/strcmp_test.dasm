@@ -1,0 +1,12 @@
+; Find trailing NULL character.
+ set a, d1
+ set b, d2
+ jsr strcmp
+
+ set b, 0
+ jsr assert_lts
+
+ exit
+
+:d1 dat "abcd", 0
+:d2 dat "abce", 0

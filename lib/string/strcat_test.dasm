@@ -7,6 +7,9 @@
  set c, 7
  jsr memcmp
 
+ set b, 0
+ jsr assert_eq
+
  exit
 
 :d1 dat "abc", 0, 0, 0, 0

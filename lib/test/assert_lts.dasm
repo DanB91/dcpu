@@ -1,13 +1,15 @@
-; ASSERTLT compares the values in registers A and B.
+; ASSERT_LTS compares the values in registers A and B.
 ; Panics and stops the runtime if A >= B.
+; 
+; This performs a singed compaison.
 ; 
 ; ## Version History:
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
-:assertlt
-  ifl a, b
+:assert_lts
+  ifu a, b
     set pc, pop
-  panic assertlt_str
+  panic assert_lts_str
 
-:assertlt_str
+:assert_lts_str
   dat "Assertion failed: A >= B", 0

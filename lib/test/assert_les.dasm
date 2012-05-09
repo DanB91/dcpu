@@ -1,13 +1,15 @@
-; ASSERTLE compares the values in registers A and B.
+; ASSERT_LES compares the values in registers A and B.
 ; Panics and stops the runtime if A > B.
+; 
+; This performs a singed compaison.
 ; 
 ; ## Version History:
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
-:assertle
-  ifg a, b
-     panic assertle_str
+:assert_les
+  ifa a, b
+     panic assert_les_str
   set pc, pop
 
-:assertle_str
+:assert_les_str
   dat "Assertion failed: A > B", 0

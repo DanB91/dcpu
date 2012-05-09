@@ -8,6 +8,9 @@
  set c, 5
  jsr memcmp
 
+ set b, 0
+ jsr assert_eq
+
 ; Set partial chunk.
  set a, d1
  set b, 0
@@ -21,7 +24,7 @@
  jsr memcmp
 
  set b, 0
- jsr asserteq
+ jsr assert_eq
 
 ; Fifth word is unchanged.
  set a, d1
@@ -30,7 +33,7 @@
  jsr memcmp
 
  set b, 0
- jsr assertgt
+ jsr assert_gt
 
  exit
 

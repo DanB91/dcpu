@@ -5,7 +5,7 @@
 
  set b, d1
  add b, 3
- jsr asserteq
+ jsr assert_eq
 
 ; Find first character.
  set a, d1
@@ -13,7 +13,7 @@
  jsr strchr
 
  set b, d1
- jsr asserteq
+ jsr assert_eq
 
 ; Find non-existing character.
  set a, d1
@@ -21,7 +21,7 @@
  jsr strchr
 
  set b, 0
- jsr asserteq
+ jsr assert_eq
 
  exit
 
