@@ -27,6 +27,8 @@ func Assemble(ast *dp.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 	asm.refs = make(map[cpu.Word]*dp.Name)
 	asm.debug = NewDebugInfo(ast.Files)
 
+	optimize(asm.ast)
+
 	// Compile program.
 	if err = asm.buildNodes(ast.Root.Children()); err != nil {
 		return
