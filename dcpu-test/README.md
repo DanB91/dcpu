@@ -52,7 +52,7 @@ is not the case.
 If all tests pass successfully, the tool exits cleanly.
 A failed test yields output as shown here:
 
-    $ dcpu-unit -V  .
+    $ dcpu-test -V  .
 	[E] string/memchr_test.dasm: Assertion failed: A != B
 		Call stack:
 		- memchr_test.dasm:7 | jsr asserteq
@@ -67,7 +67,7 @@ and the original source file and line that created this instruction.
 Here is an example of trace output for a test program.
 
     $ cd /path/to/dcpu/lib
-    $ dcpu-unit -V -t .
+    $ dcpu-test -V -t .
 	> string/memchr_test.dasm...
 	0000: 0001 0000 001f | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:1 | set a, data
 	0002: 0001 0001 0024 | 000b 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:2 | set b, 3
@@ -96,7 +96,7 @@ can be a powerful debugging tool.
 
 ### Usage
 
-    $ go get github.com/jteeuwen/dcpu/dcpu-unit
+    $ go get github.com/jteeuwen/dcpu/dcpu-test
 
 ### License
 
