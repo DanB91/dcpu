@@ -9,14 +9,14 @@ func init() {
 	RegisterOptimization(opt_branch_shorthand)
 }
 
-// opt_branch_shorthand finds instances of "IFE 0, a" amd "IFN 0, a"
+// opt_branch_shorthand finds instances of "IFE B, A" amd "IFN B, A"
 // and checks if the first operand is a short-form numeric literal.
 // If so, the operands are swapped.
 //
 // The DCPU spec states that short-form numbers can not be encoded in
 // the first operand, since its maximum value is not large enough to
 // hold all allowed literals. In this case, the assembler would have
-// to set A to 0x1f (next word) and store the value in a new word.
+// to set B to 0x1f (next word) and store the value in a new word.
 // 
 // This needlessly increases the size of the program by one word.
 // For the IFE and IFN instructions, we can prevent this from 
