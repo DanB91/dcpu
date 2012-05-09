@@ -37,6 +37,7 @@ func Assemble(ast *dp.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 	// Fix unresolved label references.
 	for k, v := range asm.refs {
 		addr, ok := asm.labels[v.Data]
+
 		if ok {
 			asm.code[k] = addr
 			continue
@@ -303,8 +304,8 @@ func (a *assembler) buildData(nodes []dp.Node) (err error) {
 
 		switch tt := expr.Children()[0].(type) {
 		case *dp.String:
-			a.debug.Emit(tt)
 			for _, r = range tt.Data {
+				a.debug.Emit(tt)
 				a.code = append(a.code, cpu.Word(r))
 			}
 
