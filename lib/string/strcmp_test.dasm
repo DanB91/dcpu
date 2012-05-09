@@ -1,4 +1,4 @@
-; Find trailing NULL character.
+; Compare A to B
  set a, d1
  set b, d2
  jsr strcmp
@@ -6,6 +6,14 @@
  set b, 0
  jsr assert_lts
 
+; Compare B to A
+ set a, d2
+ set b, d1
+ jsr strcmp
+
+ set b, 0
+ jsr assert_gts
+ 
  exit
 
 :d1 dat "abcd", 0

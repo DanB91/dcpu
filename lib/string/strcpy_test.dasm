@@ -1,0 +1,26 @@
+; Zero length
+ set a, d1
+ set b, d2
+ set c, 0
+ jsr memcpy
+
+ set b, d1
+ jsr assert_eq
+
+; Copy some stuff
+ set a, d1
+ set b, d2
+ set c, 3
+ jsr memcpy
+ 
+ set c, 3
+ jsr memcmp
+ 
+ set b, 0
+ jsr assert_eq
+
+
+ exit
+
+:d1 dat "abcd", 0
+:d2 dat "abce", 0
