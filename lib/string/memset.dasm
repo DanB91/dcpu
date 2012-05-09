@@ -5,8 +5,11 @@
 ;
 ; It returns the original ptr address.
 ;
-;
 ; ## Version History:
+;   0.1.2: Use I as loop counter so we can reduce number of cycles in _loop.
+;          This packs a larger setup cost as we have to save/restore I and J,
+;          but for larger chunks this cost is more than balanced by the reduced
+;          number of loop cycles.
 ;   0.1.1: Return original pointer value.
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
@@ -14,16 +17,18 @@
   ife 0, c  ; zero size - exit.
     set pc, pop
 
-  set push, a ; Save original address.
+  set push, i
+  set push, j
+  set i, a
 
 :memset_loop
-  set [a], b
-  add a, 1
+  sti [i], b
   sub c, 1
   ifg c, 0
     set pc, memset_loop
 
 :memset_end
-  set a, pop ; Restore original address.
+  set j, pop
+  set i, pop
   set pc, pop
 

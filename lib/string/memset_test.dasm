@@ -1,0 +1,39 @@
+; Zero length set.
+ set a, d1
+ set b, 0
+ set c, 0
+ jsr memset
+
+ set b, d1
+ set c, 5
+ jsr memcmp
+
+; Set partial chunk.
+ set a, d1
+ set b, 0
+ set c, 4
+ jsr memset
+
+; First 4 words should be equal (all zero).
+ set a, d1
+ set b, d2
+ set c, 4
+ jsr memcmp
+
+ set b, 0
+ jsr asserteq
+
+; Fifth word is unchanged.
+ set a, d1
+ set b, d2
+ set c, 5
+ jsr memcmp
+
+ set b, 0
+ jsr assertgt
+
+ exit
+
+:d1 dat 1, 2, 3, 4, 5
+:d2 dat 0, 0, 0, 0, 0
+
