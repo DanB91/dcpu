@@ -1,10 +1,10 @@
-; Zero length set.
+; Add d2 to d1
  set a, d1
  set b, d2
  jsr strcat
 
  set b, d3
- set c, 6
+ set c, 7
  jsr memcmp
 
  exit
