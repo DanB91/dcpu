@@ -74,7 +74,6 @@ func (t *Test) Run(cfg *Config) (err error) {
 //     [E] string/memchr_test.dasm Assertion failed: A != B
 //      Call stack:
 //      - memchr_test.dasm:7 | jsr asserteq
-//      - memchr_test.dasm:4 | jsr memchr
 //
 func (t *Test) formatTestError(e *cpu.TestError) error {
 	if int(e.PC) >= len(t.dbg.Data) {
