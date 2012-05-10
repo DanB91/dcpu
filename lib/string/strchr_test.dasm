@@ -19,9 +19,7 @@
  set a, d1
  set b, [d2]
  jsr strchr
-
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
  exit
 

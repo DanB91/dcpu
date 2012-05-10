@@ -18,9 +18,7 @@
  set b, d2
  set c, 5
  jsr memcmp
-
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
 ; Copy non-overlapping regions
  set a, d1
@@ -33,9 +31,7 @@
  set b, d3
  set c, 5
  jsr memcmp
-
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
  exit
 

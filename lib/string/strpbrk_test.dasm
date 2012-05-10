@@ -1,0 +1,21 @@
+; Search in set with existing tokens.
+ set a, s1
+ set b, s2
+ jsr strpbrk
+
+ set b, s1
+ add b, 2
+ jsr assert_eq
+
+; Search in set with non-existing tokens.
+; Search in set with existing tokens.
+ set a, s1
+ set b, s3
+ jsr strpbrk
+ jsr assert_ez
+
+ exit
+ 
+:s1 dat "This is a sample string", 0
+:s2 dat "aeiou", 0
+:s3 dat "xyz", 0

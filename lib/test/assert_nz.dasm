@@ -1,0 +1,13 @@
+; ASSERT_NZ compares the value in register A to 0.
+; Panics and stops the runtime if A == 0.
+; 
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:assert_nz
+  ife a, 0
+    panic assert_nz_str
+  set pc, pop
+
+:assert_nz_str
+  dat "Assertion failed: A == 0", 0

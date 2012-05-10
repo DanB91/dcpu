@@ -7,9 +7,7 @@
  set b, d3
  set c, 6
  jsr memcmp
-
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
  exit
 

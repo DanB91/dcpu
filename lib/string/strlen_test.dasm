@@ -7,9 +7,7 @@
 
  set a, s2
  jsr strlen
-
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
  exit
 

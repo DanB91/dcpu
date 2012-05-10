@@ -15,9 +15,7 @@
  
  set c, 3
  jsr memcmp
- 
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
 
  exit

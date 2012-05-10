@@ -14,9 +14,7 @@
  set b, 10
  set c, 5
  jsr memchr
-
- set b, 0
- jsr assert_eq
+ jsr assert_ez
 
 ; Existing value.
 ; Expect data+2 as return value.

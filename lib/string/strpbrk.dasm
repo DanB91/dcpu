@@ -20,15 +20,44 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strpbrk
-  set c, a
-  set j, b
+  ; Make a backup of some registers we will be using.
+  set push, x
+  set push, y
 
-:strpbrk_loop
-  set a, peek
-  sti b, [j]
-  jsr strchr
-  ifn a, 0
-    set pc, pop
-  ife b, 0
-    set pc, pop
+  set x, a
+  set y, b
+
+  ; Get string length
+  jsr strlen
+  set c, a
+  add c, x
+  add c, 1  ; z = len(str1) + 1
+  set push, c
+
+; Loop through all tokens in str2 and find the first 
+; instance if any of these in str1.
+:strpbrk_indexof
+  set a, x
+  set b, [y]
+  jsr strchr  ; ch = strchr(str1, *str2)
+
+  ifg a, 0  ; if (ch != NULL)
+    ifl a, c  ; if (ch < c)
+      set c, a  ; c = ch
+
+  add y, 1
+  ife [y], 0
+    set pc, strpbrk_ret
+
+  set pc, strpbrk_indexof
+
+:strpbrk_ret
+  ife c, pop
+    set c, 0
+  set a, c
+
+  ; Restore register backups.
+  set y, pop
+  set x, pop
+  set pc, pop
 
