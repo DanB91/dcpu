@@ -8,7 +8,6 @@
  jsr assert_eq
 
 ; Search in set with non-existing tokens.
-; Search in set with existing tokens.
  set a, s1
  set b, s3
  jsr strpbrk
