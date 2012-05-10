@@ -13,20 +13,27 @@
 ; if none of the characters in str2 are found in str1.
 ;
 ; ## Dependencies
-;   strchr.dasm
 ;   strlen.dasm
+;   strpbrk.dasm
 ;
 ; ## Version History:
-;   0.1.2: Fix checking of characters in str2.
-;          We want to check not just for the first occurance it finds as
-;          this may well lie beyond the index of another occuring token
-;          later on in str2.
-;
-;          Given s1="abcd" and s2="ba", The routine should not exit when
-;          it finds 'b' at position 1. Because 'a' also occurs and it's
-;          positioned lower than 'b'.
-;   0.1.1: Simplify exit code. No need to juggle values between a/b.
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcspn
+  set push, x
+  set x, a
+
+  jsr strpbrk
+  ifg a, 0
+    set pc, strcspn_ret
+
+:strcspn_not_found
+  set a, x
+  jsr strlen
+  set x, pop
+  set pc, pop
+
+:strcspn_ret
+  sub a, x
+  set x, pop
   set pc, pop
