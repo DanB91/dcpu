@@ -21,9 +21,9 @@ That is, if you want your code to behave as expected.
 	  ; Our function uses X and Y, so save them first.
 	  set push, x
 	  set push, y
-
+	  
 	  ; Do stuff with X and Y here...
-
+	  
 	  ; Once done, restore registers and exit.
 	  set y, pop
 	  set x, pop
