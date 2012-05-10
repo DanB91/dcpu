@@ -1,0 +1,17 @@
+; Test non-packed string
+ set a, s1
+ jsr strpacked
+ set b, 0
+ jsr assert_eq
+
+; Test packed string
+ set a, s2
+ jsr strpacked
+ set b, 1
+ jsr assert_eq
+
+ exit
+
+:s1 dat "abcd", 0
+:s2 dat 0x6162, 0x6364, 0
+

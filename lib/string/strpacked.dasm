@@ -1,0 +1,25 @@
+; int strpacked( const char * str );
+;
+; Standard DCPU strings come as one word per character.
+; Since we limit characters to the ascii range, this basically wastes
+; 8 bytes of storage space per character. A packed string can be created
+; which will store two characters in a single word.
+; This function returns TRUE if the given string is packed or not.
+;
+; Example of unpacked string (5 words):
+;    :s1 dat "abcd", 0
+;
+; Example of same string, but packed (3 words):
+;    :s2 dat 0x6162, 0x6364, 0
+;
+; Returns zero for unpacked, 1 for packed.
+;
+; ## Version History:
+;   0.1.0: Initial implementation for spec 1.7.
+;
+:strpacked
+  set b, [a]
+  set a, 0
+  ifg b, 0xff
+    set a, 1
+  set pc, pop
