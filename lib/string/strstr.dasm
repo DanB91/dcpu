@@ -17,6 +17,7 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strstr
+  set push, x
   set x, b
   set c, b
   set b, [b]
@@ -43,9 +44,11 @@
 
 :strstr_found
   set a, y
+  set x, pop
   set pc, pop
 
 :strstr_not_found
   set a, 0
+  set x, pop
   set pc, pop
 
