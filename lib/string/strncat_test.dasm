@@ -1,0 +1,19 @@
+; Add d2 to d1
+ set a, d1
+ set b, d2
+ set c, 2
+ jsr strncat
+
+ set b, d3
+ set c, 6
+ jsr memcmp
+
+ set b, 0
+ jsr assert_eq
+
+ exit
+
+:d1 dat "abc", 0, 0, 0
+:d2 dat "def", 0
+:d3 dat "abcde", 0
+

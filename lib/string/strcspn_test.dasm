@@ -1,0 +1,5 @@
+
+ exit
+
+:str dat "abc123", 0
+:keys dat "01234567890", 0

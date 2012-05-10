@@ -1,6 +1,6 @@
 ; size_t strlen ( const char * str );
 ;
-; Returns the length of str.
+; Returns the length of str. Excluding the NULL terminator.
 ;
 ; The length of a C string is determined by the terminating
 ; null-character: A C string is as long as the amount of
@@ -11,13 +11,16 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strlen
+  set push, b
   set b, a
-  set a, 0
 
 :strlen_loop
-  ife [b], 0
-    set pc, pop
+  ife [a], 0
+    set pc, strlen_ret
   add a, 1
-  add b, 1
   set pc, strlen_loop
 
+:strlen_ret
+  sub a, b
+  set b, pop
+  set pc, pop

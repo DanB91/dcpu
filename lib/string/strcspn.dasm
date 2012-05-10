@@ -29,29 +29,4 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcspn
-  set push, x
-  set push, a
-  set j, b
-
-  ; Get length of a
-  jsr strlen
-  set x, a
-
-:strcspn_loop
-  set a, peek
-  sti b, [j]
-  jsr strchr
-
-  ife b, 0
-    set pc, strcspn_ret
-
-  ifl a, x
-    set x, a
-
-  set pc, strcspn_loop
-
-:strcspn_ret
-  set a, x
-  sub a, pop
-  set x, pop
   set pc, pop

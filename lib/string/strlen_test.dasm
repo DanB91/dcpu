@@ -1,0 +1,9 @@
+ set a, str
+ jsr strlen
+
+ set b, 6
+ jsr assert_eq
+
+ exit
+
+:str dat "abc123", 0
