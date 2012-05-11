@@ -44,35 +44,43 @@
       set pc, pop ; No (stored) pointer available
 
   set push, x
-  set x, [strtok_ptr]
-
   set push, y
+
+  set x, [strtok_ptr]
   set y, b
 
-; Is str[i] a delimiter?
+; Find the next delimiter
 :strtok_is_delim
+  ife [x], 0
+    set pc, strtok_ret
+
   set a, y
   set b, [x]
-  add x, 1
   jsr strchr
 
   ifg a, 0
-    set pc, strtok_found_delim
-
-  set pc, strtok_is_delim
-
-; str[i] is a delimiter.
-; If i > 0, then return a new token.
-; Otherwise, continue to find delimiters.
-:strtok_found_delim
-  ifn [strtok_ptr], x
     set pc, strtok_yield
 
+  add x, 1
+  set pc, strtok_is_delim
+
+; str[i] is a delimiter. Return a new token if token length > 0
+:strtok_yield
+  ifn x, [strtok_ptr]
+     set pc, strtok_valid_token
+
+  add x, 1
   set [strtok_ptr], x
   set pc, strtok_is_delim
 
-:strtok_yield
-  
+:strtok_valid_token
+  set [x], 0
+  set a, [strtok_ptr]
+  set [strtok_ptr], x
+  set pc, strtok_ret
+
+:strtok_invalid_token
+  set a, 0
 
 :strtok_ret
   set y, pop
@@ -82,9 +90,5 @@
 
 ; Internal pointer. Retains state across multiple calls when
 ; tokenizing the same string.
-;
-; Note that this inherently makes this function non-threadsafe.
-; A threadsafe variety of strtok should accept a third parameter which
-; points to the remaining string buffer contents.
 :strtok_ptr dat 0
 

@@ -1,0 +1,12 @@
+ set a, s1
+ set b, s2
+ jsr strtok
+ 
+ set b, s1
+ add b, 2
+ jsr assert_eq
+
+ exit
+ 
+:s1 dat "- This, is a sample string.", 0
+:s2 dat " ,.-", 0
