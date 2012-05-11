@@ -1,7 +1,7 @@
 ; ASSERT_GTS compares the values in registers A and B.
 ; Panics and stops the runtime if A <= B.
 ; 
-; This performs a singed compaison.
+; This performs a singed comparison.
 ; 
 ; ## Version History:
 ;   0.1.0: Initial implementation for spec 1.7.

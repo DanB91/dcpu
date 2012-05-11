@@ -24,9 +24,8 @@ For example: `lib/string/memchr_test.dasm` runs various tests to
 probe the behaviour of the `memchr` function. It pushes in a set of
 values through CPU registers, calls `memchr` and then performs the unit test.
 
-Any additional data that is required by the tests, can be defined
-at the end of the source file. With the exception of the `test` instruction,
-the entire `*.test` file is a valid DASM source file.
+With the exception of the `PANIC` and `EXIT` instructions,
+the entire `*_test.dasm` file is a valid DASM source program.
 
 ### Test functions
 
@@ -38,7 +37,7 @@ Example code for a single test unit may look like this:
 	 jsr memchr
 	 
 	 set b, data
-	 jsr asserteq
+	 jsr assert_eq
 
 	 exit
 
@@ -46,7 +45,7 @@ Example code for a single test unit may look like this:
 	 dat 1, 2, 3, 4, 5
 
 This defines some inputs, then calls `memchr` and compares the value in the
-A register with something we expect it to be. `asserteq` panic if this
+A register with something we expect it to be. `assert_eq` panics if this
 is not the case.
 
 If all tests pass successfully, the tool exits cleanly.
@@ -68,7 +67,7 @@ Here is an example of trace output for a test program.
 
     $ cd /path/to/dcpu/lib
     $ dcpu-test -V -t .
-	> string/memchr_test.dasm...
+	[*] string/memchr_test.dasm...
 	0000: 0001 0000 001f | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:1 | set a, data
 	0002: 0001 0001 0024 | 000b 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:2 | set b, 3
 	0003: 0001 0002 0021 | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:3 | set c, 0
@@ -76,9 +75,9 @@ Here is an example of trace output for a test program.
 	0010: 0012 0002 0021 | 000b 0003 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | memchr.dasm:15 | ife c, 0 ; num is zero -- No compare needed.
 	0011: 0001 001c 0018 | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr.dasm:16 | set pc, pop
 	0006: 0001 0001 001f | 000b 0003 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:6 | set b, data
-	0008: 0000 0001 001f | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:7 | jsr asserteq
-	001a: 0013 0000 0001 | 000b 000b 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | asserteq.dasm:8 | ifn a, b
-	001d: 0001 001c 0018 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | asserteq.dasm:10 | set pc, pop
+	0008: 0000 0001 001f | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:7 | jsr assert_eq
+	001a: 0013 0000 0001 | 000b 000b 0000 0000 0000 0000 0000 0000 | fffe 0000 0000 | assert_eq.dasm:8 | ifn a, b
+	001d: 0001 001c 0018 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | assert_eq.dasm:10 | set pc, pop
 	000a: 0000 001f 0000 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:9 | exit
 
 ### Clock speed

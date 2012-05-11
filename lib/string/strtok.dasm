@@ -25,53 +25,66 @@
 ; to strtok, all subsequent calls to this function with a null pointer
 ; as the first argument return a null pointer.
 ;
+; Note that this function modifies the original input string by replacing
+; token delimiters with NULL terminators.
+;
 ; ## Dependencies
-;   strcspn.dasm
+;   strchr.dasm
+;   strpbrk.dasm
 ;
 ; ## Version History:
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strtok
-  ; Do we have a subsequent call on the same string?
-  ife a, 0
-    set a, [strtok_ptr]
+  ifn a, 0
+    set [strtok_ptr], a
 
-  ; If we still have NULL, there is nothing left to do.
   ife a, 0
-    set pc, pop
+    ife [strtok_ptr], 0
+      set pc, pop ; No (stored) pointer available
 
-  ; Store pointers
-  set x, a
+  set push, x
+  set x, [strtok_ptr]
+
+  set push, y
   set y, b
 
-  ; Skip to first delimiter occurance.
-:strtok_next_occur
-  jsr strcspn
+; Is str[i] a delimiter?
+:strtok_is_delim
+  set a, y
+  set b, [x]
+  add x, 1
+  jsr strchr
 
-  ; No delimiter found.
-  ife a, 0
-    set pc, pop
+  ifg a, 0
+    set pc, strtok_found_delim
 
-  ; If first character is a delimiter. Skip to next instance.
-  ; Otherwise start splitting.
-  ifg a, 1
-    set pc, strtok_split
+  set pc, strtok_is_delim
 
-  set a, x
-  add a, 1
-  set pc, strtok_next_occur
+; str[i] is a delimiter.
+; If i > 0, then return a new token.
+; Otherwise, continue to find delimiters.
+:strtok_found_delim
+  ifn [strtok_ptr], x
+    set pc, strtok_yield
 
-:strtok_split
-  add a, x
+  set [strtok_ptr], x
+  set pc, strtok_is_delim
+
+:strtok_yield
   
 
 :strtok_ret
-  set [strtok_ptr], a ; Store current pointer for future calls.
+  set y, pop
+  set x, pop
   set pc, pop
 
 
 ; Internal pointer. Retains state across multiple calls when
-; tokenizing the same string. 
+; tokenizing the same string.
 ;
-; Note that this explicitely makes the function unsafe for multi-threading.
+; Note that this inherently makes this function non-threadsafe.
+; A threadsafe variety of strtok should accept a third parameter which
+; points to the remaining string buffer contents.
 :strtok_ptr dat 0
+

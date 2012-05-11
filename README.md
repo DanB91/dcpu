@@ -6,6 +6,10 @@ which should make the writing of larger programs a little less painful.
 
 [1]: http://dcpu.com
 
+More importantly, it defines a unit testing framework which allows us to
+write unit tests for any piece of code. It automatically finds and executes
+all these tests and supplies appropriate error messages where applicable.
+
 * _dcpu.lang_: This file is a DCPU syntax file for GtkSourceView
   compatible editors (like Gedit). It should be installed in the
   language-specs directory.

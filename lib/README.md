@@ -8,7 +8,7 @@ That is, if you want your code to behave as expected.
 
 * The A, B and C registers are used to push arguments into a function.
 * The A register will hold the return value from a function if applicable.
-* When calling a subroutine, the A, B and C registers are considered free
+* When calling a function, the A, B and C registers are considered free
   for all. Their contents are not preserved across calls. So if you are
   using them for anything important, you are required to save/restore them
   manually.
