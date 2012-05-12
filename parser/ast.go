@@ -41,7 +41,109 @@ func (a *AST) Parse(r io.Reader, filename string) (err error) {
 
 	io.Copy(&buf, r)
 
-	return a.readDocument(lex.Run(buf.Bytes()), &a.Root.children)
+	if err = a.readDocument(lex.Run(buf.Bytes()), &a.Root.children); err != nil {
+		return
+	}
+
+	constants := make(map[string]Node)
+
+	if err = a.findConstants(constants); err != nil {
+		return
+	}
+
+	a.replaceConstants(a.Root.children, constants)
+	return
+}
+
+// replaceConstants finds al constant references and replaces them
+// with constant values.
+func (a *AST) replaceConstants(nodes []Node, c map[string]Node) {
+	for i := range nodes {
+		instr, ok := a.Root.children[i].(*Instruction)
+
+		if !ok {
+			continue
+		}
+
+		argv := instr.children[1:]
+		for j := range argv {
+			expr := argv[j].(*Expression)
+
+			for k := range expr.children {
+				switch tt := expr.children[k].(type) {
+				case *Name:
+					if node, ok := c[tt.Data]; ok {
+						expr.children[k] = node
+					}
+				}
+			}
+		}
+	}
+
+	return
+}
+
+// findConstants finds all constant (EQU) definitions.
+// Adds them to the supplied map and removes them from the AST.
+func (a *AST) findConstants(list map[string]Node) (err error) {
+	for i := 0; i < len(a.Root.children); i++ {
+		instr, ok := a.Root.children[i].(*Instruction)
+		if !ok {
+			continue
+		}
+
+		name := instr.children[0].(*Name)
+
+		if name.Data != "equ" {
+			continue
+		}
+
+		if len(instr.children) != 3 {
+			return NewParseError(
+				a.Files[instr.File()], instr.Line(), instr.Col(),
+				"Invalid argument count for EQU. Want 2, got %d.",
+				len(instr.children)-1,
+			)
+		}
+
+		exp := instr.children[1].(*Expression)
+		key, ok := exp.children[0].(*Name)
+
+		if !ok {
+			return NewParseError(
+				a.Files[key.File()], key.Line(), key.Col(),
+				"Invalid Node %T. Expected *Name", key,
+			)
+		}
+
+		if _, ok = list[key.Data]; ok {
+			return NewParseError(
+				a.Files[key.File()], key.Line(), key.Col(),
+				"Duplicate constant %q", key.Data,
+			)
+		}
+
+		val := instr.children[2].(*Expression).children[0]
+
+		switch val.(type) {
+		case *Name:
+		case *Number:
+		case *String:
+		default:
+			return NewParseError(
+				a.Files[val.File()], val.Line(), val.Col(),
+				"Invalid Node %T. Expected *Name", val,
+			)
+		}
+
+		list[key.Data] = val
+
+		copy(a.Root.children[i:], a.Root.children[i+1:])
+		a.Root.children = a.Root.children[:len(a.Root.children)-1]
+		i--
+	}
+
+	return
 }
 
 // readDocument reads tokens from the given channel and turns them into AST nodes.
