@@ -1,0 +1,15 @@
+
+equ WIDTH,  0xa
+equ HEIGHT, 0xb
+equ SAMPLE_STRING, "foobar"
+
+:main
+  set a, WIDTH
+  set b, HEIGHT
+  jsr init_display
+
+:init_display
+  set pc, pop
+
+:data dat SAMPLE_STRING, 0
+
