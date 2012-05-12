@@ -59,24 +59,14 @@ func (a *AST) Parse(r io.Reader, filename string) (err error) {
 // with constant values.
 func (a *AST) replaceConstants(nodes []Node, c map[string]Node) {
 	for i := range nodes {
-		instr, ok := a.Root.children[i].(*Instruction)
-
-		if !ok {
-			continue
-		}
-
-		argv := instr.children[1:]
-		for j := range argv {
-			expr := argv[j].(*Expression)
-
-			for k := range expr.children {
-				switch tt := expr.children[k].(type) {
-				case *Name:
-					if node, ok := c[tt.Data]; ok {
-						expr.children[k] = node
-					}
-				}
+		switch tt := nodes[i].(type) {
+		case *Name:
+			if node, ok := c[tt.Data]; ok {
+				nodes[i] = node
 			}
+
+		case NodeCollection:
+			a.replaceConstants(tt.Children(), c)
 		}
 	}
 
