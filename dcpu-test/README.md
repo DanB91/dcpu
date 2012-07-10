@@ -89,13 +89,13 @@ can be a powerful debugging tool.
 
 ### Dependencies
 
-    $ go get github.com/jteeuwen/dcpu/asm
-    $ go get github.com/jteeuwen/dcpu/cpu
-    $ go get github.com/jteeuwen/dcpu/parser
+* github.com/jteeuwen/dcpu/asm
+* github.com/jteeuwen/dcpu/cpu
+* github.com/jteeuwen/dcpu/parser
 
 ### Usage
 
-    $ go get github.com/jteeuwen/dcpu/dcpu-test
+Run `dcpu-test -h` for a listing of options.
 
 ### License
 

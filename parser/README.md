@@ -2,9 +2,6 @@
 
 This package parses DASM source and turns it into an Abstract Syntax Tree.
 
-### Usage
-
-    $ go get github.com/jteeuwen/dcpu/parser
 
 ### License
 

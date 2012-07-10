@@ -74,8 +74,8 @@ along with the available pre- and post-processors.
 
 ### Debug symbol files
 
-When creating debug symbol files, the assembler uotputs a file with JSON
-encoded data. it has the following format:
+When creating debug symbol files, the assembler outputs a file with JSON
+encoded data. It has the following format:
 
 	{
 	 "Files": [
@@ -111,7 +111,7 @@ RAM at offset 0. Otherwise it becomes `info := dbg.SourceMapping[PC-offset]`.
 
 The available debug data may be expanded at some point to include more data.
 
-To see this being used, refer to the the `dcpu-test` program.
+To see this being used, refer to the `dcpu-test` program.
 
 
 ### Dependencies

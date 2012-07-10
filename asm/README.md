@@ -5,7 +5,7 @@ compiled program you can run on the CPU.
 
 ### Dependencies
 
-    $ go get github.com/jteeuwen/dcpu/parser
+* github.com/jteeuwen/dcpu/parser
 
 ### License
 
