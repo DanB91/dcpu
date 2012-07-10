@@ -27,12 +27,11 @@ func writeProgram(program []cpu.Word, file string, little_endian bool) (err erro
 	var b [2]byte
 
 	for _, word := range program {
-		if little_endian {
-			b[0] = byte(word & 0xff)
-			b[1] = byte((word >> 8) & 0xff)
-		} else {
-			b[0] = byte((word >> 8) & 0xff)
-			b[1] = byte(word & 0xff)
+		b[0] = byte((word >> 8) & 0xff)
+		b[1] = byte(word & 0xff)
+
+		if little_endian { // SWAP ALL THE BYTES \o/
+			b[0], b[1] = b[1], b[0]
 		}
 
 		_, err = w.Write(b[:])
