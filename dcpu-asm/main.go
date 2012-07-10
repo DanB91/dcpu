@@ -132,6 +132,16 @@ func parseArgs() {
 		}
 	}
 
+	// A valid debug output path?
+	if len(*debugfile) > 0 {
+		if stat, err := os.Lstat(*debugfile); err != nil {
+			if os.IsExist(err) && stat.IsDir() {
+				fmt.Fprintf(os.Stderr, "Debug file %q exists and is not a file.\n", *debugfile)
+				os.Exit(1)
+			}
+		}
+	}
+
 	// Parse include paths.
 	if len(*include) > 0 {
 		includes = strings.Split(*include, ":")
