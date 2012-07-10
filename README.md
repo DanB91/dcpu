@@ -1,14 +1,10 @@
 ## DCPU
 
 This repository contains [DCPU assembly][1] utilities and code.
-Mostly commonly used library bits and bobs, along with a preprocessor
-which should make the writing of larger programs a little less painful.
+Mostly commonly used library bits and bobs, along with a comprehensive
+assembler and unit testing framework.
 
 [1]: http://dcpu.com
-
-More importantly, it defines a unit testing framework which allows us to
-write unit tests for any piece of code. It automatically finds and executes
-all these tests and supplies appropriate error messages where applicable.
 
 * _dcpu.lang_: This file is a DCPU syntax file for GtkSourceView
   compatible editors (like Gedit). It should be installed in the
@@ -27,6 +23,9 @@ all these tests and supplies appropriate error messages where applicable.
 * _dcpu-test_: This program runs unit tests as defined in the `lib` 
   directory. We use this to verify newly written code does what we
   want it to do. Refer to its README for more info.
+* _dcpu-data_: This is a small tool which generates DCPU assembly source
+  from any input file. Useful if oyu want to embed binary data in your
+  programs.
 * _lib/_: This directory holds often used assembly code and unit tests.
 
 
@@ -38,8 +37,8 @@ To install all tools in one go, do the following:
     $ cd dcpu
     $ go install -ldflags "-X main.AppVersionRev `date -u +%s` -s" ./...
 
-The `dcpu-asm` and `dcpu-test` programs will be installed where ever
-your `$GOBIN` is set to. They are now ready for use.
+The `dcpu-asm`, `dcpu-test` and `dcpu-data` programs will be installed
+where ever your `$GOBIN` points to. They are now ready for use.
 
 The `-X main.AppVersionRev ...` bit in the `-ldflags` section of
 `go install` automatically sets the `AppVersionRev` variable in version.go
