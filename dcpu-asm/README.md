@@ -114,6 +114,21 @@ The available debug data may be expanded at some point to include more data.
 To see this being used, refer to the `dcpu-test` program.
 
 
+### Pre- & Post-processors
+
+These are modules which perform changes on the generated AST and assembled
+binary code respectively. They can function as simple novelty tools or to
+find and implement useful code optimizations which either speeds things up
+or reduces a program's memory footprint.
+
+By default each desired processor has to be named manually through its
+respective commandline switch. However, by using the `-p` switch, we can
+force all processors to run which explicitely perform optimization roles.
+This would be roughly equivalent to running gcc with the `-O3` switch.
+
+The optimization processors are described in detail in the OPTIMIZATIONS.md
+file.
+
 ### Dependencies
 
 * github.com/jteeuwen/dcpu/asm
