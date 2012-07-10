@@ -10,7 +10,7 @@ import (
 
 func init() {
 	RegisterPreProcessor("scramble",
-		"Obfuscate label names and label references.", NewScrambler)
+		"Obfuscate label names and label references.", NewScrambler, false)
 }
 
 // Scrambler obfuscates labels and label references in the given AST.

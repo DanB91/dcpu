@@ -7,7 +7,7 @@ import dp "github.com/jteeuwen/dcpu/parser"
 
 func init() {
 	RegisterPreProcessor("strip",
-		"Remove all code comments.", NewStripper)
+		"Remove all code comments.", NewStripper, false)
 }
 
 // Stripper removes all code comments from the AST.

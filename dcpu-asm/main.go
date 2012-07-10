@@ -19,11 +19,12 @@ import (
 var (
 	infile       string
 	includes     []string
-	dumpast      = flag.Bool("a", false, "Dump pre-processed AST to the output.")
-	dumpsrc      = flag.Bool("s", false, "Dump pre-processed source code to the output.")
-	outfile      = flag.String("o", "", "Name of the output file.")
-	debugfile    = flag.String("d", "", "Name of the file to write debug symbols to.")
-	littleendian = flag.Bool("l", false, "Generate Little Endian binary output. Defaults to Big Endian.")
+	dumpast      = flag.Bool("a", false, "")
+	dumpsrc      = flag.Bool("s", false, "")
+	outfile      = flag.String("o", "", "")
+	debugfile    = flag.String("d", "", "")
+	littleendian = flag.Bool("l", false, "")
+	optimize     = flag.Bool("p", false, "")
 )
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 	}
 
 	// Run pre-processors on the generated AST.
-	err = PreProcess(&ast)
+	err = PreProcess(&ast, *optimize)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Pre processor: %v\n", err)
 		os.Exit(1)
@@ -65,7 +66,7 @@ func main() {
 	}
 
 	// Run post-processors on generated binary code and debug symbols.
-	err = PostProcess(program, dbg)
+	err = PostProcess(program, dbg, *optimize)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Post processor: %v\n", err)
 		os.Exit(1)
@@ -167,6 +168,8 @@ func usage() {
 	fmt.Fprintf(os.Stdout, "        -a : Dump pre-processed AST to the output.\n")
 	fmt.Fprintf(os.Stdout, "        -s : Dump pre-processed source code to the output.\n")
 	fmt.Fprintf(os.Stdout, "        -l : Generate Little Endian binary output. Defaults to Big Endian.\n")
+	fmt.Fprintf(os.Stdout, "        -p : Force all pre- and post-processors which are marked\n"+
+		"             as optimizations to run. No need to manually specify them.\n")
 	fmt.Fprintf(os.Stdout, "        -h : Display this help.\n")
 	fmt.Fprintf(os.Stdout, "        -v : Display version information.\n")
 
@@ -178,7 +181,11 @@ func usage() {
 		fmt.Fprintf(os.Stdout, "Available processors are:\n\n")
 
 		for k, v := range preprocessors {
-			fmt.Fprintf(os.Stdout, " -%s : %s\n", k, v.desc)
+			if v.isopt {
+				fmt.Fprintf(os.Stdout, " -%s : [optimization] %s\n", k, v.desc)
+			} else {
+				fmt.Fprintf(os.Stdout, " -%s : %s\n", k, v.desc)
+			}
 		}
 	}
 
@@ -187,7 +194,11 @@ func usage() {
 		fmt.Fprintf(os.Stdout, "Available processors are:\n\n")
 
 		for k, v := range postprocessors {
-			fmt.Fprintf(os.Stdout, " -%s : %s\n", k, v.desc)
+			if v.isopt {
+				fmt.Fprintf(os.Stdout, " -%s : [optimization] %s\n", k, v.desc)
+			} else {
+				fmt.Fprintf(os.Stdout, " -%s : %s\n", k, v.desc)
+			}
 		}
 	}
 }

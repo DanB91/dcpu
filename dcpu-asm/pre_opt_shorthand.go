@@ -1,15 +1,17 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package asm
+package main
 
 import dp "github.com/jteeuwen/dcpu/parser"
 
 func init() {
-	RegisterOptimization(opt_branch_shorthand)
+	RegisterPreProcessor("shorthand",
+		"Fixes 'IF[E|N] 0, $R' to use one word less.",
+		NewOptShorthand, true)
 }
 
-// opt_branch_shorthand finds instances of "IFE B, A" amd "IFN B, A"
+// OptShorthand finds instances of "IFE B, A" and "IFN B, A"
 // and checks if the first operand is a short-form numeric literal.
 // If so, the operands are swapped.
 //
@@ -25,7 +27,11 @@ func init() {
 // For other instructions this is problematic, since swapping them out
 // changes the semantics of the operation. In those cases, we simply
 // allow the assembler to generate the extra word.
-func opt_branch_shorthand(ast *dp.AST) {
+type OptShorthand struct{}
+
+func NewOptShorthand() PreProcessor { return new(OptShorthand) }
+
+func (*OptShorthand) Process(ast *dp.AST) (err error) {
 	var instr *dp.Instruction
 	var argv []dp.Node
 	var name *dp.Name
@@ -57,4 +63,6 @@ func opt_branch_shorthand(ast *dp.AST) {
 			argv[1], argv[2] = argv[2], argv[1]
 		}
 	}
+
+	return
 }

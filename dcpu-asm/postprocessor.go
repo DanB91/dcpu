@@ -18,9 +18,10 @@ type PostProcessor interface {
 type PostProcessorFunc func() PostProcessor
 
 type PostProcessorDef struct {
-	proc PostProcessorFunc
-	desc string
-	use  bool
+	proc  PostProcessorFunc // Processor handler.
+	desc  string            // Processor description.
+	use   bool              // Whether to perform the processing or not.
+	isopt bool              // is this an optimization?
 }
 
 // List of available PostProcessors and a value indicating whether
@@ -29,7 +30,7 @@ var postprocessors map[string]*PostProcessorDef
 
 // RegisterPostProcessor registers a new PostProcessor with
 // its commandline name, description string.
-func RegisterPostProcessor(name, desc string, pf PostProcessorFunc) {
+func RegisterPostProcessor(name, desc string, pf PostProcessorFunc, isopt bool) {
 	if postprocessors == nil {
 		postprocessors = make(map[string]*PostProcessorDef)
 	}
@@ -39,16 +40,21 @@ func RegisterPostProcessor(name, desc string, pf PostProcessorFunc) {
 	}
 
 	postprocessors[name] = &PostProcessorDef{
-		proc: pf,
-		desc: desc,
-		use:  false,
+		proc:  pf,
+		desc:  desc,
+		use:   false,
+		isopt: isopt,
 	}
 }
 
 // PostProcess traverses all registered post processors and
 // passes the compiled program into them for parsing.
-func PostProcess(program []cpu.Word, symbols *asm.DebugInfo) (err error) {
+func PostProcess(program []cpu.Word, symbols *asm.DebugInfo, force_opt bool) (err error) {
 	for _, v := range postprocessors {
+		if force_opt && v.isopt {
+			v.use = true
+		}
+
 		if !v.use {
 			continue
 		}

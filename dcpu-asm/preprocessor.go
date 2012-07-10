@@ -17,9 +17,10 @@ type PreProcessor interface {
 type PreProcessorFunc func() PreProcessor
 
 type PreProcessorDef struct {
-	proc PreProcessorFunc
-	desc string
-	use  bool
+	proc  PreProcessorFunc // Processor handler.
+	desc  string           // Processor description.
+	use   bool             // Whether to perform the processing or not.
+	isopt bool             // is this an optimization?
 }
 
 // List of available pre-processor and a value indicating whether
@@ -28,7 +29,7 @@ var preprocessors map[string]*PreProcessorDef
 
 // Register registers a new pre-processor with its commandline name,
 // description string.
-func RegisterPreProcessor(name, desc string, pf PreProcessorFunc) {
+func RegisterPreProcessor(name, desc string, pf PreProcessorFunc, isopt bool) {
 	if preprocessors == nil {
 		preprocessors = make(map[string]*PreProcessorDef)
 	}
@@ -38,16 +39,21 @@ func RegisterPreProcessor(name, desc string, pf PreProcessorFunc) {
 	}
 
 	preprocessors[name] = &PreProcessorDef{
-		proc: pf,
-		desc: desc,
-		use:  false,
+		proc:  pf,
+		desc:  desc,
+		use:   false,
+		isopt: isopt,
 	}
 }
 
 // PreProcess traverses all registered pre-processor and
 // passes the AST into them for parsing.
-func PreProcess(ast *dp.AST) (err error) {
+func PreProcess(ast *dp.AST, force_opt bool) (err error) {
 	for _, v := range preprocessors {
+		if force_opt && v.isopt {
+			v.use = true
+		}
+
 		if !v.use {
 			continue
 		}
