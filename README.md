@@ -10,6 +10,7 @@ assembler and unit testing framework.
   compatible editors (like Gedit). It should be installed in the
   language-specs directory.
   For me this is at: `/usr/share/gtksourceview-3.0/language-specs/`. 
+* **lib/**: This directory holds often used assembly code and unit tests.
 * **parser**: This holds a package that parses assembly source and turns it
   into an Abstract Syntax Tree.
 * **asm**: This holds aan assembler. It turns an AST into a compiled
@@ -17,7 +18,7 @@ assembler and unit testing framework.
 * **cpu**: A CPU emulator implementation. It adds the necessary instructions
   to make unit tests behave properly. As such, it may not be ideal to use
   as a standalone emulator.
-* **cpu/hw/**_: List of hardware components that can be hooked into the CPU.
+* **cpu/hw/**: List of hardware components that can be hooked into the CPU.
 * **dcpu-asm**: This is a commandline assembler with a wide range of options,
   including pre- and post-processors. Refer to its README for more info.
 * **dcpu-test**: This program runs unit tests as defined in the `lib` 
