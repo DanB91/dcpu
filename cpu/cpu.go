@@ -108,7 +108,7 @@ func (c *CPU) triggerInterrupt(msg Word) {
 // In order to step through code for debugging, call cpu.Step
 // manually.
 func (c *CPU) Run(entrypoint Word) (err error) {
-	clock := time.After(c.ClockSpeed)
+	clock := time.Tick(c.ClockSpeed)
 	s := c.Store
 	s.PC = entrypoint
 

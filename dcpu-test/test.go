@@ -60,9 +60,10 @@ func (t *Test) Run(cfg *Config) (err error) {
 	}
 
 	c.ClockSpeed = time.Duration(cfg.Clock)
+
 	if err = c.Run(0); err != nil {
 		if te, ok := err.(*cpu.TestError); ok {
-			return t.formatTestError(te)
+			err = t.formatTestError(te)
 		}
 	}
 

@@ -74,7 +74,16 @@ func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 
 	name := r.Data + ".dasm"
 	walker := func(f string, info os.FileInfo, err error) error {
-		if filepath.Base(f) == name {
+		fb := filepath.Base(f)
+
+		if len(fb) > 0 && fb[0] == '_' {
+			// Skip files and directories beginning with an underscore.
+			// This ensures behaviour similar to the Go tool chain where
+			// these files are not included in the build cycle.
+			return nil
+		}
+
+		if fb == name {
 			file = f
 			return io.EOF // Signal walker to stop.
 		}
