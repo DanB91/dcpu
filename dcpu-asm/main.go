@@ -78,7 +78,7 @@ func main() {
 	}
 
 	// Write binary output.
-	if err = writeProgram(program, *outfile); err != nil {
+	if err = writeProgram(program, *outfile, *littleendian); err != nil {
 		fmt.Fprintf(os.Stderr, "Binary writer: %v\n", err)
 		os.Exit(1)
 	}

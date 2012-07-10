@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func writeProgram(program []cpu.Word, file string) (err error) {
+func writeProgram(program []cpu.Word, file string, little_endian bool) (err error) {
 	var w io.Writer
 
 	if len(file) == 0 {
@@ -25,10 +25,9 @@ func writeProgram(program []cpu.Word, file string) (err error) {
 	}
 
 	var b [2]byte
-	le := *littleendian
 
 	for _, word := range program {
-		if le {
+		if little_endian {
 			b[0] = byte(word & 0xff)
 			b[1] = byte((word >> 8) & 0xff)
 		} else {
