@@ -1,6 +1,7 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+// DCPU unit-testing framework.
 package main
 
 import (
@@ -9,13 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
-)
-
-const (
-	AppName    = "dcpu-test"
-	AppVersion = "0.3.8"
 )
 
 func main() {
@@ -100,8 +95,7 @@ func parseArgs() *Config {
 	flag.Parse()
 
 	if version {
-		fmt.Fprintf(os.Stdout, "%s %s (Go runtime %s)\nCopyright (c) 2012, Jim Teeuwen.\n",
-			AppName, AppVersion, runtime.Version())
+		fmt.Fprintf(os.Stdout, "%s\n", Version())
 		os.Exit(0)
 	}
 

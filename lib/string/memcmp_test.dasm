@@ -5,7 +5,6 @@
  jsr memcmp
 
  set x, b
-
  set b, d1
  jsr assert_eq
 

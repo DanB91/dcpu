@@ -4,7 +4,7 @@ This is a customized emulator for the DCPU.
 It is tailored specifically to run unit tests.
 
 It has some extra instructions to facilitate proper function of unit tests
-as they are defined in the `dcpu-unit` tool.
+as they are defined in the `dcpu-test` tool.
 
 ### License
 

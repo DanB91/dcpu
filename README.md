@@ -22,8 +22,8 @@ all these tests and supplies appropriate error messages where applicable.
   to make unit tests behave properly. As such, it may not be ideal to use
   as a standalone emulator.
 * _cpu/hw/*_: List of hardware components that can be hooked into the CPU.
-* _dcpu-pp_: This is a commandline tool that offers some pre-processing
-  magic for `.dasm` source code. Refer to its README for more info.
+* _dcpu-asm_: This is a commandline assembler with a wide range of options,
+  including pre- and post-processors. Refer to its README for more info.
 * _dcpu-test_: This program runs unit tests as defined in the `lib` 
   directory. We use this to verify newly written code does what we
   want it to do. Refer to its README for more info.
@@ -36,18 +36,15 @@ To install all tools in one go, do the following:
 
     $ git clone https://github.com/jteeuwen/dcpu.git
     $ cd dcpu
-    $ go install -a -ldflags="-s" ./...
+    $ go install -ldflags "-X main.AppVersionRev `date -u +%s` -s" ./...
 
-The `dcpu-pp` and `dcpu-unit` programs will now be installed where ever
+The `dcpu-asm` and `dcpu-test` programs will be installed where ever
 your `$GOBIN` is set to. They are now ready for use.
 
-The `-a` switch ensures everything is freshly built (including the linked
-Go core packages). The `-ldflags="-s"` switch causes binaries to be built
-without all the debug symbols. This speeds them up a little and drastically
-reduces their file size. The `./...` bit simply means: Build any and all
-packages in this directory and all sub directories. The Go tool will
-automatically figure out the dependency tree and build things in the right
-order.
+The `-X main.AppVersionRev \`date -u +%s\`` bit in the `-ldflags` section of
+`go install` automatically sets the `AppVersionRev` variable in version.go
+to the current unix timestamp. This allows us to do auto-incremented
+versioning every time we build.
 
 ### License
 

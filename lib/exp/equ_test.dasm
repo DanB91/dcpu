@@ -7,6 +7,7 @@ equ SAMPLE_STRING, "foobar"
   set a, WIDTH
   set b, HEIGHT
   jsr init_display
+  exit
 
 :init_display
   set pc, pop

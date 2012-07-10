@@ -76,7 +76,7 @@ func (t *Test) Run(cfg *Config) (err error) {
 //      - memchr_test.dasm:7 | jsr asserteq
 //
 func (t *Test) formatTestError(e *cpu.TestError) error {
-	if int(e.PC) >= len(t.dbg.Data) {
+	if int(e.PC) >= len(t.dbg.SourceMapping) {
 		return errors.New(fmt.Sprintf("No debug symbols available for address %04x.", e.PC))
 	}
 
@@ -113,7 +113,7 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 	}
 
 	if verbose {
-		if int(pc) >= len(t.dbg.Data) {
+		if int(pc) >= len(t.dbg.SourceMapping) {
 			fmt.Fprintf(os.Stdout,
 				"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | <unknown>\n",
 				pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
@@ -206,7 +206,7 @@ func (t *Test) getSourceLine(pc cpu.Word) string {
 		return line
 	}
 
-	symbol := t.dbg.Data[pc]
+	symbol := t.dbg.SourceMapping[pc]
 	file := t.dbg.Files[symbol.File]
 
 	fd, err := os.Open(file)

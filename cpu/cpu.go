@@ -1,6 +1,7 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+// DCPU emulator package.
 package cpu
 
 import (
@@ -107,15 +108,14 @@ func (c *CPU) triggerInterrupt(msg Word) {
 // In order to step through code for debugging, call cpu.Step
 // manually.
 func (c *CPU) Run(entrypoint Word) (err error) {
+	clock := time.After(c.ClockSpeed)
 	s := c.Store
 	s.PC = entrypoint
 
 	for {
 		select {
-		case <-time.After(c.ClockSpeed):
-			err = c.Step()
-
-			if err != nil {
+		case <-clock:
+			if err = c.Step(); err != nil {
 				if err == io.EOF {
 					err = nil // No need to propagate this one.
 				}

@@ -1,6 +1,7 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+// DCPU Assembler package.
 package asm
 
 import (
@@ -297,7 +298,6 @@ func (a *assembler) buildData(nodes []dp.Node) (err error) {
 
 	for i := range nodes {
 		expr, ok := nodes[i].(*dp.Expression)
-
 		if !ok {
 			continue
 		}

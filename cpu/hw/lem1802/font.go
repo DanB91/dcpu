@@ -13,7 +13,7 @@ import (
 )
 
 // DefaultFont defines the default character set for the LEM1802 monitor.
-// 128 characters at 2 words/character. 
+// 128 characters at 2 words per character. 
 func DefaultFont() []cpu.Word {
 	b := bytes.NewBuffer(lem1802font_png)
 	font, _ := LoadFont(b)
@@ -25,9 +25,8 @@ func DefaultFont() []cpu.Word {
 // The supplied image should be 128x32 pixels where each
 // glyph occupies 4x8 pixels. This gives 128 glyphs.
 // 
-// The loader expects a black background with
-// glyphs drawn in white. To be more precise, the glyphs need a red channel
-// with a value > 0.
+// The loader expects a black background with glyphs drawn in white.
+// To be more precise, the glyphs need a red channel with a value > 0.
 //
 // Characters are stored in the returned slice as two words per glyph.
 // Each word splits into two rows of eight bits. Giving a 4x8 grid for
@@ -60,19 +59,19 @@ func LoadFont(r io.Reader) (font []cpu.Word, err error) {
 	}
 
 	var index int
-	var char [4]cpu.Word
+	var octet [4]cpu.Word
 
 	font = make([]cpu.Word, 256)
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y += 8 {
 		for x := bounds.Min.X; x < bounds.Max.X; x += 4 {
-			char[0] = translate(img, x+0, y)
-			char[1] = translate(img, x+1, y)
-			char[2] = translate(img, x+2, y)
-			char[3] = translate(img, x+3, y)
+			octet[0] = translate(img, x+0, y)
+			octet[1] = translate(img, x+1, y)
+			octet[2] = translate(img, x+2, y)
+			octet[3] = translate(img, x+3, y)
 
-			font[index+0] = char[0]<<8 | char[1]
-			font[index+1] = char[2]<<8 | char[3]
+			font[index+0] = octet[0]<<8 | octet[1]
+			font[index+1] = octet[2]<<8 | octet[3]
 			index += 2
 		}
 	}

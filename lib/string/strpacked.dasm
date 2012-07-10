@@ -2,7 +2,7 @@
 ;
 ; Standard DCPU strings come as one word per character.
 ; Since we limit characters to the ascii range, this basically wastes
-; 8 bytes of storage space per character. A packed string can be created
+; 8 bits of storage space per character. A packed string can be created
 ; which will store two characters in a single word.
 ; This function returns TRUE if the given string is packed or not.
 ;

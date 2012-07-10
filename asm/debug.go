@@ -14,8 +14,8 @@ type SourceInfo struct {
 
 // DebugInfo will map binary instructions to original source locations.
 type DebugInfo struct {
-	Files []string      // List of files used to build the original source.
-	Data  []*SourceInfo // Binary <-> Source mappings.
+	Files         []string      // List of files used to build the original source.
+	SourceMapping []*SourceInfo // Binary <-> Source mappings. One entry per instruction.
 }
 
 func NewDebugInfo(files []string) *DebugInfo {
@@ -27,6 +27,6 @@ func NewDebugInfo(files []string) *DebugInfo {
 // Emit emits one or more debug symbols.
 func (d *DebugInfo) Emit(n ...dp.Node) {
 	for i := range n {
-		d.Data = append(d.Data, &SourceInfo{n[i].File(), n[i].Line(), n[i].Col()})
+		d.SourceMapping = append(d.SourceMapping, &SourceInfo{n[i].File(), n[i].Line(), n[i].Col()})
 	}
 }

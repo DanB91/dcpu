@@ -1,6 +1,6 @@
 ## DCPU Unit Tester
 
-This app is a DCPU assembler and runtime. It is specifically tailored
+This tool is a DCPU assembler and runtime. It is specifically tailored
 to run assembly unit tests as defined below.
 
 The idea is to slap this somewhere into your existing tool chain.

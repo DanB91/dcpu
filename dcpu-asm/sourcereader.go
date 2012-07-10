@@ -12,12 +12,12 @@ import (
 
 // parseInput takes the input files and parses their contents into
 // the given AST.
-func parseInput(ast *dp.AST, c *Config) (err error) {
-	if err = readSource(ast, c.Input); err != nil {
+func parseInput(ast *dp.AST, input string, includes []string) (err error) {
+	if err = readSource(ast, input); err != nil {
 		return
 	}
 
-	return resolveIncludes(ast, c)
+	return resolveIncludes(ast, includes)
 }
 
 // readSource reads the given file and parses its contents
@@ -35,7 +35,7 @@ func readSource(ast *dp.AST, file string) error {
 // resolveIncludes finds references to undefined labels.
 // It then tries to find the code for these labels in the supplied
 // include paths. Files should be defined as '<labelname>.dasm'.
-func resolveIncludes(ast *dp.AST, c *Config) (err error) {
+func resolveIncludes(ast *dp.AST, includes []string) (err error) {
 	var labels []*dp.Label
 	var refs []*dp.Name
 
@@ -50,7 +50,7 @@ func resolveIncludes(ast *dp.AST, c *Config) (err error) {
 		return
 	}
 
-	if len(c.Include) == 0 {
+	if len(includes) == 0 {
 		// We have unresolved references, but no places to look
 		// for their implementation. This constitutes a booboo.
 		return dp.NewParseError(ast.Files[refs[0].File()], refs[0].Line(), refs[0].Col(),
@@ -58,7 +58,7 @@ func resolveIncludes(ast *dp.AST, c *Config) (err error) {
 	}
 
 	for i := range refs {
-		if err = loadInclude(ast, c, refs[i]); err != nil {
+		if err = loadInclude(ast, includes, refs[i]); err != nil {
 			return
 		}
 	}
@@ -69,7 +69,7 @@ func resolveIncludes(ast *dp.AST, c *Config) (err error) {
 // loadInclude tries to load the given reference as an include file.
 // Parses it into the supplied AST and verifies that it contains what
 // we are looking for.
-func loadInclude(ast *dp.AST, c *Config, r *dp.Name) (err error) {
+func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 	var file string
 
 	name := r.Data + ".dasm"
@@ -82,8 +82,8 @@ func loadInclude(ast *dp.AST, c *Config, r *dp.Name) (err error) {
 		return nil
 	}
 
-	for i := range c.Include {
-		filepath.Walk(c.Include[i], walker)
+	for i := range includes {
+		filepath.Walk(includes[i], walker)
 
 		if len(file) > 0 {
 			break
@@ -107,7 +107,7 @@ func loadInclude(ast *dp.AST, c *Config, r *dp.Name) (err error) {
 	}
 
 	// This new file may hold its own include requirements.
-	return resolveIncludes(ast, c)
+	return resolveIncludes(ast, includes)
 }
 
 // findUndefinedRefs compares both given lists of labels and

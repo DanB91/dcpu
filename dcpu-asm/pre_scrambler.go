@@ -9,13 +9,14 @@ import (
 )
 
 func init() {
-	Register("scramble", "Obfuscate label names and label references.", NewScrambler)
+	RegisterPreProcessor("scramble",
+		"Obfuscate label names and label references.", NewScrambler)
 }
 
-// Scrambler obfuscates Label and Label References in the given AST.
+// Scrambler obfuscates labels and label references in the given AST.
 type Scrambler struct{}
 
-func NewScrambler() Processor { return new(Scrambler) }
+func NewScrambler() PreProcessor { return new(Scrambler) }
 
 func (p *Scrambler) Process(ast *dp.AST) (err error) {
 	var labels []*dp.Label
