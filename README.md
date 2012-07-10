@@ -41,7 +41,7 @@ To install all tools in one go, do the following:
 The `dcpu-asm` and `dcpu-test` programs will be installed where ever
 your `$GOBIN` is set to. They are now ready for use.
 
-The `-X main.AppVersionRev \`date -u +%s\`` bit in the `-ldflags` section of
+The `-X main.AppVersionRev ...` bit in the `-ldflags` section of
 `go install` automatically sets the `AppVersionRev` variable in version.go
 to the current unix timestamp. This allows us to do auto-incremented
 versioning every time we build.
