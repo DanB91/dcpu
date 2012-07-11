@@ -11,7 +11,7 @@ import (
 const (
 	AppName         = "dcpu-asm"
 	AppVersionMajor = 0
-	AppVersionMinor = 2
+	AppVersionMinor = 3
 )
 
 // revision part of the program version.

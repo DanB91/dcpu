@@ -27,6 +27,10 @@ Packages:
   to make unit tests behave properly. As such, it may not be ideal to use
   as a standalone emulator.
 * **cpu/hw/**: List of hardware components that can be hooked into the CPU.
+* **prof**: this package holds a profiler for DASM code. It maintains
+  information about a currently executing program. Things like cycle costs,
+  timing data, etc. An emulator can use it to generate a profile file which
+  can then be examined for performance bottlenecks.
 
 Commandline tools:
 * **dcpu-asm**: This is a commandline assembler with a wide range of options,

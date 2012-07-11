@@ -92,6 +92,7 @@ can be a powerful debugging tool.
 * github.com/jteeuwen/dcpu/asm
 * github.com/jteeuwen/dcpu/cpu
 * github.com/jteeuwen/dcpu/parser
+* github.com/jteeuwen/dcpu/prof
 
 ### Usage
 

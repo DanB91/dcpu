@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"github.com/jteeuwen/dcpu/cpu"
 	"io"
+	"path"
+	"path/filepath"
 	"strconv"
 	"unicode/utf8"
 )
@@ -28,6 +30,13 @@ func (a *AST) Parse(r io.Reader, filename string) (err error) {
 
 	if len(filename) == 0 {
 		filename = a.tempName()
+	}
+
+	if !path.IsAbs(filename) {
+		filename, err = filepath.Abs(filename)
+		if err != nil {
+			return
+		}
 	}
 
 	if a.hasFile(filename) {

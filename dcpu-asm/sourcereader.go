@@ -73,7 +73,7 @@ func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 	var file string
 
 	name := r.Data + ".dasm"
-	walker := func(f string, info os.FileInfo, err error) error {
+	walker := func(f string, info os.FileInfo, e error) (err error) {
 		fb := filepath.Base(f)
 
 		if len(fb) > 0 && fb[0] == '_' {
@@ -84,7 +84,10 @@ func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 		}
 
 		if fb == name {
-			file = f
+			file, err = filepath.Abs(f)
+			if err != nil {
+				return
+			}
 			return io.EOF // Signal walker to stop.
 		}
 

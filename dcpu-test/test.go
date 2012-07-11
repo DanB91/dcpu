@@ -11,6 +11,7 @@ import (
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 	dp "github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/prof"
 	"io"
 	"os"
 	"path/filepath"
@@ -22,6 +23,7 @@ import (
 type Test struct {
 	dbg       *asm.DebugInfo      // Debug symbols for compiled program.
 	cache     map[cpu.Word]string // Cache of source lines for trace output.
+	profile   *prof.Profile       // Profiling information.
 	includes  []string            // Include paths.
 	callstack []string            // callstack for the test program.
 	file      string              // Test source file.
@@ -37,21 +39,21 @@ func NewTest(file string, inc []string) *Test {
 }
 
 // Run loads up the test sources, compiles it and performs
-// the unit tests defined in it.
-//
-// Any errors are returned through the status channel.
+// the unit tests defined in it. Additionally, it runs a profiler
+// on the program which can optionally be written to an output file
+// for examination.
 func (t *Test) Run(cfg *Config) (err error) {
 	if cfg.Verbose {
 		fmt.Fprintf(os.Stdout, "[*] %s...\n", t.file)
 	}
 
-	var ast *dp.AST
-	if ast, err = t.parse(); err != nil {
+	ast, err := t.parse()
+	if err != nil {
 		return
 	}
 
-	var c *cpu.CPU
-	if c, err = t.compile(ast); err != nil {
+	c, err := t.compile(ast)
+	if err != nil {
 		return
 	}
 
@@ -60,11 +62,27 @@ func (t *Test) Run(cfg *Config) (err error) {
 	}
 
 	c.ClockSpeed = time.Duration(cfg.Clock)
+	t.profile = prof.New(t.dbg.Files, len(t.dbg.SourceMapping))
 
-	if err = c.Run(0); err != nil {
+	err = c.Run(0)
+
+	if err != nil {
 		if te, ok := err.(*cpu.TestError); ok {
 			err = t.formatTestError(te)
 		}
+	}
+
+	if len(cfg.Profile) > 0 {
+		var fd *os.File
+		fd, err = os.Create(cfg.Profile)
+
+		if err != nil {
+			return
+		}
+
+		defer fd.Close()
+
+		err = prof.Write(t.profile, fd)
 	}
 
 	return
@@ -99,6 +117,9 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 // It yields current PC, opcode, operands, all register contents and
 // appends the original line of sourcecode
 func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
+	sym := t.dbg.SourceMapping[pc]
+	t.profile.Update(pc, op, a, b, sym.File, sym.Line, sym.Col)
+
 	if op == cpu.EXT && a == cpu.JSR {
 		line := t.getSourceLine(pc)
 		t.callstack = append(t.callstack, line)
@@ -113,21 +134,23 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 		t.callstack = t.callstack[:sz-1]
 	}
 
-	if verbose {
-		if int(pc) >= len(t.dbg.SourceMapping) {
-			fmt.Fprintf(os.Stdout,
-				"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | <unknown>\n",
-				pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
-			return
-		}
-
-		line := t.getSourceLine(pc)
-
-		fmt.Fprintf(os.Stdout,
-			"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n",
-			pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z,
-			s.I, s.J, s.SP, s.EX, s.IA, line)
+	if !verbose {
+		return
 	}
+
+	if int(pc) >= len(t.dbg.SourceMapping) {
+		fmt.Fprintf(os.Stdout,
+			"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | <unknown>\n",
+			pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z, s.I, s.J, s.SP, s.EX, s.IA)
+		return
+	}
+
+	line := t.getSourceLine(pc)
+
+	fmt.Fprintf(os.Stdout,
+		"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | %s\n",
+		pc, op, a, b, s.A, s.B, s.C, s.X, s.Y, s.Z,
+		s.I, s.J, s.SP, s.EX, s.IA, line)
 }
 
 // parse reads the test source and constructs a complete AST.
@@ -212,6 +235,7 @@ func (t *Test) getSourceLine(pc cpu.Word) string {
 
 	fd, err := os.Open(file)
 	if err != nil {
+		t.cache[pc] = ""
 		return ""
 	}
 
@@ -226,6 +250,7 @@ func (t *Test) getSourceLine(pc cpu.Word) string {
 
 	for {
 		if line, _, err = r.ReadLine(); err != nil {
+			t.cache[pc] = ""
 			if err == io.EOF {
 				err = nil
 			}

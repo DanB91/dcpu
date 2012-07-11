@@ -12,6 +12,7 @@ import (
 type Config struct {
 	Include []string // List of paths where we look to resolve source file references.
 	Input   string   // Input source directory.
+	Profile string   // Name of profile output file.
 	Clock   int64    // Clockspeed at which to run the tests.
 	Trace   bool     // Print trace data for each instruction as it is executed.
 	Verbose bool     // Print additional debug output.

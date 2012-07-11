@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 )
@@ -89,6 +88,7 @@ func parseArgs() *Config {
 	flag.Int64Var(&c.Clock, "c", c.Clock, "Clock speed in nanoseconds at which to run the tests.")
 	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
+	flag.StringVar(&c.Profile, "p", "", "name of output file for profiler data.")
 	flag.BoolVar(&c.Trace, "t", false, "Print trace output for each instruction as it is executed.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.BoolVar(&c.Verbose, "V", false, "Print additional debug output.")
@@ -111,12 +111,15 @@ func parseArgs() *Config {
 		os.Exit(1)
 	}
 
-	c.Input = path.Clean(flag.Arg(0))
-
 	// Ensure we have an existing directory.
+	c.Input = filepath.Clean(flag.Arg(0))
 	if _, err := os.Lstat(c.Input); err != nil {
 		fmt.Fprintf(os.Stderr, "Input path: %v\n", err)
 		os.Exit(1)
+	}
+
+	if len(c.Profile) > 0 {
+		c.Profile = filepath.Clean(c.Profile)
 	}
 
 	// Parse include paths.
@@ -124,7 +127,7 @@ func parseArgs() *Config {
 		c.Include = strings.Split(include, ":")
 
 		for i := range c.Include {
-			v := path.Clean(c.Include[i])
+			v := filepath.Clean(c.Include[i])
 			c.Include[i] = v
 
 			stat, err := os.Lstat(v)
