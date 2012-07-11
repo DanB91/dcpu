@@ -19,6 +19,8 @@ func TestIdentity(t *testing.T) {
 	a.Update(3, cpu.MUL, 0, 0x22, 0, 3, 1)
 	a.Update(4, cpu.SET, 1, 0, 0, 4, 1)
 
+	a.UpdateCost(2, 5)
+
 	err := Write(a, &w)
 	if err != nil {
 		t.Fatalf("Write: %v", err)
@@ -80,6 +82,10 @@ func TestIdentity(t *testing.T) {
 
 		if va.A != vb.A {
 			t.Fatalf("va.A != vb.A")
+		}
+
+		if va.Penalty != vb.Penalty {
+			t.Fatalf("va.Penalty != vb.Penalty")
 		}
 
 		if va.Opcode != vb.Opcode {

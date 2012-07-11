@@ -7,7 +7,14 @@ import "github.com/jteeuwen/dcpu/cpu"
 
 // Profile data for a specific opcode.
 type ProfileData struct {
-	Count  uint64   // Number of times this opcode was called.
+	Count uint64 // Number of times this opcode was called.
+
+	// Number of additional cost points incurred at runtime.
+	// This has to be independant of the usual instruction cost as the
+	// DCPU spec employs different rules here. This is mostly relevant
+	// for skipped branch instructions. They gain cost from the skipping.
+	Penalty uint64
+
 	File   int      // Original source file.
 	Line   int      // Original source line.
 	Col    int      // Original source column.
@@ -40,7 +47,7 @@ func (p *ProfileData) Cost() uint8 {
 	return c
 }
 
-// CumulativeCount returns the cumulative cycle cost for this entry.
+// CumulativeCost returns the cumulative cycle cost for this entry.
 func (p *ProfileData) CumulativeCost() uint64 {
-	return p.Count * uint64(p.Cost())
+	return p.Count*uint64(p.Cost()) + p.Penalty
 }

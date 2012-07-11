@@ -15,6 +15,16 @@ const MaxIntQueue = 0xff
 // This signature represents a Debug trace handler.
 type TraceFunc func(pc, op, a, b Word, store *Storage)
 
+// This handler is fired whenever we skip one or more branch instructions.
+// It is necessary for external tools to keep track of cycle costs.
+//
+// It simply yields the increased cost of the branch skip along with
+// some execution context.
+//
+// Since we can skip arbitrarily large, nested branches in one go, this
+// value can make a lot of difference in total cycle costs.
+type BranchSkipFunc func(pc, cost Word)
+
 // Instruction encoding: aaaaaabbbbbooooo
 
 // Encode encodes the given opcode and operands into an instruction.
@@ -29,13 +39,14 @@ func Decode(w Word) (op, a, b Word) {
 
 // A CPU can run a single program.
 type CPU struct {
-	Store           *Storage      // Memory and registers
-	devices         []Device      // List of hardware devices.
-	intQueue        chan Word     // Interrupt queue.
-	Trace           TraceFunc     // When set, allows tracing of instructions as they are executed. For debug only.
-	ClockSpeed      time.Duration // Speed of CPU clock.
-	size            Word          // Size of last instruction (in words).
-	queueInterrupts bool          // Use interrupt queueing or not.
+	Store            *Storage       // Memory and registers
+	devices          []Device       // List of hardware devices.
+	intQueue         chan Word      // Interrupt queue.
+	Trace            TraceFunc      // When set, allows tracing of instructions as they are executed. For debug only.
+	NotifyBranchSkip BranchSkipFunc // Used to notify host of the cost of skipped branch instructions.
+	ClockSpeed       time.Duration  // Speed of CPU clock.
+	size             Word           // Size of last instruction (in words).
+	queueInterrupts  bool           // Use interrupt queueing or not.
 }
 
 // New creates and initializes a new CPU instance.
@@ -160,11 +171,26 @@ func (c *CPU) skip() Word {
 //   |      set a, 4
 //   |-> exit 0
 //
-func (c *CPU) skipBranch() {
+func (c *CPU) skipBranch(pc Word) {
+	var cost Word
+
 	for {
+		cost++
+
 		if op := c.skip(); op < IFB || op > IFU {
 			break
 		}
+	}
+
+	// The skipcount denotes how manu instructions we skipped.
+	// The spec notes that for every skipped branch, the cycle cost
+	// increments by one. We should notify somebody about this.
+	//
+	// Cycle counts are generally not our problem in this emulator,
+	// but external tools which do care, can not get to this information
+	// on their own.
+	if c.NotifyBranchSkip != nil {
+		c.NotifyBranchSkip(pc, cost)
 	}
 }
 
@@ -281,42 +307,42 @@ func (c *CPU) Step() (err error) {
 
 	case IFB:
 		if (*va & *vb) == 0 {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFC:
 		if (*va & *vb) != 0 {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFE:
 		if *va != *vb {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFN:
 		if *va == *vb {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFG:
 		if *va <= *vb {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFA:
 		if Signed(*va) <= Signed(*vb) {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFL:
 		if *va >= *vb {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case IFU:
 		if Signed(*va) >= Signed(*vb) {
-			c.skipBranch()
+			c.skipBranch(s.PC - c.size)
 		}
 
 	case ADX:

@@ -61,6 +61,9 @@ var be = binary.BigEndian
 //        - 64-bit unsigned int:
 //          Number of times we executed this instruction.
 //    
+//        - 64-bit unsigned int:
+//          Cost penalty incurred at runtime.
+//    
 func Write(p *Profile, w io.Writer) (err error) {
 	// [1]
 	size := uint32(len(p.Files))
@@ -96,7 +99,7 @@ func Write(p *Profile, w io.Writer) (err error) {
 	}
 
 	// [5]
-	var d [25]byte
+	var d [33]byte
 	for pc, v := range p.Usage {
 		if v == nil {
 			continue
@@ -110,6 +113,9 @@ func Write(p *Profile, w io.Writer) (err error) {
 		d[17], d[18], d[19], d[20], d[21], d[22], d[23], d[24] =
 			byte(v.Count>>56), byte(v.Count>>48), byte(v.Count>>40), byte(v.Count>>32),
 			byte(v.Count>>24), byte(v.Count>>16), byte(v.Count>>8), byte(v.Count)
+		d[25], d[26], d[27], d[28], d[29], d[30], d[31], d[32] =
+			byte(v.Penalty>>56), byte(v.Penalty>>48), byte(v.Penalty>>40), byte(v.Penalty>>32),
+			byte(v.Penalty>>24), byte(v.Penalty>>16), byte(v.Penalty>>8), byte(v.Penalty)
 
 		_, err = w.Write(d[:])
 		if err != nil {

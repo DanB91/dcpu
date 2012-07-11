@@ -57,12 +57,17 @@ func (t *Test) Run(cfg *Config) (err error) {
 		return
 	}
 
+	t.profile = prof.New(t.dbg.Files, len(t.dbg.SourceMapping))
+
 	c.Trace = func(pc, op, a, b cpu.Word, s *cpu.Storage) {
 		t.trace(pc, op, a, b, s, cfg.Trace)
 	}
 
+	c.NotifyBranchSkip = func(pc, cost cpu.Word) {
+		t.profile.UpdateCost(pc, cost)
+	}
+
 	c.ClockSpeed = time.Duration(cfg.Clock)
-	t.profile = prof.New(t.dbg.Files, len(t.dbg.SourceMapping))
 
 	err = c.Run(0)
 

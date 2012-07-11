@@ -61,10 +61,18 @@ func (p *Profile) Update(pc, op, a, b cpu.Word, file, line, col int) {
 		pd.File = file
 		pd.Line = line
 		pd.Col = col
+		pd.Penalty = 0
 		p.Usage[pc] = pd
 	}
 
 	pd.Count++
+}
+
+// UpdateCost alters the cumulative cost of a given instruction where necessary.
+// This can happen when a branching instruction failed its check and had to
+// be skipped. This increases its cost.
+func (p *Profile) UpdateCost(pc, cost cpu.Word) {
+	p.Usage[pc].Penalty += uint64(cost)
 }
 
 // CountUses counts the number of instructions we have actually seen

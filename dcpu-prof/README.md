@@ -31,31 +31,37 @@ Here is an excerpt of an example usage:
 	top
 		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
 	============================================================================
-		   8 (0.12%) |    2 |      16 (0.13%) |       memchr.dasm:19 | ife [a], b
-		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:22 | ife c, 0
-		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:21 | sub c, 1
-		   6 (0.09%) |    2 |      12 (0.10%) |       memchr.dasm:24 | add a, 1
-		   6 (0.09%) |    2 |      12 (0.10%) |       memchr.dasm:25 | set pc ,memchr_loop
-		   3 (0.04%) |    3 |       9 (0.07%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
-		   2 (0.03%) |    2 |       4 (0.03%) |     assert_eq.dasm:8 | ifn a, b
-		   2 (0.03%) |    1 |       2 (0.02%) |    assert_eq.dasm:10 | set pc, pop
-		   1 (0.01%) |    2 |       2 (0.02%) |        _test.dasm:30 | exit
-		   1 (0.01%) |    2 |       2 (0.02%) |        _test.dasm:17 | jsr assert_ez
-	
+		   8 (0.12%) |    2 |      23 (0.16%) |       memchr.dasm:19 | ife [a], b
+		   7 (0.10%) |    2 |      20 (0.14%) |       memchr.dasm:22 | ife c, 0
+		   7 (0.10%) |    2 |      14 (0.10%) |       memchr.dasm:21 | sub c, 1
+		   6 (0.09%) |    2 |      12 (0.08%) |       memchr.dasm:24 | add a, 1
+		   6 (0.09%) |    2 |      12 (0.08%) |       memchr.dasm:25 | set pc ,memchr_loop
+		   3 (0.04%) |    3 |      11 (0.08%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
+		   2 (0.03%) |    2 |       6 (0.04%) |     assert_eq.dasm:8 | ifn a, b
+		   2 (0.03%) |    1 |       2 (0.01%) |    assert_eq.dasm:10 | set pc, pop
+		   1 (0.01%) |    2 |       2 (0.01%) |        _test.dasm:30 | exit
+		   1 (0.01%) |    2 |       2 (0.01%) |        _test.dasm:17 | jsr assert_ez
+
+	top 3 cumulative 
+		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
+	============================================================================
+		   8 (0.12%) |    2 |      23 (0.16%) |       memchr.dasm:19 | ife [a], b
+		   7 (0.10%) |    2 |      20 (0.14%) |       memchr.dasm:22 | ife c, 0
+		   7 (0.10%) |    2 |      14 (0.10%) |       memchr.dasm:21 | sub c, 1
+
+	top 3 count
+		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
+	============================================================================
+		   8 (0.12%) |    2 |      23 (0.16%) |       memchr.dasm:19 | ife [a], b
+		   7 (0.10%) |    2 |      20 (0.14%) |       memchr.dasm:22 | ife c, 0
+		   7 (0.10%) |    2 |      14 (0.10%) |       memchr.dasm:21 | sub c, 1
+
 	top 3 cost
 		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
 	============================================================================
-		   3 (0.04%) |    3 |       9 (0.07%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
-		   1 (0.01%) |    2 |       2 (0.02%) |         _test.dasm:3 | set a, data
-		   1 (0.01%) |    2 |       2 (0.02%) |         _test.dasm:9 | jsr assert_eq
-	
-	top 3 cumulative
-		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
-	============================================================================
-		   8 (0.12%) |    2 |      16 (0.13%) |       memchr.dasm:19 | ife [a], b
-		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:22 | ife c, 0
-		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:21 | sub c, 1
-
+		   3 (0.04%) |    3 |      11 (0.08%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
+		   1 (0.01%) |    2 |       2 (0.01%) |         _test.dasm:3 | set a, data
+		   1 (0.01%) |    2 |       2 (0.01%) |         _test.dasm:9 | jsr assert_eq
 
 
 ### Dependencies
