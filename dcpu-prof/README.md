@@ -64,8 +64,31 @@ Here is an excerpt of an example usage:
 		   1 (0.01%) |    2 |       2 (0.01%) |         _test.dasm:9 | jsr assert_eq
 
 
+In this example, the table shows 5 fields:
+
+* **COUNT**: This is the total number of times the particular instruction
+  was executed.
+  
+* **COST**: This is the cpy cycle cost for 1 single execution of this
+  instruction. It includes the cost for the operands.
+  
+* **CUM. COST**: This is the total (cumulative) cost incurred by this
+  instruction over the entire runtime of the program. It is not simply a
+  matter of COUNT*COST, but it additionally holds penalty costs which may have
+  been incurred in particular situations. Most notably this applies to skipped
+  branch instructions. The SPEC notes that these always incur a penalty of X
+  cycles for each skipped branch.
+  
+* **FILE**: This is the file name and line number from which the particular
+  instruction originated.
+  
+* **SOURCE**: This shows the original source line from which this instruction'
+  was generated.
+
+
 ### Dependencies
 
+* github.com/jteeuwen/dcpu/cpu
 * github.com/jteeuwen/dcpu/prof
 
 
