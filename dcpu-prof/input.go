@@ -1,24 +1,27 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-// This tool queries and analyses profiling data from a given input file.
 package main
 
 import (
 	"bufio"
-	"bytes"
+	"fmt"
 	"os"
+	"strings"
 )
 
 // pollInput polls for commandline input.
 // Commands are sent over the returned channel.
-func pollInput() <-chan string {
-	c := make(chan string)
+func pollInput() <-chan []string {
+	c := make(chan []string)
 
 	go func() {
 		defer close(c)
 
 		r := bufio.NewReader(os.Stdin)
+
+		fmt.Printf("%s\n", Version())
+		fmt.Printf("Press 'q' to exit or 'help' for help.\n")
 
 		for {
 			line, _, err := r.ReadLine()
@@ -26,7 +29,7 @@ func pollInput() <-chan string {
 				return
 			}
 
-			c <- string(bytes.TrimSpace(line))
+			c <- strings.Fields(string(line))
 		}
 
 	}()
