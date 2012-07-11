@@ -4,6 +4,14 @@ This package contains a profiler which tracks usage information for a single
 running DCPU program. Its output can be written to a file after execution,'
 which can then be examined for performance bottlenecks.
 
+The output file is written in a binary format. It can be used by the `dcpu-prof`
+tool to query and analyze profiling data.
+
+Among other things, it lists cpu cycle costs for each and every instruction
+that was executed. This is tied to the original source code through the
+use of debug symbols.
+
+
 ### Dependencies
 
 * github.com/jteeuwen/dcpu/cpu

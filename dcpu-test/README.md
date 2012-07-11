@@ -13,6 +13,7 @@ The assertion functions perform various comparisons on input
 values and panic when these fail. This uses the custom `PANIC` instruction.
 It simply prints a supplied error string and exits the tool.
 
+
 ### *_test.dasm
 
 These contain the actual test code that should be executed. Just like
@@ -56,6 +57,7 @@ A failed test yields output as shown here:
 		Call stack:
 		- memchr_test.dasm:7 | jsr asserteq
 
+
 ### Runtime tracing
 
 The `-t` flag will print runtime trace output for each instruction
@@ -80,11 +82,23 @@ Here is an example of trace output for a test program.
 	001d: 0001 001c 0018 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | assert_eq.dasm:10 | set pc, pop
 	000a: 0000 001f 0000 | 000b 000b 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:9 | exit
 
+
 ### Clock speed
 
 The `-c N` flag defines the cpu's clock speed in nanoseconds.
 Set this to a higher value to slow the CPU down. Combined with `-t`, this
 can be a powerful debugging tool.
+
+
+### Profiling
+
+Using the `-p <path>` switch, we can write profiling data to the given file.
+The output file can be used by the `dcpu-prof` tool to query and analyze
+profiling data for a given program.
+
+Among other things, it lists cpu cycle costs for each and every instruction
+that was executed. This is tied to the original source code through the
+use of debug symbols.
 
 
 ### Dependencies
@@ -93,6 +107,7 @@ can be a powerful debugging tool.
 * github.com/jteeuwen/dcpu/cpu
 * github.com/jteeuwen/dcpu/parser
 * github.com/jteeuwen/dcpu/prof
+
 
 ### Usage
 
