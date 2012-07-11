@@ -5,8 +5,6 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"github.com/jteeuwen/dcpu/prof"
@@ -64,7 +62,7 @@ func parseArgs() *prof.Profile {
 		fd, err := os.Open(filepath.Clean(flag.Arg(0)))
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Input path: %v\n", err)
+			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
 
@@ -79,28 +77,4 @@ func parseArgs() *prof.Profile {
 	}
 
 	return p
-}
-
-// pollInput polls for commandline input.
-// Commands are sent over the returned channel.
-func pollInput() <-chan string {
-	c := make(chan string)
-
-	go func() {
-		defer close(c)
-
-		r := bufio.NewReader(os.Stdin)
-
-		for {
-			line, _, err := r.ReadLine()
-			if err != nil {
-				return
-			}
-
-			c <- string(bytes.TrimSpace(line))
-		}
-
-	}()
-
-	return c
 }

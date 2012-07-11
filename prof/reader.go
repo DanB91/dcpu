@@ -76,16 +76,6 @@ func Read(r io.Reader) (p *Profile, err error) {
 		pd.Col = int(d[13])<<24 | int(d[14])<<16 | int(d[15])<<8 | int(d[16])
 		pd.Count = uint64(d[17])<<56 | uint64(d[18])<<48 | uint64(d[19])<<40 | uint64(d[20])<<32 |
 			uint64(d[21])<<24 | uint64(d[22])<<16 | uint64(d[23])<<8 | uint64(d[24])
-
-		pd.CycleCost = opcodes[pd.Opcode]
-
-		if pd.A <= 0x1f {
-			pd.CycleCost += operands[pd.A]
-		}
-
-		if pd.B <= 0x1f {
-			pd.CycleCost += operands[pd.B]
-		}
 	}
 
 	return

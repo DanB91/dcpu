@@ -18,7 +18,6 @@ Run the program with the `-h` flag for a listing of all options.
 
 ### Dependencies
 
-* github.com/jteeuwen/dcpu/cpu
 * github.com/jteeuwen/dcpu/prof
 
 

@@ -1,6 +1,7 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+// This package implements a DCPU code profiler.
 package prof
 
 import "github.com/jteeuwen/dcpu/cpu"
@@ -60,16 +61,6 @@ func (p *Profile) Update(pc, op, a, b cpu.Word, file, line, col int) {
 		pd.File = file
 		pd.Line = line
 		pd.Col = col
-		pd.CycleCost = opcodes[op]
-
-		if a <= 0x1f {
-			pd.CycleCost += operands[a]
-		}
-
-		if b <= 0x1f {
-			pd.CycleCost += operands[b]
-		}
-
 		p.Usage[pc] = pd
 	}
 

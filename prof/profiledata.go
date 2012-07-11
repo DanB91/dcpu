@@ -7,16 +7,40 @@ import "github.com/jteeuwen/dcpu/cpu"
 
 // Profile data for a specific opcode.
 type ProfileData struct {
-	Count     uint64   // Number of times this opcode was called.
-	File      int      // Original source file.
-	Line      int      // Original source line.
-	Col       int      // Original source column.
-	Opcode    cpu.Word // Opcode this data applies to.
-	A, B      cpu.Word // Arguments for this instruction.
-	CycleCost uint8    // Number of cpu cycles this opcode consumed (including operands).
+	Count  uint64   // Number of times this opcode was called.
+	File   int      // Original source file.
+	Line   int      // Original source line.
+	Col    int      // Original source column.
+	Opcode cpu.Word // Opcode this data applies to.
+	A, B   cpu.Word // Arguments for this instruction.
 }
 
-// CumulativeCount returns the cumulative cycle count for this entry.
-func (p *ProfileData) CumulativeCount() uint64 {
-	return p.Count * uint64(p.CycleCost)
+// Cost returns the cycle cost for this entry.
+func (p *ProfileData) Cost() uint8 {
+	var c uint8
+
+	if p.Opcode == cpu.EXT {
+		c = opcodes[p.A]
+
+		if p.B <= 0x1f {
+			c += operands[p.B]
+		}
+	} else {
+		c = opcodes[p.Opcode]
+
+		if p.A <= 0x1f {
+			c += operands[p.A]
+		}
+
+		if p.B <= 0x1f {
+			c += operands[p.B]
+		}
+	}
+
+	return c
+}
+
+// CumulativeCount returns the cumulative cycle cost for this entry.
+func (p *ProfileData) CumulativeCost() uint64 {
+	return p.Count * uint64(p.Cost())
 }
