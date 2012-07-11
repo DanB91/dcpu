@@ -54,8 +54,8 @@ To install all tools in one go, do the following:
     $ cd dcpu
     $ go install -ldflags "-X main.AppVersionRev `date -u +%s` -s" ./...
 
-The `dcpu-asm`, `dcpu-test` and `dcpu-data` programs will be installed
-where ever your `$GOBIN` points to. They are now ready for use.
+The `dcpu-asm`, `dcpu-test`, `dcpu-prof` and `dcpu-data` programs will be
+installed where ever your `$GOBIN` points to. They are now ready for use.
 
 The `-X main.AppVersionRev ...` bit in the `-ldflags` section of
 `go install` automatically sets the `AppVersionRev` variable in version.go
