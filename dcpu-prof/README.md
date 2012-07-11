@@ -27,38 +27,35 @@ Here is an excerpt of an example usage:
 	dcpu-prof 0.1.1342027356 (Go runtime go1.0.2).
 	Copyright (c) 2010-2012, Jim Teeuwen.
 	Press 'q' to exit and 'help' for help.
-	
-	top 10
-		  COUNT | COST |  CUM. COST |                 FILE | SOURCE
+    
+	top
+		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
 	============================================================================
-		      8 |    2 |         16 |       memchr.dasm:19 | ife [a], b
-		      7 |    2 |         14 |       memchr.dasm:22 | ife c, 0
-		      7 |    2 |         14 |       memchr.dasm:21 | sub c, 1
-		      6 |    2 |         12 |       memchr.dasm:24 | add a, 1
-		      6 |    2 |         12 |       memchr.dasm:25 | set pc ,memchr_loop
-		      3 |    3 |          9 |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
-		      2 |    2 |          4 |     assert_eq.dasm:8 | ifn a, b
-		      2 |    1 |          2 |    assert_eq.dasm:10 | set pc, pop
-		      1 |    2 |          2 |        _test.dasm:30 | exit
-		      1 |    2 |          2 |        _test.dasm:17 | jsr assert_ez
+		   8 (0.12%) |    2 |      16 (0.13%) |       memchr.dasm:19 | ife [a], b
+		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:22 | ife c, 0
+		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:21 | sub c, 1
+		   6 (0.09%) |    2 |      12 (0.10%) |       memchr.dasm:24 | add a, 1
+		   6 (0.09%) |    2 |      12 (0.10%) |       memchr.dasm:25 | set pc ,memchr_loop
+		   3 (0.04%) |    3 |       9 (0.07%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
+		   2 (0.03%) |    2 |       4 (0.03%) |     assert_eq.dasm:8 | ifn a, b
+		   2 (0.03%) |    1 |       2 (0.02%) |    assert_eq.dasm:10 | set pc, pop
+		   1 (0.01%) |    2 |       2 (0.02%) |        _test.dasm:30 | exit
+		   1 (0.01%) |    2 |       2 (0.02%) |        _test.dasm:17 | jsr assert_ez
 	
-	top 5 count
-		  COUNT | COST |  CUM. COST |                 FILE | SOURCE
+	top 3 cost
+		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
 	============================================================================
-		      8 |    2 |         16 |       memchr.dasm:19 | ife [a], b
-		      7 |    2 |         14 |       memchr.dasm:22 | ife c, 0
-		      7 |    2 |         14 |       memchr.dasm:21 | sub c, 1
-		      6 |    2 |         12 |       memchr.dasm:24 | add a, 1
-		      6 |    2 |         12 |       memchr.dasm:25 | set pc ,memchr_loop
+		   3 (0.04%) |    3 |       9 (0.07%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
+		   1 (0.01%) |    2 |       2 (0.02%) |         _test.dasm:3 | set a, data
+		   1 (0.01%) |    2 |       2 (0.02%) |         _test.dasm:9 | jsr assert_eq
 	
-	top 5 cumulative
-		  COUNT | COST |  CUM. COST |                 FILE | SOURCE
+	top 3 cumulative
+		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
 	============================================================================
-		      8 |    2 |         16 |       memchr.dasm:19 | ife [a], b
-		      7 |    2 |         14 |       memchr.dasm:22 | ife c, 0
-		      7 |    2 |         14 |       memchr.dasm:21 | sub c, 1
-		      6 |    2 |         12 |       memchr.dasm:25 | set pc ,memchr_loop
-		      6 |    2 |         12 |       memchr.dasm:24 | add a, 1
+		   8 (0.12%) |    2 |      16 (0.13%) |       memchr.dasm:19 | ife [a], b
+		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:22 | ife c, 0
+		   7 (0.10%) |    2 |      14 (0.11%) |       memchr.dasm:21 | sub c, 1
+
 
 
 ### Dependencies

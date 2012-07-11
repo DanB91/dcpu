@@ -12,6 +12,9 @@ import (
 )
 
 func top(prof *prof.Profile, count int, sort string) {
+	var filename, source string
+	var countpercent, costpercent float64
+	var counttotal, costtotal float64
 	var list SampleList
 
 	for i, v := range prof.Usage {
@@ -31,13 +34,16 @@ func top(prof *prof.Profile, count int, sort string) {
 		SamplesByCount(list).Sort()
 	}
 
+	for _, v := range list {
+		counttotal += float64(v.Data.Count)
+		costtotal += float64(v.Data.CumulativeCost())
+	}
+
 	if len(list) > count {
 		list = list[:count]
 	}
 
-	var filename, source string
-
-	fmt.Println("      COUNT | COST |  CUM. COST |                 FILE | SOURCE")
+	fmt.Println("           COUNT | COST |       CUM. COST |                 FILE | SOURCE")
 	fmt.Println("============================================================================")
 	for i := range list {
 		filename = prof.Files[list[i].Data.File]
@@ -50,12 +56,19 @@ func top(prof *prof.Profile, count int, sort string) {
 			filename = "..." + filename[3:]
 		}
 
-		fmt.Printf(" %10d | %4d | %10d | %20s | %s\n",
+		countpercent = float64(list[i].Data.Count) / counttotal
+		costpercent = float64(list[i].Data.CumulativeCost()) / costtotal
+
+		fmt.Printf(" %7d (%.2f%%) | %4d | %7d (%.2f%%) | %20s | %s\n",
 			list[i].Data.Count,
+			countpercent,
 			list[i].Data.Cost(),
 			list[i].Data.CumulativeCost(),
+			costpercent,
 			filename,
 			source,
 		)
 	}
+
+	fmt.Println()
 }
