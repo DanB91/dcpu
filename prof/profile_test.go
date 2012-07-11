@@ -86,8 +86,8 @@ func TestIdentity(t *testing.T) {
 			t.Fatalf("va.B != vb.B")
 		}
 
-		if va.CycleCost != vb.CycleCost {
-			t.Fatalf("va.CycleCost != vb.CycleCost")
+		if va.Cost() != vb.Cost() {
+			t.Fatalf("va.Cost() != vb.Cost()")
 		}
 	}
 }
