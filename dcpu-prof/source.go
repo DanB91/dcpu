@@ -22,8 +22,8 @@ func getSourceLine(prof *prof.Profile, pc cpu.Word) string {
 		return line
 	}
 
-	fileno := prof.Usage[pc].File
-	lineno := prof.Usage[pc].Line
+	fileno := prof.Data[pc].File
+	lineno := prof.Data[pc].Line
 	file := prof.Files[fileno]
 
 	fd, err := os.Open(file)

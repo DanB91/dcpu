@@ -45,7 +45,7 @@ func Read(r io.Reader) (p *Profile, err error) {
 		return
 	}
 
-	p.Usage = make([]*ProfileData, size)
+	p.Data = make([]*ProfileData, size)
 
 	// [4]
 	if err = binary.Read(r, be, &size); err != nil {
@@ -60,13 +60,13 @@ func Read(r io.Reader) (p *Profile, err error) {
 		}
 
 		pc := (uint16(d[0]) << 8) | uint16(d[1])
-		if int(pc) >= len(p.Usage) {
+		if int(pc) >= len(p.Data) {
 			err = errors.New(fmt.Sprintf("Invalid program counter value: 0x%04x", pc))
 			return
 		}
 
 		pd := new(ProfileData)
-		p.Usage[pc] = pd
+		p.Data[pc] = pd
 
 		pd.Opcode = cpu.Word(d[2])
 		pd.A = cpu.Word(d[3])

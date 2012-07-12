@@ -17,7 +17,7 @@ func top(prof *prof.Profile, count int, sort string) {
 	var counttotal, costtotal float64
 	var list SampleList
 
-	for i, v := range prof.Usage {
+	for i, v := range prof.Data {
 		if v != nil {
 			list = append(list, Sample{PC: cpu.Word(i), Data: v})
 		}

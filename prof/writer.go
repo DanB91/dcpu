@@ -87,7 +87,7 @@ func Write(p *Profile, w io.Writer) (err error) {
 	}
 
 	// [3]
-	size = uint32(len(p.Usage))
+	size = uint32(len(p.Data))
 	if err = binary.Write(w, be, size); err != nil {
 		return
 	}
@@ -100,7 +100,7 @@ func Write(p *Profile, w io.Writer) (err error) {
 
 	// [5]
 	var d [33]byte
-	for pc, v := range p.Usage {
+	for pc, v := range p.Data {
 		if v == nil {
 			continue
 		}
