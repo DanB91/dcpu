@@ -5,7 +5,6 @@
 package prof
 
 import (
-	"fmt"
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 )
@@ -115,8 +114,6 @@ func listContains(l []cpu.Word, w cpu.Word) bool {
 	return false
 }
 
-var fp = fmt.Printf
-
 // findFuncAddresses finds all unique function address that have been called.
 //
 // XXX(jimt): This makes one important assumption; address references in a
@@ -160,7 +157,9 @@ func (p *Profile) isBranch(pc cpu.Word) bool {
 // XXX(jimt): This makes some assumptions about code layout which may not
 // necessarily be valid. Notably the one described in Profile.findFuncAddresses()
 // Additionally, it assumes functions will always return by means of 
-// a `SET PC, POP` instruction.
+// a `SET PC, POP` instruction. It also assumes this return is physically the
+// last instruction in the function. Jumping over it to more code would be
+// problematic.
 func (p *Profile) indexFunctions() {
 	addresslist := p.findFuncAddresses()
 	if len(addresslist) == 0 {
