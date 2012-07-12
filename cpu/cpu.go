@@ -9,44 +9,35 @@ import (
 	"time"
 )
 
-// Maximum interrupt queue size.
-const MaxIntQueue = 0xff
-
-// This signature represents a Debug trace handler.
-type TraceFunc func(pc, op, a, b Word, store *Storage)
-
-// This handler is fired whenever we skip one or more branch instructions.
-// It is necessary for external tools to keep track of cycle costs.
-//
-// It simply yields the increased cost of the branch skip along with
-// some execution context.
-//
-// Since we can skip arbitrarily large, nested branches in one go, this
-// value can make a lot of difference in total cycle costs.
-type BranchSkipFunc func(pc, cost Word)
-
-// Instruction encoding: aaaaaabbbbbooooo
-
-// Encode encodes the given opcode and operands into an instruction.
-func Encode(a, b, c Word) Word {
-	return a | (b << 5) | (c << 10)
-}
-
-// Decode decodes the given word into an opcode and operands.
-func Decode(w Word) (op, a, b Word) {
-	return w & 0x1f, (w >> 5) & 0x1f, (w >> 10) & 0x3f
-}
-
 // A CPU can run a single program.
 type CPU struct {
-	Store            *Storage       // Memory and registers
-	devices          []Device       // List of hardware devices.
-	intQueue         chan Word      // Interrupt queue.
-	Trace            TraceFunc      // When set, allows tracing of instructions as they are executed. For debug only.
-	NotifyBranchSkip BranchSkipFunc // Used to notify host of the cost of skipped branch instructions.
-	ClockSpeed       time.Duration  // Speed of CPU clock.
-	size             Word           // Size of last instruction (in words).
-	queueInterrupts  bool           // Use interrupt queueing or not.
+	Store    *Storage  // Memory and registers
+	devices  []Device  // List of hardware devices.
+	intQueue chan Word // Interrupt queue.
+
+	// When set, allows tracing of instructions as they are executed.
+	Trace TraceFunc
+
+	// This handler is fired whenever we skip one or more branch instructions.
+	// It is necessary for external tools to keep track of cycle costs.
+	//
+	// It simply yields the increased cost of the branch skip along with
+	// some execution context.
+	//
+	// Since we can skip arbitrarily large, nested branches in one go, this
+	// value can make a lot of difference in total cycle costs.
+	NotifyBranchSkip BranchSkipFunc
+
+	// This one is called whenever a new instruction is about to be executed.
+	// It gives the host an insight into the execution context.
+	//
+	// This could be merged with TraceFunc, but we want to keep their intent
+	// separate for clarity.
+	InstructionHandler InstructionFunc
+
+	ClockSpeed      time.Duration // Speed of CPU clock.
+	size            Word          // Size of last instruction (in words).
+	queueInterrupts bool          // Use interrupt queueing or not.
 }
 
 // New creates and initializes a new CPU instance.
@@ -219,6 +210,15 @@ func (c *CPU) Step() (err error) {
 	}
 
 	vb = c.decodeOperand(b, false)
+
+	// Notify host of instruction context?
+	if c.InstructionHandler != nil {
+		var value Word
+		if op != EXT {
+			value = *va
+		}
+		c.InstructionHandler(s.PC-c.size, op, a, b, value, *vb, s)
+	}
 
 	// Trace output for debugging?
 	if c.Trace != nil {

@@ -20,6 +20,12 @@ type ProfileData struct {
 	Col    int      // Original source column.
 	Opcode cpu.Word // Opcode this data applies to.
 	A, B   cpu.Word // Arguments for this instruction.
+
+	// Extra word referred to by operands.
+	// These are useful for our profiler to identify jump targets.
+	// Jump targets usually encode their targeta ddress in a new word.
+	// We store it here so we can refer to it later.
+	AValue, BValue cpu.Word
 }
 
 // Cost returns the cycle cost for this entry.

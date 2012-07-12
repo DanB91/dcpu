@@ -26,7 +26,8 @@ func main() {
 	for {
 		select {
 		case cmd := <-input:
-			err := handle(prof, cmd)
+			err := Handle(prof, cmd)
+
 			if err != nil {
 				if err == io.EOF {
 					return

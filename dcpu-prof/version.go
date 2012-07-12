@@ -11,7 +11,7 @@ import (
 const (
 	AppName         = "dcpu-prof"
 	AppVersionMajor = 0
-	AppVersionMinor = 1
+	AppVersionMinor = 2
 )
 
 // revision part of the program version.

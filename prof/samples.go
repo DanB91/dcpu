@@ -1,16 +1,15 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package main
+package prof
 
 import (
 	"github.com/jteeuwen/dcpu/cpu"
-	"github.com/jteeuwen/dcpu/prof"
 	"sort"
 )
 
 type Sample struct {
-	Data *prof.ProfileData
+	Data *ProfileData
 	PC   cpu.Word
 }
 

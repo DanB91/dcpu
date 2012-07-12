@@ -52,28 +52,17 @@ func (t *Test) Run(cfg *Config) (err error) {
 		return
 	}
 
-	c, err := t.compile(ast)
+	c, err := t.compile(ast, cfg)
 	if err != nil {
 		return
 	}
-
-	t.profile = prof.New(t.dbg.Files, len(t.dbg.SourceMapping))
-
-	c.Trace = func(pc, op, a, b cpu.Word, s *cpu.Storage) {
-		t.trace(pc, op, a, b, s, cfg.Trace)
-	}
-
-	c.NotifyBranchSkip = func(pc, cost cpu.Word) {
-		t.profile.UpdateCost(pc, cost)
-	}
-
-	c.ClockSpeed = time.Duration(cfg.Clock)
 
 	err = c.Run(0)
 
 	if err != nil {
 		if te, ok := err.(*cpu.TestError); ok {
 			err = t.formatTestError(te)
+			return
 		}
 	}
 
@@ -85,9 +74,8 @@ func (t *Test) Run(cfg *Config) (err error) {
 			return
 		}
 
-		defer fd.Close()
-
 		err = prof.Write(t.profile, fd)
+		fd.Close()
 	}
 
 	return
@@ -122,9 +110,7 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 // It yields current PC, opcode, operands, all register contents and
 // appends the original line of sourcecode
 func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
-	sym := t.dbg.SourceMapping[pc]
-	t.profile.Update(pc, op, a, b, sym.File, sym.Line, sym.Col)
-
+	// Update callstack
 	if op == cpu.EXT && a == cpu.JSR {
 		line := t.getSourceLine(pc)
 		t.callstack = append(t.callstack, line)
@@ -143,6 +129,7 @@ func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 		return
 	}
 
+	// Print trace output
 	if int(pc) >= len(t.dbg.SourceMapping) {
 		fmt.Fprintf(os.Stdout,
 			"%04x: %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x | <unknown>\n",
@@ -172,7 +159,7 @@ func (t *Test) parse() (*dp.AST, error) {
 }
 
 // compile compiles the given AST and returns a CPU instance ready to run the code.
-func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
+func (t *Test) compile(ast *dp.AST, cfg *Config) (c *cpu.CPU, err error) {
 	var bin []cpu.Word
 
 	if bin, t.dbg, err = asm.Assemble(ast); err != nil {
@@ -184,8 +171,25 @@ func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 			"%s: Program has no unconditional EXIT. This means the test will run indefinitely.", t.file))
 	}
 
+	t.profile = prof.New(t.dbg.Files, len(t.dbg.SourceMapping))
+
 	c = cpu.New()
 	copy(c.Store.Mem[:], bin)
+
+	c.ClockSpeed = time.Duration(cfg.Clock)
+	c.Trace = func(pc, op, a, b cpu.Word, s *cpu.Storage) {
+		t.trace(pc, op, a, b, s, cfg.Trace)
+	}
+
+	c.InstructionHandler = func(pc, op, a, b, va, vb cpu.Word, s *cpu.Storage) {
+		sym := t.dbg.SourceMapping[pc]
+		t.profile.Update(pc, op, a, b, va, vb, sym.File, sym.Line, sym.Col)
+	}
+
+	c.NotifyBranchSkip = func(pc, cost cpu.Word) {
+		t.profile.UpdateCost(pc, cost)
+	}
+
 	return
 }
 

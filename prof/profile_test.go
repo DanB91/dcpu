@@ -14,10 +14,10 @@ func TestIdentity(t *testing.T) {
 	var w bytes.Buffer
 
 	a := New([]string{"a.dasm"}, 5)
-	a.Update(0, cpu.SET, 0, 0x1f, 0, 1, 1)
-	a.Update(2, cpu.ADD, 0, 0x22, 0, 2, 1)
-	a.Update(3, cpu.MUL, 0, 0x22, 0, 3, 1)
-	a.Update(4, cpu.SET, 1, 0, 0, 4, 1)
+	a.Update(0, cpu.SET, 0, 0x1f, 0, 0xffff, 0, 1, 1)
+	a.Update(2, cpu.ADD, 0, 0x22, 0xffff, 1, 0, 2, 1)
+	a.Update(3, cpu.MUL, 0, 0x22, 0, 1, 0, 3, 1)
+	a.Update(4, cpu.SET, 1, 0, 0, 0, 0, 4, 1)
 
 	a.UpdateCost(2, 5)
 
@@ -41,12 +41,12 @@ func TestIdentity(t *testing.T) {
 		}
 	}
 
-	if len(a.Usage) != len(b.Usage) {
-		t.Fatalf("len(a.Usage) != len(b.Usage)")
+	if len(a.Data) != len(b.Data) {
+		t.Fatalf("len(a.Data) != len(b.Data)")
 	}
 
-	for pc, va := range a.Usage {
-		vb := b.Usage[pc]
+	for pc, va := range a.Data {
+		vb := b.Data[pc]
 
 		if va == nil || vb == nil {
 			if va == nil && vb != nil {
@@ -82,6 +82,18 @@ func TestIdentity(t *testing.T) {
 
 		if va.A != vb.A {
 			t.Fatalf("va.A != vb.A")
+		}
+
+		if va.B != vb.B {
+			t.Fatalf("va.B != vb.B")
+		}
+
+		if va.AValue != vb.AValue {
+			t.Fatalf("va.AValue != vb.AValue")
+		}
+
+		if va.BValue != vb.BValue {
+			t.Fatalf("va.BValue != vb.BValue")
 		}
 
 		if va.Penalty != vb.Penalty {

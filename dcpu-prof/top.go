@@ -5,33 +5,35 @@ package main
 
 import (
 	"fmt"
-	"github.com/jteeuwen/dcpu/cpu"
 	"github.com/jteeuwen/dcpu/prof"
 	"path/filepath"
 	"strings"
 )
 
-func top(prof *prof.Profile, count int, sort string) {
-	var filename, source string
-	var countpercent, costpercent float64
-	var counttotal, costtotal float64
-	var list SampleList
+const (
+	DefaultTopCount = 5
+	DefaultTopSort  = "count"
+)
 
-	for i, v := range prof.Data {
-		if v != nil {
-			list = append(list, Sample{PC: cpu.Word(i), Data: v})
-		}
+// Display sorted list of profile data for every function call.
+func top(p *prof.Profile, count int, sort string) {
+	var filename, source string
+	var scount, scost string
+	var counttotal, costtotal float64
+
+	list := p.DataForFunctions()
+
+	if len(list) == 0 {
+		fmt.Println("0 samples.")
+		return
 	}
 
 	switch strings.ToLower(sort) {
-	case "cost":
-		SamplesByCost(list).Sort()
-
 	case "cumulative":
-		SamplesByCumulativeCost(list).Sort()
+		prof.SamplesByCumulativeCost(list).Sort()
 
 	case "count":
-		SamplesByCount(list).Sort()
+		prof.SamplesByCount(list).Sort()
 	}
 
 	for _, v := range list {
@@ -43,11 +45,9 @@ func top(prof *prof.Profile, count int, sort string) {
 		list = list[:count]
 	}
 
-	fmt.Println("           COUNT | COST |       CUM. COST |                 FILE | SOURCE")
-	fmt.Println("============================================================================")
 	for i := range list {
-		filename = prof.Files[list[i].Data.File]
-		source = getSourceLine(prof, list[i].PC)
+		filename = p.Files[list[i].Data.File]
+		source = getSourceLine(p, list[i].PC)
 
 		filename = filepath.Base(filename)
 		filename = fmt.Sprintf("%s:%d", filename, list[i].Data.Line)
@@ -56,15 +56,17 @@ func top(prof *prof.Profile, count int, sort string) {
 			filename = "..." + filename[3:]
 		}
 
-		countpercent = float64(list[i].Data.Count) / counttotal
-		costpercent = float64(list[i].Data.CumulativeCost()) / costtotal
+		scount = fmt.Sprintf("%.1f%%",
+			float64(list[i].Data.Count)/counttotal)
 
-		fmt.Printf(" %7d (%.2f%%) | %4d | %7d (%.2f%%) | %20s | %s\n",
+		scost = fmt.Sprintf("%.1f%%",
+			float64(list[i].Data.CumulativeCost())/costtotal)
+
+		fmt.Printf(" %8d %6s %8d %6s %s %s\n",
 			list[i].Data.Count,
-			countpercent,
-			list[i].Data.Cost(),
+			scount,
 			list[i].Data.CumulativeCost(),
-			costpercent,
+			scost,
 			filename,
 			source,
 		)
