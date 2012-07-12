@@ -21,27 +21,28 @@ Run the program with the `-h` flag for a listing of all options.
 
 ### Example
 
+### Top Example
 Here is an excerpt of an example usage of the `top` command.
 It lists only the usage of functions. This is a good starting point
 when profiling code. As it gives a rough overview of where most of the CPU
 time is spent without going into too much detail.
 
-	$ dcpu-prof testdata/test.prof 
-	dcpu-prof 0.3.1342111457 (Go runtime go1.0.2).
+	$ gobuild && ./dcpu-prof ../testdata/test.prof 
+	dcpu-prof 0.4.1342128514 (Go runtime go1.0.2).
 	Copyright (c) 2010-2012, Jim Teeuwen.
 	Press 'q' to exit or 'help' for help.
 	
-	> top
-	10 sample(s), 29 cycle(s)
-		    4  40.00%       10  34.48% assert_eq            assert_eq.dasm:8
-		    4  40.00%       14  48.28% memchr               memchr.dasm:15
-		    2  20.00%        5  17.24% assert_ez            assert_ez.dasm:8
+	top
+	48 sample(s), 110 cycle(s)
+		   42  87.50%       98  89.09% memchr               memchr.dasm:15
+		    4   8.33%        8   7.27% assert_eq            assert_eq.dasm:8
+		    2   4.17%        4   3.64% assert_ez            assert_ez.dasm:8
 
-	> top 3 cost
-	10 sample(s), 29 cycle(s)
-		    4  40.00%       14  48.28% memchr               memchr.dasm:15
-		    4  40.00%       10  34.48% assert_eq            assert_eq.dasm:8
-		    2  20.00%        5  17.24% assert_ez            assert_ez.dasm:8
+	top 3 cost
+	48 sample(s), 110 cycle(s)
+		   42  87.50%       98  89.09% memchr               memchr.dasm:15
+		    4   8.33%        8   7.27% assert_eq            assert_eq.dasm:8
+		    2   4.17%        4   3.64% assert_ez            assert_ez.dasm:8
 
 
 The table shows 6 columns:
@@ -63,6 +64,81 @@ The table shows 6 columns:
   
 * **FILE**: This shows the original source file and line in which the
   function is defined.
+
+
+### List Example
+
+Here is an example of the `list` command output:
+
+	list
+	===> lib/string/memchr.dasm 15-29
+	42 sample(s), 98 cycle(s)
+
+		   3       11   015:   ife 0, c ; num is zero -- No compare needed.
+		   1        1   016:     set pc, pop
+		                017: 
+		                018: :memchr_loop
+		   8       23   019:   ife [a], b
+		   1        1   020:     set pc, pop
+		   7       14   021:   sub c, 1
+		   7       20   022:   ife c, 0
+		   1        2   023:     set pc, memchr_ret
+		   6       12   024:   add a, 1
+		   6       12   025:   set pc ,memchr_loop
+		                026: 
+		                027: :memchr_ret
+		   1        1   028:   set a, 0
+		   1        1   029:   set pc, pop
+
+	===> lib/test/assert_eq.dasm 8-10
+	4 sample(s), 8 cycle(s)
+
+		   2        6   008:   ifn a, b
+		                009:     panic assert_eq_str
+		   2        2   010:   set pc, pop
+
+	===> lib/test/assert_ez.dasm 8-10
+	2 sample(s), 4 cycle(s)
+
+		   1        3   008:   ifn a, 0
+		                009:     panic assert_ez_str
+		   1        1   010:   set pc, pop
+
+
+
+It lists the sources for all functions that match the filter specified in
+the command. Using `list` without a filter, defaults to showing all function
+sources. This display comes with the original source code, along with some
+extra data in the first two columns:
+
+* **COUNT**: This is the total number of times the instruction was executed.
+  
+* **COST**: This is the total cycle cost for this instruction.
+  
+The output of this command without a filter can be overwhelming in a large
+codebase, so it is practical to use it in combination with `top`. Use `top`
+to find the function that consumes the most cycles and then list the
+detailed usage with list:
+
+	list memchr
+	===> lib/string/memchr.dasm 15-29
+	42 sample(s), 98 cycle(s)
+
+		   3       11   015:   ife 0, c ; num is zero -- No compare needed.
+		   1        1   016:     set pc, pop
+		                017: 
+		                018: :memchr_loop
+		   8       23   019:   ife [a], b
+		   1        1   020:     set pc, pop
+		   7       14   021:   sub c, 1
+		   7       20   022:   ife c, 0
+		   1        2   023:     set pc, memchr_ret
+		   6       12   024:   add a, 1
+		   6       12   025:   set pc ,memchr_loop
+		                026: 
+		                027: :memchr_ret
+		   1        1   028:   set a, 0
+		   1        1   029:   set pc, pop
 
 
 ### Dependencies

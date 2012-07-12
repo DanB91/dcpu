@@ -38,7 +38,7 @@ type Profile struct {
 	Data []ProfileData
 
 	// List of function definitions. The address at which they start and end.
-	funcs [][2]cpu.Word
+	funcs FuncList
 }
 
 // New creates a new profile for the given code and debug data.
@@ -58,6 +58,7 @@ func New(code []cpu.Word, dbg *asm.DebugInfo) *Profile {
 		p.Data[pc] = pd
 	}
 
+	p.getInstructionSizes()
 	return p
 }
 
@@ -75,14 +76,22 @@ func (p *Profile) UpdateCost(pc, cost cpu.Word) {
 	p.Data[pc].Penalty += uint64(cost)
 }
 
+func (p *Profile) getInstructionSizes() {
+	var pc, size cpu.Word
+
+	for pc = 0; pc < cpu.Word(len(p.Data)); pc += size {
+		size = cpu.Sizeof(cpu.Decode(p.Data[pc].Data))
+		p.Data[pc].Size = size
+	}
+}
+
 // countOpcodes counts the number of times the given opcode is used.
 func (p *Profile) countOpcodes(opcode cpu.Word, extended bool) int {
 	var c int
-	var pc, op, a, b, size cpu.Word
+	var pc, op, a cpu.Word
 
-	for pc = 0; pc < cpu.Word(len(p.Data)); pc += size {
-		op, a, b = cpu.Decode(p.Data[pc].Data)
-		size = cpu.Sizeof(op, a, b)
+	for pc = 0; pc < cpu.Word(len(p.Data)); pc += p.Data[pc].Size {
+		op, a, _ = cpu.Decode(p.Data[pc].Data)
 
 		if extended {
 			if op == cpu.EXT && a == opcode {
@@ -116,11 +125,10 @@ var fp = fmt.Printf
 // jump. This is rather flaky, but I know of no better solution at this point.
 func (p *Profile) findFuncAddresses() []cpu.Word {
 	var list []cpu.Word
-	var pc, op, a, b, size, addr cpu.Word
+	var pc, op, a, b, addr cpu.Word
 
-	for pc = 0; pc < cpu.Word(len(p.Data)); pc += size {
+	for pc = 0; pc < cpu.Word(len(p.Data)); pc += p.Data[pc].Size {
 		op, a, b = cpu.Decode(p.Data[pc].Data)
-		size = cpu.Sizeof(op, a, b)
 
 		if op != cpu.EXT || a != cpu.JSR || b == 0 {
 			continue
@@ -159,18 +167,19 @@ func (p *Profile) indexFunctions() {
 		return
 	}
 
-	p.funcs = make([][2]cpu.Word, len(addresslist))
+	p.funcs = make(FuncList, len(addresslist))
 
 	var pc, op, a, b, size cpu.Word
 
 	cap := cpu.Word(len(p.Data))
 	for i := range p.funcs {
 		pc = addresslist[i]
-		p.funcs[i][0] = pc
-		p.funcs[i][1] = pc
+		p.funcs[i].Addr = pc
+		size = p.Data[pc].Size
+		pc += size
 
 		// Find end address for this function.
-		for pc++; pc < cap; pc += size {
+		for ; pc < cap; pc += size {
 			op, a, b = cpu.Decode(p.Data[pc].Data)
 
 			// Do we have a 'return' statement (set pc, pop)?
@@ -178,45 +187,21 @@ func (p *Profile) indexFunctions() {
 				// Check if it is part of a branching instruction.
 				// If not, consider it the end address of the function.
 				if !p.isBranch(pc - size) {
-					p.funcs[i][1] = pc
+					p.funcs[i].Data = p.Data[p.funcs[i].Addr : pc+1]
 					break
 				}
 			}
 
-			size = cpu.Sizeof(op, a, b)
+			size = p.Data[pc].Size
 		}
 	}
 }
 
-// FunctionCosts finds all function definitions which have been called
-// at runtime. It calculates the combined count and cost for all instructions
-// in these functions.
-func (p *Profile) FunctionCosts() SampleList {
-	if p.countOpcodes(cpu.JSR, true) == 0 {
-		return nil // No function calls.
-	}
-
+// Functions yields the address ranges of all known functions.
+func (p *Profile) Functions() []FuncDef {
 	if len(p.funcs) == 0 {
 		// Functions have not been indexed yet.
 		p.indexFunctions()
 	}
-
-	list := make(SampleList, len(p.funcs))
-
-	var pc cpu.Word
-	for i := range list {
-		pc = p.funcs[i][0]
-		list[i].PC = pc
-		list[i].Data = p.Data[pc].Copy()
-		list[i].Data.Count = 0
-		list[i].Data.Penalty = 0
-
-		for ; pc <= p.funcs[i][1]; pc++ {
-			list[i].Data.Count += p.Data[pc].Count
-			list[i].Data.Penalty += p.Data[pc].Penalty
-		}
-	}
-
-	return list
+	return p.funcs
 }
-

@@ -70,5 +70,6 @@ func Read(r io.Reader) (p *Profile, err error) {
 		p.Data[i] = pd
 	}
 
+	p.getInstructionSizes()
 	return
 }

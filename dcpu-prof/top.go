@@ -11,57 +11,50 @@ import (
 
 const (
 	DefaultTopCount = 5
-	DefaultTopSort  = "count"
+	DefaultTopSort  = "cost"
 )
 
 // Display sorted list of profile data for every function call.
 func top(p *prof.Profile, count int, sort string) {
-	var source string
-	var scount, scost string
 	var counttotal, costtotal float64
 
-	list := p.FunctionCosts()
+	funcs := p.Functions()
 
-	if len(list) == 0 {
+	if len(funcs) == 0 {
 		fmt.Println("0 samples.")
 		return
 	}
 
+	for i := range funcs {
+		if len(funcs[i].Label) == 0 {
+			funcs[i].Label = GetLabel(p, funcs[i].Addr)
+		}
+
+		a, b := funcs[i].Cost()
+		counttotal += float64(a)
+		costtotal += float64(b)
+	}
+
 	switch strings.ToLower(sort) {
-	case "cost":
-		prof.SamplesByCumulativeCost(list).Sort()
-
 	case "count":
-		prof.SamplesByCount(list).Sort()
+		prof.FuncListByCount(funcs).Sort()
+	case "cost":
+		prof.FuncListByCost(funcs).Sort()
 	}
 
-	for _, v := range list {
-		counttotal += float64(v.Data.Count)
-		costtotal += float64(v.Data.CumulativeCost())
-	}
-
-	if len(list) > count {
-		list = list[:count]
+	if len(funcs) > count {
+		funcs = funcs[:count]
 	}
 
 	fmt.Printf("%.0f sample(s), %.0f cycle(s)\n", counttotal, costtotal)
 
-	for i := range list {
-		source = getLabel(p, list[i].PC)
-
-		scount = fmt.Sprintf("%.2f%%",
-			float64(list[i].Data.Count)/(counttotal*0.01))
-
-		scost = fmt.Sprintf("%.2f%%",
-			float64(list[i].Data.CumulativeCost())/(costtotal*0.01))
+	for i := range funcs {
+		count, cost := funcs[i].Cost()
+		scount := fmt.Sprintf("%.2f%%", float64(count)/(counttotal*0.01))
+		scost := fmt.Sprintf("%.2f%%", float64(cost)/(costtotal*0.01))
 
 		fmt.Printf(" %8d %7s %8d %7s %s\n",
-			list[i].Data.Count,
-			scount,
-			list[i].Data.CumulativeCost(),
-			scost,
-			source,
-		)
+			count, scount, cost, scost, funcs[i].Label)
 	}
 
 	fmt.Println()

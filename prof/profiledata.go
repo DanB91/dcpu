@@ -19,6 +19,7 @@ type ProfileData struct {
 	Line int      // Original source line.
 	Col  int      // Original source column.
 	Data cpu.Word // Encoded instruciton value.
+	Size cpu.Word // Size of instruction.
 }
 
 // Copy creates a deep copy of the given data.
@@ -30,6 +31,7 @@ func (p *ProfileData) Copy() *ProfileData {
 		Line:    p.Line,
 		Col:     p.Col,
 		Data:    p.Data,
+		Size:    p.Size,
 	}
 }
 

@@ -6,9 +6,7 @@ package main
 import (
 	"bufio"
 	"github.com/jteeuwen/dcpu/cpu"
-	"github.com/jteeuwen/dcpu/prof"
 	"os"
-	"strings"
 )
 
 var sourceCache map[cpu.Word]string
@@ -17,44 +15,37 @@ func init() {
 	sourceCache = make(map[cpu.Word]string)
 }
 
-// getSourceLine attempts to find the original line of sourcecode that
-// create a given instruction.
-func getSourceLine(prof *prof.Profile, pc cpu.Word) string {
-	if line, ok := sourceCache[pc]; ok {
-		return line
-	}
-
-	fileno := prof.Data[pc].File
-	lineno := prof.Data[pc].Line
-	file := prof.Files[fileno]
-
+// GetSourceLines returns a range of lines from the given file.
+func GetSourceLines(file string, start, end int) []string {
 	fd, err := os.Open(file)
 	if err != nil {
-		sourceCache[pc] = ""
-		return ""
+		return nil
 	}
 
 	defer fd.Close()
 
 	r := bufio.NewReader(fd)
 
-	var count int
+	var lines []string
 	var data []byte
+
+	count := 1 // line number start at 1, not 0.
 
 	for {
 		if data, _, err = r.ReadLine(); err != nil {
-			sourceCache[pc] = ""
-			return ""
+			return nil
 		}
 
-		if count < lineno-1 {
-			count++
-			continue
+		if count >= start && count <= end {
+			lines = append(lines, string(data))
 		}
 
-		sourceCache[pc] = strings.TrimSpace(string(data))
-		break
+		if count > end {
+			break
+		}
+
+		count++
 	}
 
-	return sourceCache[pc]
+	return lines
 }

@@ -9,15 +9,37 @@ import (
 	"github.com/jteeuwen/dcpu/parser"
 	"github.com/jteeuwen/dcpu/prof"
 	"path"
+	"strings"
 )
 
-var labelCache map[cpu.Word]string
-
-func init() {
-	labelCache = make(map[cpu.Word]string)
+type LabelDef struct {
+	Label string
+	PC    cpu.Word
 }
 
-// getLabel attempts to find the original label definition for a
+type LabelCache []LabelDef
+
+func (l LabelCache) IndexOfLabel(v string) int {
+	for i := range l {
+		if strings.EqualFold(l[i].Label, v) {
+			return i
+		}
+	}
+	return -1
+}
+
+func (l LabelCache) IndexOfAddress(v cpu.Word) int {
+	for i := range l {
+		if l[i].PC == v {
+			return i
+		}
+	}
+	return -1
+}
+
+var labelCache LabelCache
+
+// GetLabel attempts to find the original label definition for a
 // given instruction.
 //
 // We use this in places where we need to know the original name of
@@ -26,9 +48,9 @@ func init() {
 // in the assembly process. They do not persist into the final program.
 // We therefor have to parse the original source into an AST again and
 // find it manually.
-func getLabel(p *prof.Profile, pc cpu.Word) string {
-	if label, ok := labelCache[pc]; ok {
-		return label
+func GetLabel(p *prof.Profile, pc cpu.Word) string {
+	if idx := labelCache.IndexOfAddress(pc); idx > -1 {
+		return labelCache[idx].Label
 	}
 
 	file := p.Files[p.Data[pc].File]
@@ -36,13 +58,13 @@ func getLabel(p *prof.Profile, pc cpu.Word) string {
 	ast, err := GetAST(file)
 
 	if err != nil {
-		labelCache[pc] = ""
+		labelCache = append(labelCache, LabelDef{"", pc})
 		return ""
 	}
 
 	node := findLabelNode(ast.Root, line, p.Data[pc].Col)
 	if node == nil {
-		labelCache[pc] = ""
+		labelCache = append(labelCache, LabelDef{"", pc})
 		return ""
 	}
 
@@ -50,7 +72,8 @@ func getLabel(p *prof.Profile, pc cpu.Word) string {
 	lbl, ok := node.(*parser.Label)
 
 	if !ok {
-		name = fmt.Sprintf("%04x", pc)
+		labelCache = append(labelCache, LabelDef{"", pc})
+		return ""
 	} else {
 		name = lbl.Data
 	}
@@ -60,10 +83,13 @@ func getLabel(p *prof.Profile, pc cpu.Word) string {
 	}
 
 	_, file = path.Split(file)
+	name = fmt.Sprintf("%s %s:%d", name, file, line)
 
-	labelCache[pc] = fmt.Sprintf("%s %s:%d", name, file, line)
+	if labelCache.IndexOfLabel(name) == -1 {
+		labelCache = append(labelCache, LabelDef{name, pc})
+	}
 
-	return labelCache[pc]
+	return name
 }
 
 func findLabelNode(n parser.Node, line, col int) parser.Node {
@@ -75,11 +101,8 @@ func findLabelNode(n parser.Node, line, col int) parser.Node {
 	case parser.NodeCollection:
 		list := tt.Children()
 		for i, v := range list {
-			if n = findLabelNode(v, line, col); n != nil {
-				if i == 0 {
-					return n
-				}
-
+			n = findLabelNode(v, line, col)
+			if n != nil {
 				// Return node preceeding this node.
 				// We will assume it is a label definition.
 				return list[i-1]
