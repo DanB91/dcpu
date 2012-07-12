@@ -5,8 +5,6 @@ package prof
 
 import (
 	"encoding/binary"
-	"errors"
-	"fmt"
 	"github.com/jteeuwen/dcpu/cpu"
 	"io"
 )
@@ -45,47 +43,31 @@ func Read(r io.Reader) (p *Profile, err error) {
 		return
 	}
 
-	p.Data = make([]*ProfileData, size)
+	p.Data = make([]ProfileData, size)
 
 	// [4]
-	if err = binary.Read(r, be, &size); err != nil {
-		return
-	}
-
-	// [5]
-	var d [37]byte
-	for i := uint32(0); i < size; i++ {
+	var d [30]byte
+	for i := range p.Data {
 		if _, err = r.Read(d[:]); err != nil {
 			return
 		}
 
-		pc := (uint16(d[0]) << 8) | uint16(d[1])
-		if int(pc) >= len(p.Data) {
-			err = errors.New(fmt.Sprintf("Invalid program counter value: 0x%04x", pc))
-			return
-		}
+		var pd ProfileData
 
-		pd := new(ProfileData)
-		p.Data[pc] = pd
+		pd.Data = cpu.Word(d[0])<<8 | cpu.Word(d[1])
+		pd.File = int(d[2])<<24 | int(d[3])<<16 | int(d[4])<<8 | int(d[5])
+		pd.Line = int(d[6])<<24 | int(d[7])<<16 | int(d[8])<<8 | int(d[9])
+		pd.Col = int(d[10])<<24 | int(d[11])<<16 | int(d[12])<<8 | int(d[13])
 
-		pd.Opcode = cpu.Word(d[2])
-		pd.A = cpu.Word(d[3])
-		pd.B = cpu.Word(d[4])
+		pd.Count = uint64(d[14])<<56 | uint64(d[15])<<48 | uint64(d[16])<<40 |
+			uint64(d[17])<<32 | uint64(d[18])<<24 | uint64(d[19])<<16 |
+			uint64(d[20])<<8 | uint64(d[21])
 
-		pd.AValue = cpu.Word(d[5])<<8 | cpu.Word(d[6])
-		pd.BValue = cpu.Word(d[7])<<8 | cpu.Word(d[8])
+		pd.Penalty = uint64(d[22])<<56 | uint64(d[23])<<48 | uint64(d[24])<<40 |
+			uint64(d[25])<<32 | uint64(d[26])<<24 | uint64(d[27])<<16 |
+			uint64(d[28])<<8 | uint64(d[29])
 
-		pd.File = int(d[9])<<24 | int(d[10])<<16 | int(d[11])<<8 | int(d[12])
-		pd.Line = int(d[13])<<24 | int(d[14])<<16 | int(d[15])<<8 | int(d[16])
-		pd.Col = int(d[17])<<24 | int(d[18])<<16 | int(d[19])<<8 | int(d[20])
-
-		pd.Count = uint64(d[21])<<56 | uint64(d[22])<<48 | uint64(d[23])<<40 |
-			uint64(d[24])<<32 | uint64(d[25])<<24 | uint64(d[26])<<16 |
-			uint64(d[27])<<8 | uint64(d[28])
-
-		pd.Penalty = uint64(d[29])<<56 | uint64(d[30])<<48 | uint64(d[31])<<40 |
-			uint64(d[32])<<32 | uint64(d[33])<<24 | uint64(d[34])<<16 |
-			uint64(d[35])<<8 | uint64(d[36])
+		p.Data[i] = pd
 	}
 
 	return

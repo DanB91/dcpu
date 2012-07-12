@@ -171,7 +171,7 @@ func (t *Test) compile(ast *dp.AST, cfg *Config) (c *cpu.CPU, err error) {
 			"%s: Program has no unconditional EXIT. This means the test will run indefinitely.", t.file))
 	}
 
-	t.profile = prof.New(t.dbg.Files, len(t.dbg.SourceMapping))
+	t.profile = prof.New(bin, t.dbg)
 
 	c = cpu.New()
 	copy(c.Store.Mem[:], bin)
@@ -181,9 +181,8 @@ func (t *Test) compile(ast *dp.AST, cfg *Config) (c *cpu.CPU, err error) {
 		t.trace(pc, op, a, b, s, cfg.Trace)
 	}
 
-	c.InstructionHandler = func(pc, op, a, b, va, vb cpu.Word, s *cpu.Storage) {
-		sym := t.dbg.SourceMapping[pc]
-		t.profile.Update(pc, op, a, b, va, vb, sym.File, sym.Line, sym.Col)
+	c.InstructionHandler = func(pc cpu.Word, s *cpu.Storage) {
+		t.profile.Update(pc, s)
 	}
 
 	c.NotifyBranchSkip = func(pc, cost cpu.Word) {

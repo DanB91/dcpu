@@ -9,7 +9,7 @@ const MaxIntQueue = 0xff
 
 type TraceFunc func(pc, op, a, b Word, store *Storage)
 
-type InstructionFunc func(pc, op, a, b, va, vb Word, store *Storage)
+type InstructionFunc func(pc Word, store *Storage)
 
 type BranchSkipFunc func(pc, cost Word)
 

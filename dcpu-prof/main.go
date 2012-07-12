@@ -15,12 +15,6 @@ import (
 
 func main() {
 	prof := parseArgs()
-
-	if prof.CountUses() == 0 {
-		fmt.Fprintln(os.Stdout, "Profile has no sample data.\n")
-		os.Exit(0)
-	}
-
 	input := pollInput()
 
 	for {

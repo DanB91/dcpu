@@ -16,6 +16,15 @@ type Sample struct {
 // List of samples.
 type SampleList []Sample
 
+func (s SampleList) IndexOfPC(pc cpu.Word) int {
+	for i := range s {
+		if s[i].PC == pc {
+			return i
+		}
+	}
+	return -1
+}
+
 // List of samples, sortable by PC.
 type SamplesByPC SampleList
 
@@ -31,22 +40,6 @@ func (s SamplesByCount) Len() int           { return len(s) }
 func (s SamplesByCount) Less(i, j int) bool { return s[i].Data.Count >= s[j].Data.Count }
 func (s SamplesByCount) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s SamplesByCount) Sort()              { sort.Sort(s) }
-
-// List of samples, sortable by Opcode.
-type SamplesByOpcode SampleList
-
-func (s SamplesByOpcode) Len() int           { return len(s) }
-func (s SamplesByOpcode) Less(i, j int) bool { return s[i].Data.Opcode >= s[j].Data.Opcode }
-func (s SamplesByOpcode) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s SamplesByOpcode) Sort()              { sort.Sort(s) }
-
-// List of samples, sortable by cost.
-type SamplesByCost SampleList
-
-func (s SamplesByCost) Len() int           { return len(s) }
-func (s SamplesByCost) Less(i, j int) bool { return s[i].Data.Cost() >= s[j].Data.Cost() }
-func (s SamplesByCost) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s SamplesByCost) Sort()              { sort.Sort(s) }
 
 // List of samples, sortable by cumulative cost.
 type SamplesByCumulativeCost SampleList

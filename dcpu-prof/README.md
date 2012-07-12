@@ -21,75 +21,55 @@ Run the program with the `-h` flag for a listing of all options.
 
 ### Example
 
-Here is an excerpt of an example usage:
+Here is an excerpt of an example usage of the `top` command.
+It lists only the usage of functions. This is a good starting point
+when profiling code. As it gives a rough overview of where most of the CPU
+time is spent without going into too much detail.
 
 	$ dcpu-prof testdata/test.prof 
-	dcpu-prof 0.1.1342027356 (Go runtime go1.0.2).
+	dcpu-prof 0.3.1342111457 (Go runtime go1.0.2).
 	Copyright (c) 2010-2012, Jim Teeuwen.
-	Press 'q' to exit and 'help' for help.
-    
+	Press 'q' to exit or 'help' for help.
+	
 	top
-		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
-	============================================================================
-		   8 (0.12%) |    2 |      23 (0.16%) |       memchr.dasm:19 | ife [a], b
-		   7 (0.10%) |    2 |      20 (0.14%) |       memchr.dasm:22 | ife c, 0
-		   7 (0.10%) |    2 |      14 (0.10%) |       memchr.dasm:21 | sub c, 1
-		   6 (0.09%) |    2 |      12 (0.08%) |       memchr.dasm:24 | add a, 1
-		   6 (0.09%) |    2 |      12 (0.08%) |       memchr.dasm:25 | set pc ,memchr_loop
-		   3 (0.04%) |    3 |      11 (0.08%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
-		   2 (0.03%) |    2 |       6 (0.04%) |     assert_eq.dasm:8 | ifn a, b
-		   2 (0.03%) |    1 |       2 (0.01%) |    assert_eq.dasm:10 | set pc, pop
-		   1 (0.01%) |    2 |       2 (0.01%) |        _test.dasm:30 | exit
-		   1 (0.01%) |    2 |       2 (0.01%) |        _test.dasm:17 | jsr assert_ez
-
-	top 3 cumulative 
-		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
-	============================================================================
-		   8 (0.12%) |    2 |      23 (0.16%) |       memchr.dasm:19 | ife [a], b
-		   7 (0.10%) |    2 |      20 (0.14%) |       memchr.dasm:22 | ife c, 0
-		   7 (0.10%) |    2 |      14 (0.10%) |       memchr.dasm:21 | sub c, 1
-
-	top 3 count
-		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
-	============================================================================
-		   8 (0.12%) |    2 |      23 (0.16%) |       memchr.dasm:19 | ife [a], b
-		   7 (0.10%) |    2 |      20 (0.14%) |       memchr.dasm:22 | ife c, 0
-		   7 (0.10%) |    2 |      14 (0.10%) |       memchr.dasm:21 | sub c, 1
+	10 sample(s), 29 cycle(s)
+		    4  40.00%       10  34.48% assert_eq            assert_eq.dasm:8
+		    4  40.00%       14  48.28% memchr               memchr.dasm:15
+		    2  20.00%        5  17.24% assert_ez            assert_ez.dasm:8
 
 	top 3 cost
-		       COUNT | COST |       CUM. COST |                 FILE | SOURCE
-	============================================================================
-		   3 (0.04%) |    3 |      11 (0.08%) |       memchr.dasm:15 | ife 0, c ; num is zero -- No compare needed.
-		   1 (0.01%) |    2 |       2 (0.01%) |         _test.dasm:3 | set a, data
-		   1 (0.01%) |    2 |       2 (0.01%) |         _test.dasm:9 | jsr assert_eq
+	10 sample(s), 29 cycle(s)
+		    4  40.00%       14  48.28% memchr               memchr.dasm:15
+		    4  40.00%       10  34.48% assert_eq            assert_eq.dasm:8
+		    2  20.00%        5  17.24% assert_ez            assert_ez.dasm:8
 
 
-In this example, the table shows 5 fields:
+The table shows 6 columns:
 
-* **COUNT**: This is the total number of times the particular instruction
-  was executed.
+* **COUNT**: This is the cumulative total number of times each instruction
+  inside this function was executed.
+
+* **COUNT PERC**: This is the percentage of the total count for all
+  returned samples.
   
-* **COST**: This is the cpy cycle cost for 1 single execution of this
-  instruction. It includes the cost for the operands.
+* **COST**: This is the cumulative cycle cost for all instructions inside
+  this function.
   
-* **CUM. COST**: This is the total (cumulative) cost incurred by this
-  instruction over the entire runtime of the program. It is not simply a
-  matter of COUNT*COST, but it additionally holds penalty costs which may have
-  been incurred in particular situations. Most notably this applies to skipped
-  branch instructions. The SPEC notes that these always incur a penalty of X
-  cycles for each skipped branch.
+* **COST PERC**: This is the cost percentage of the total cost for the
+  returned samples.
   
-* **FILE**: This is the file name and line number from which the particular
-  instruction originated.
+* **NAME**: This is the name of the function, denoted by the label that
+  directly preceeded its definition.
   
-* **SOURCE**: This shows the original source line from which this instruction'
-  was generated.
+* **FILE**: This shows the original source file and line in which the
+  function is defined.
 
 
 ### Dependencies
 
 * github.com/jteeuwen/dcpu/cpu
 * github.com/jteeuwen/dcpu/prof
+* github.com/jteeuwen/dcpu/parser
 
 
 ### License

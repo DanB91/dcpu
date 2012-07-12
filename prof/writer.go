@@ -26,33 +26,14 @@ var be = binary.BigEndian
 //        - Each string is written out as raw bytes.
 //    
 //    [3] 32-bit unsigned integer:
-//        Total number of ProfileData entries. One for instruction in
+//        Number of ProfileData entries. One for instruction in
 //        the program.
 //    
-//    [4] 32-bit unsigned integer:
-//        Number of ProfileData entries actually being used. Meaning for
-//        each PC value we encountered.
-//    
-//    [5] N number of ProfileData entries.
-//        Where N is the amount described in [4].
+//    [4] N number of ProfileData entries.
+//        Where N is the amount described in [3].
 //    
 //        - 16-bit unsigned integer:
-//          The PC value to which this entry applies.
-//    
-//        - 8-bit unsigned integer:
-//          The opcode to which this entry applies.
-//    
-//        - 8-bit unsigned integer:
-//          Operand A for this instruction (op a, b).
-//    
-//        - 8-bit unsigned integer:
-//          Operand B for this instruction (op a, b).
-//    
-//        - 16-bit unsigned integer:
-//          Value of operand A (next word).
-//    
-//        - 16-bit unsigned integer:
-//          Value of operand B (next word).
+//          The encoded instruction to which this entry applies.
 //    
 //        - 32-bit unsigned int:
 //          The file index for the original source code.
@@ -99,63 +80,43 @@ func Write(p *Profile, w io.Writer) (err error) {
 	}
 
 	// [4]
-	size = uint32(p.CountUses())
-	if err = binary.Write(w, be, size); err != nil {
-		return
-	}
+	var d [30]byte
+	for _, v := range p.Data {
+		d[0] = byte(v.Data >> 8)
+		d[1] = byte(v.Data)
 
-	// [5]
-	var d [37]byte
-	for pc, v := range p.Data {
-		if v == nil {
-			continue
-		}
+		d[2] = byte(v.File >> 24)
+		d[3] = byte(v.File >> 16)
+		d[4] = byte(v.File >> 8)
+		d[5] = byte(v.File)
 
-		d[0] = byte(pc >> 8)
-		d[1] = byte(pc)
+		d[6] = byte(v.Line >> 24)
+		d[7] = byte(v.Line >> 16)
+		d[8] = byte(v.Line >> 8)
+		d[9] = byte(v.Line)
 
-		d[2] = byte(v.Opcode)
-		d[3] = byte(v.A)
-		d[4] = byte(v.B)
+		d[10] = byte(v.Col >> 24)
+		d[11] = byte(v.Col >> 16)
+		d[12] = byte(v.Col >> 8)
+		d[13] = byte(v.Col)
 
-		d[5] = byte(v.AValue >> 8)
-		d[6] = byte(v.AValue)
+		d[14] = byte(v.Count >> 56)
+		d[15] = byte(v.Count >> 48)
+		d[16] = byte(v.Count >> 40)
+		d[17] = byte(v.Count >> 32)
+		d[18] = byte(v.Count >> 24)
+		d[19] = byte(v.Count >> 16)
+		d[20] = byte(v.Count >> 8)
+		d[21] = byte(v.Count)
 
-		d[7] = byte(v.BValue >> 8)
-		d[8] = byte(v.BValue)
-
-		d[9] = byte(v.File >> 24)
-		d[10] = byte(v.File >> 16)
-		d[11] = byte(v.File >> 8)
-		d[12] = byte(v.File)
-
-		d[13] = byte(v.Line >> 24)
-		d[14] = byte(v.Line >> 16)
-		d[15] = byte(v.Line >> 8)
-		d[16] = byte(v.Line)
-
-		d[17] = byte(v.Col >> 24)
-		d[18] = byte(v.Col >> 16)
-		d[19] = byte(v.Col >> 8)
-		d[20] = byte(v.Col)
-
-		d[21] = byte(v.Count >> 56)
-		d[22] = byte(v.Count >> 48)
-		d[23] = byte(v.Count >> 40)
-		d[24] = byte(v.Count >> 32)
-		d[25] = byte(v.Count >> 24)
-		d[26] = byte(v.Count >> 16)
-		d[27] = byte(v.Count >> 8)
-		d[28] = byte(v.Count)
-
-		d[29] = byte(v.Penalty >> 56)
-		d[30] = byte(v.Penalty >> 48)
-		d[31] = byte(v.Penalty >> 40)
-		d[32] = byte(v.Penalty >> 32)
-		d[33] = byte(v.Penalty >> 24)
-		d[34] = byte(v.Penalty >> 16)
-		d[35] = byte(v.Penalty >> 8)
-		d[36] = byte(v.Penalty)
+		d[22] = byte(v.Penalty >> 56)
+		d[23] = byte(v.Penalty >> 48)
+		d[24] = byte(v.Penalty >> 40)
+		d[25] = byte(v.Penalty >> 32)
+		d[26] = byte(v.Penalty >> 24)
+		d[27] = byte(v.Penalty >> 16)
+		d[28] = byte(v.Penalty >> 8)
+		d[29] = byte(v.Penalty)
 
 		_, err = w.Write(d[:])
 		if err != nil {

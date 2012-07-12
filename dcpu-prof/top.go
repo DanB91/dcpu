@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"github.com/jteeuwen/dcpu/prof"
-	"path/filepath"
 	"strings"
 )
 
@@ -17,11 +16,11 @@ const (
 
 // Display sorted list of profile data for every function call.
 func top(p *prof.Profile, count int, sort string) {
-	var filename, source string
+	var source string
 	var scount, scost string
 	var counttotal, costtotal float64
 
-	list := p.DataForFunctions()
+	list := p.FunctionCosts()
 
 	if len(list) == 0 {
 		fmt.Println("0 samples.")
@@ -29,7 +28,7 @@ func top(p *prof.Profile, count int, sort string) {
 	}
 
 	switch strings.ToLower(sort) {
-	case "cumulative":
+	case "cost":
 		prof.SamplesByCumulativeCost(list).Sort()
 
 	case "count":
@@ -45,29 +44,22 @@ func top(p *prof.Profile, count int, sort string) {
 		list = list[:count]
 	}
 
+	fmt.Printf("%.0f sample(s), %.0f cycle(s)\n", counttotal, costtotal)
+
 	for i := range list {
-		filename = p.Files[list[i].Data.File]
-		source = getSourceLine(p, list[i].PC)
+		source = getLabel(p, list[i].PC)
 
-		filename = filepath.Base(filename)
-		filename = fmt.Sprintf("%s:%d", filename, list[i].Data.Line)
+		scount = fmt.Sprintf("%.2f%%",
+			float64(list[i].Data.Count)/(counttotal*0.01))
 
-		if len(filename) > 20 {
-			filename = "..." + filename[3:]
-		}
+		scost = fmt.Sprintf("%.2f%%",
+			float64(list[i].Data.CumulativeCost())/(costtotal*0.01))
 
-		scount = fmt.Sprintf("%.1f%%",
-			float64(list[i].Data.Count)/counttotal)
-
-		scost = fmt.Sprintf("%.1f%%",
-			float64(list[i].Data.CumulativeCost())/costtotal)
-
-		fmt.Printf(" %8d %6s %8d %6s %s %s\n",
+		fmt.Printf(" %8d %7s %8d %7s %s\n",
 			list[i].Data.Count,
 			scount,
 			list[i].Data.CumulativeCost(),
 			scost,
-			filename,
 			source,
 		)
 	}

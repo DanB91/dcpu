@@ -5,6 +5,7 @@ package prof
 
 import (
 	"bytes"
+	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 	"testing"
 )
@@ -13,11 +14,29 @@ import (
 func TestIdentity(t *testing.T) {
 	var w bytes.Buffer
 
-	a := New([]string{"a.dasm"}, 5)
-	a.Update(0, cpu.SET, 0, 0x1f, 0, 0xffff, 0, 1, 1)
-	a.Update(2, cpu.ADD, 0, 0x22, 0xffff, 1, 0, 2, 1)
-	a.Update(3, cpu.MUL, 0, 0x22, 0, 1, 0, 3, 1)
-	a.Update(4, cpu.SET, 1, 0, 0, 0, 0, 4, 1)
+	code := []cpu.Word{
+		cpu.Encode(cpu.SET, 0, 0x1f),
+		0xffff,
+		cpu.Encode(cpu.ADD, 0, 0x22),
+		cpu.Encode(cpu.MUL, 0, 0x22),
+		cpu.Encode(cpu.SET, 1, 0),
+	}
+
+	dbg := new(asm.DebugInfo)
+	dbg.Files = []string{"a.dasm"}
+	dbg.SourceMapping = []*asm.SourceInfo{
+		new(asm.SourceInfo),
+		new(asm.SourceInfo),
+		new(asm.SourceInfo),
+		new(asm.SourceInfo),
+		new(asm.SourceInfo),
+	}
+
+	a := New(code, dbg)
+	a.Update(0, nil)
+	a.Update(2, nil)
+	a.Update(3, nil)
+	a.Update(4, nil)
 
 	a.UpdateCost(2, 5)
 
@@ -48,18 +67,6 @@ func TestIdentity(t *testing.T) {
 	for pc, va := range a.Data {
 		vb := b.Data[pc]
 
-		if va == nil || vb == nil {
-			if va == nil && vb != nil {
-				t.Fatalf("va is nil. vb is not.")
-			}
-
-			if va != nil && vb == nil {
-				t.Fatalf("va is not nil. vb is.")
-			}
-
-			continue
-		}
-
 		if va.Count != vb.Count {
 			t.Fatalf("va.Count != vb.Count")
 		}
@@ -76,32 +83,12 @@ func TestIdentity(t *testing.T) {
 			t.Fatalf("va.Col != vb.Col")
 		}
 
-		if va.Opcode != vb.Opcode {
-			t.Fatalf("va.Opcode != vb.Opcode")
-		}
-
-		if va.A != vb.A {
-			t.Fatalf("va.A != vb.A")
-		}
-
-		if va.B != vb.B {
-			t.Fatalf("va.B != vb.B")
-		}
-
-		if va.AValue != vb.AValue {
-			t.Fatalf("va.AValue != vb.AValue")
-		}
-
-		if va.BValue != vb.BValue {
-			t.Fatalf("va.BValue != vb.BValue")
+		if va.Data != vb.Data {
+			t.Fatalf("va.Data != vb.Data")
 		}
 
 		if va.Penalty != vb.Penalty {
 			t.Fatalf("va.Penalty != vb.Penalty")
-		}
-
-		if va.Opcode != vb.Opcode {
-			t.Fatalf("va.B != vb.B")
 		}
 
 		if va.Cost() != vb.Cost() {

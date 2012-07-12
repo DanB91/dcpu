@@ -15,38 +15,45 @@ type ProfileData struct {
 	// for skipped branch instructions. They gain cost from the skipping.
 	Penalty uint64
 
-	File   int      // Original source file.
-	Line   int      // Original source line.
-	Col    int      // Original source column.
-	Opcode cpu.Word // Opcode this data applies to.
-	A, B   cpu.Word // Arguments for this instruction.
+	File int      // Original source file.
+	Line int      // Original source line.
+	Col  int      // Original source column.
+	Data cpu.Word // Encoded instruciton value.
+}
 
-	// Extra word referred to by operands.
-	// These are useful for our profiler to identify jump targets.
-	// Jump targets usually encode their targeta ddress in a new word.
-	// We store it here so we can refer to it later.
-	AValue, BValue cpu.Word
+// Copy creates a deep copy of the given data.
+func (p *ProfileData) Copy() *ProfileData {
+	return &ProfileData{
+		Count:   p.Count,
+		Penalty: p.Penalty,
+		File:    p.File,
+		Line:    p.Line,
+		Col:     p.Col,
+		Data:    p.Data,
+	}
 }
 
 // Cost returns the cycle cost for this entry.
 func (p *ProfileData) Cost() uint8 {
 	var c uint8
 
-	if p.Opcode == cpu.EXT {
-		c = opcodes[p.A]
+	op, a, b := cpu.Decode(p.Data)
 
-		if p.B <= 0x1f {
-			c += operands[p.B]
+	if op == cpu.EXT {
+		c = opcodes[a]
+
+		if b <= 0x1f {
+			c += operands[b]
 		}
 	} else {
-		c = opcodes[p.Opcode]
+		c = opcodes[op]
 
-		if p.A <= 0x1f {
-			c += operands[p.A]
+		if a <= 0x1f {
+			c += operands[a]
 		}
 
-		if p.B <= 0x1f {
-			c += operands[p.B]
+		if b <= 0x1f {
+			c += operands[b]
 		}
 	}
 

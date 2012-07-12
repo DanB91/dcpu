@@ -134,7 +134,7 @@ func (c *CPU) Run(entrypoint Word) (err error) {
 func (c *CPU) nextInstruction() (op, a, b Word) {
 	s := c.Store
 	op, a, b = Decode(s.Mem[s.PC])
-	c.size = wordCount(op, a, b)
+	c.size = Sizeof(op, a, b)
 	s.PC++
 	return
 }
@@ -143,7 +143,7 @@ func (c *CPU) nextInstruction() (op, a, b Word) {
 func (c *CPU) skip() Word {
 	s := c.Store
 	op, a, b := Decode(s.Mem[s.PC])
-	s.PC += wordCount(op, a, b)
+	s.PC += Sizeof(op, a, b)
 	return op
 }
 
@@ -213,11 +213,7 @@ func (c *CPU) Step() (err error) {
 
 	// Notify host of instruction context?
 	if c.InstructionHandler != nil {
-		var value Word
-		if op != EXT {
-			value = *va
-		}
-		c.InstructionHandler(s.PC-c.size, op, a, b, value, *vb, s)
+		c.InstructionHandler(s.PC-c.size, s)
 	}
 
 	// Trace output for debugging?
@@ -552,10 +548,8 @@ func (c *CPU) decodeOperand(w Word, isTarget bool) *Word {
 	return &w
 }
 
-// wordCount counts the number of words occupied by the next instruction.
-// This is needed to correctly skip the appropriate amount of words
-// in the IF(x) instructions.
-func wordCount(op, a, b Word) (count Word) {
+// Sizeof counts the number of words occupied by the given instruction.
+func Sizeof(op, a, b Word) (count Word) {
 	count = 1
 
 	if op != EXT && (a == 0x1e || a == 0x1f || (a >= 0x10 && a <= 0x17)) {

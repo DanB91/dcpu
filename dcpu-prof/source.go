@@ -17,6 +17,8 @@ func init() {
 	sourceCache = make(map[cpu.Word]string)
 }
 
+// getSourceLine attempts to find the original line of sourcecode that
+// create a given instruction.
 func getSourceLine(prof *prof.Profile, pc cpu.Word) string {
 	if line, ok := sourceCache[pc]; ok {
 		return line

@@ -52,7 +52,7 @@ func usage() {
                     This sorts by number of times each function has been
                     called. This is the default sorting mode.
 
-                  cumulative
+                  cost
                     This sorts by the total cycle cost over the entire
                     program's runtime.
 `)
