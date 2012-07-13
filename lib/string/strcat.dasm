@@ -26,7 +26,6 @@
    ifn [j], 0
       set pc, strcat_add_src
 
-
 ; Set trailing NULL.
    set [i], 0
    set pc, pop

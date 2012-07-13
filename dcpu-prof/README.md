@@ -11,6 +11,34 @@ types of data in table form. Options to these commands allow us to
 sort the data in different ways and to filter out unnecessary clutter.
 
 
+## Known issues
+
+The profiling mode for functions is flaky at best because it makes some
+assumptions about code layout which will not be true in all situations.
+
+One of the assumptions is that address references in a JSR instruction can
+not be null (0). This is done to prevent the profiler from interpreting data
+sections as code and mistaking some data for a valid jump. This is not
+100% fool-proof, but it works for the majority of cases.
+
+Additionally, it assumes functions will always return by means of 
+an unconditional `SET PC, POP` instruction. It also assumes this return is
+physically the last instruction in the function. Jumping over it to more code
+would be problematic.
+
+One example of this can be seen in `lib/string/memmove.dasm` at line 36. As far
+as the profiler is concerned, that line is the end of the `memmove` function,
+eventhough it clearly isn't. The consequence of this is that the count and
+cycle cost values for the `memmove` fuction are incorrect.
+
+A solution could be to reorganize the branching statements to make the return
+a part of it, but this is not necessarily an efficient solution when one
+considers the overhead that failed branch checks can incur.
+
+If your code contains a lot of these cases, it is advised to only use
+the file mode listings in this profiler, since it makes no such assumptions.
+
+
 ### Usage
 
 Read the given file:
@@ -120,22 +148,8 @@ the detailed usage with `list`:
 	list -f memchr
 	===> lib/string/memchr.dasm 15-29
 	42 sample(s), 98 cycle(s)
-
-		   3       11   015:   ife 0, c ; num is zero -- No compare needed.
-		   1        1   016:     set pc, pop
-		                017: 
-		                018: :memchr_loop
-		   8       23   019:   ife [a], b
-		   1        1   020:     set pc, pop
-		   7       14   021:   sub c, 1
-		   7       20   022:   ife c, 0
-		   1        2   023:     set pc, memchr_ret
-		   6       12   024:   add a, 1
-		   6       12   025:   set pc ,memchr_loop
-		                026: 
-		                027: :memchr_ret
-		   1        1   028:   set a, 0
-		   1        1   029:   set pc, pop
+	
+	...
 
 
 As with `top`, we can specify the `-file` flag in this command to list

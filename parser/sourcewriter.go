@@ -75,7 +75,7 @@ func (sw *SourceWriter) Write() {
 	for i, v := range sw.a.Root.Children() {
 		switch v.(type) {
 		case *Comment:
-			if i > 0 && !followsComment {
+			if i > 0 && !followsBranch && followsInstruction && !followsComment {
 				sw.w.Write(newline)
 			}
 

@@ -21,7 +21,6 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strpbrk
-
 ; Make a backup of some registers we will be using.
    set push, x
    set push, y

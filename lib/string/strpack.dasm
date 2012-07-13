@@ -14,7 +14,6 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strpack
-
 ; No need to continue with empty string.
    ifn [a], 0
       ifl [a], 0x100

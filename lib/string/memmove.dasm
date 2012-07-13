@@ -20,16 +20,13 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memmove
-
 ; size is zero -- Nothing to copy.
    ife c, 0
       set pc, pop
 
-
 ; a and b are the same locations -- Nothing to copy.
    ife a, b
       set pc, pop
-
 
 ; Copying only one word is special cased.
    ifg c, 1
@@ -39,7 +36,6 @@
    set pc, pop
 
 :memmove_range
-
 ; Store pointers in (de|in)crementing registers.
    set i, a
    set j, b

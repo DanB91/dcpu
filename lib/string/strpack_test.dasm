@@ -2,13 +2,11 @@
    ifg a, 0xff
       exit
 
-
 ; panic str_packed
    set a, s1
    jsr strpack
    ifl a, 0x100
       exit
-
 
 ; panic str_notpacked
    exit
