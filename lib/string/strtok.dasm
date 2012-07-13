@@ -36,59 +36,56 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strtok
-  ifn a, 0
-    set [strtok_ptr], a
+   ifn a, 0
+      set [strtok_ptr], a
 
-  ife a, 0
-    ife [strtok_ptr], 0
-      set pc, pop ; No (stored) pointer available
+   ife a, 0
+      ife [strtok_ptr], 0
+         set pc, pop ; No (stored) pointer available
 
-  set push, x
-  set push, y
-
-  set x, [strtok_ptr]
-  set y, b
+   set push, x
+   set push, y
+   set x, [strtok_ptr]
+   set y, b
 
 ; Find the next delimiter
 :strtok_is_delim
-  ife [x], 0
-    set pc, strtok_ret
+   ife [x], 0
+      set pc, strtok_ret
 
-  set a, y
-  set b, [x]
-  jsr strchr
+   set a, y
+   set b, [x]
+   jsr strchr
+   ifg a, 0
+      set pc, strtok_yield
 
-  ifg a, 0
-    set pc, strtok_yield
-
-  add x, 1
-  set pc, strtok_is_delim
+   add x, 1
+   set pc, strtok_is_delim
 
 ; str[i] is a delimiter. Return a new token if token length > 0
 :strtok_yield
-  ifn x, [strtok_ptr]
-     set pc, strtok_valid_token
+   ifn x, [strtok_ptr]
+      set pc, strtok_valid_token
 
-  add x, 1
-  set [strtok_ptr], x
-  set pc, strtok_is_delim
+   add x, 1
+   set [strtok_ptr], x
+   set pc, strtok_is_delim
 
 :strtok_valid_token
-  set [x], 0
-  set a, [strtok_ptr]
-  set [strtok_ptr], x
-  set pc, strtok_ret
+   set [x], 0
+   set a, [strtok_ptr]
+   set [strtok_ptr], x
+   set pc, strtok_ret
 
 :strtok_invalid_token
-  set a, 0
+   set a, 0
 
 :strtok_ret
-  set y, pop
-  set x, pop
-  set pc, pop
-
+   set y, pop
+   set x, pop
+   set pc, pop
 
 ; Internal pointer. Retains state across multiple calls when
 ; tokenizing the same string.
-:strtok_ptr dat 0
-
+:strtok_ptr
+   dat 0

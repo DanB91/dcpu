@@ -20,51 +20,56 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memmove
-  ; size is zero -- Nothing to copy.
-  ife c, 0
-    set pc, pop
 
-  ; a and b are the same locations -- Nothing to copy.
-  ife a, b
-    set pc, pop
+; size is zero -- Nothing to copy.
+   ife c, 0
+      set pc, pop
 
-  ; Copying only one word is special cased.
-  ifg c, 1
-    set pc, memmove_range
 
-  set [a], [b]
-  set pc, pop
+; a and b are the same locations -- Nothing to copy.
+   ife a, b
+      set pc, pop
+
+
+; Copying only one word is special cased.
+   ifg c, 1
+      set pc, memmove_range
+
+   set [a], [b]
+   set pc, pop
 
 :memmove_range
-  ; Store pointers in (de|in)crementing registers.
-  set i ,a
-  set j, b
 
-  ; Destructive overlap == dst >= src && dest < src + n.
-  ifl i, j
-    set pc, memmove_no_overlap
+; Store pointers in (de|in)crementing registers.
+   set i, a
+   set j, b
 
-  add b, c
-  sub b, 1
-  ifg a, b
-    set pc, memmove_no_overlap
+; Destructive overlap == dst >= src && dest < src + n.
+   ifl i, j
+      set pc, memmove_no_overlap
 
-  sub c, 1
-  add i, c
-  add j, c
-  add c, 1
+   add b, c
+   sub b, 1
+   ifg a, b
+      set pc, memmove_no_overlap
+
+   sub c, 1
+   add i, c
+   add j, c
+   add c, 1
 
 :memmove_overlap
-  std [i], [j]
-  sub c, 1
-  ifg c, 0
-    set pc, memmove_overlap
-  set pc, pop
+   std [i], [j]
+   sub c, 1
+   ifg c, 0
+      set pc, memmove_overlap
+
+   set pc, pop
 
 :memmove_no_overlap
-  sti [i], [j]
-  sub c, 1
-  ifg c, 0
-    set pc, memmove_no_overlap
-  set pc, pop
+   sti [i], [j]
+   sub c, 1
+   ifg c, 0
+      set pc, memmove_no_overlap
 
+   set pc, pop

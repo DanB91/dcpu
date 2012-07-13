@@ -7,9 +7,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_lts
-  ifu a, b
-    set pc, pop
-  panic assert_lts_str
+   ifu a, b
+      set pc, pop
+
+   panic assert_lts_str
 
 :assert_lts_str
-  dat "Assertion failed: A >= B", 0
+   dat "Assertion failed: A >= B", 0

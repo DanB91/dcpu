@@ -14,21 +14,20 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memset
-  ife 0, c  ; zero size - exit.
-    set pc, pop
+   ife 0, c ; zero size - exit.
+      set pc, pop
 
-  set push, i
-  set push, j
-  set i, a
+   set push, i
+   set push, j
+   set i, a
 
 :memset_loop
-  sti [i], b
-  sub c, 1
-  ifg c, 0
-    set pc, memset_loop
+   sti [i], b
+   sub c, 1
+   ifg c, 0
+      set pc, memset_loop
 
 :memset_end
-  set j, pop
-  set i, pop
-  set pc, pop
-
+   set j, pop
+   set i, pop
+   set pc, pop

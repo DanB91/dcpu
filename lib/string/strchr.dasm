@@ -14,13 +14,15 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strchr
-  ife [a], b
-    set pc, pop
-  ife [a], 0
-    set pc, strchr_not_found
-  add a, 1
-  set pc, strchr
+   ife [a], b
+      set pc, pop
+
+   ife [a], 0
+      set pc, strchr_not_found
+
+   add a, 1
+   set pc, strchr
 
 :strchr_not_found
-  set a, 0
-  set pc, pop
+   set a, 0
+   set pc, pop

@@ -11,16 +11,17 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strlen
-  set push, b
-  set b, a
+   set push, b
+   set b, a
 
 :strlen_loop
-  ife [a], 0
-    set pc, strlen_ret
-  add a, 1
-  set pc, strlen_loop
+   ife [a], 0
+      set pc, strlen_ret
+
+   add a, 1
+   set pc, strlen_loop
 
 :strlen_ret
-  sub a, b
-  set b, pop
-  set pc, pop
+   sub a, b
+   set b, pop
+   set pc, pop

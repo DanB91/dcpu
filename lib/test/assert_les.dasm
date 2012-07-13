@@ -7,9 +7,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_les
-  ifa a, b
-     panic assert_les_str
-  set pc, pop
+   ifa a, b
+      panic assert_les_str
+
+   set pc, pop
 
 :assert_les_str
-  dat "Assertion failed: A > B", 0
+   dat "Assertion failed: A > B", 0

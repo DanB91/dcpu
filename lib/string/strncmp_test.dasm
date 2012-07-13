@@ -1,23 +1,22 @@
 ; Compare partial
- set a, d1
- set b, d2
- set c, 3
- jsr strncmp
-
- set b, 0
- jsr assert_eq
-
+   set a, d1
+   set b, d2
+   set c, 3
+   jsr strncmp
+   set b, 0
+   jsr assert_eq
 
 ; Compare full
- set a, d1
- set b, d2
- set c, 5
- jsr strncmp
+   set a, d1
+   set b, d2
+   set c, 5
+   jsr strncmp
+   set b, 0
+   jsr assert_lts
+   exit
 
- set b, 0
- jsr assert_lts
- 
- exit
+:d1
+   dat "abcd", 0
 
-:d1 dat "abcd", 0
-:d2 dat "abce", 0
+:d2
+   dat "abce", 0

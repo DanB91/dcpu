@@ -1,15 +1,14 @@
- set a, s1
- jsr strlen
+   set a, s1
+   jsr strlen
+   set b, 6
+   jsr assert_eq
+   set a, s2
+   jsr strlen
+   jsr assert_ez
+   exit
 
- set b, 6
- jsr assert_eq
+:s1
+   dat "abc123", 0
 
-
- set a, s2
- jsr strlen
- jsr assert_ez
-
- exit
-
-:s1 dat "abc123", 0
-:s2 dat 0
+:s2
+   dat 0

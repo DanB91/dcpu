@@ -20,20 +20,19 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcspn
-  set push, x
-  set x, a
-
-  jsr strpbrk
-  ifg a, 0
-    set pc, strcspn_ret
+   set push, x
+   set x, a
+   jsr strpbrk
+   ifg a, 0
+      set pc, strcspn_ret
 
 :strcspn_not_found
-  set a, x
-  jsr strlen
-  set x, pop
-  set pc, pop
+   set a, x
+   jsr strlen
+   set x, pop
+   set pc, pop
 
 :strcspn_ret
-  sub a, x
-  set x, pop
-  set pc, pop
+   sub a, x
+   set x, pop
+   set pc, pop

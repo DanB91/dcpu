@@ -1,28 +1,27 @@
 ; Copy first 3 characters.
- set a, d1
- set b, d2
- set c, 3
- jsr strncpy
-
- set a, d1
- set b, d2
- jsr strcmp
- 
- set b, 0
- jsr assert_lts
+   set a, d1
+   set b, d2
+   set c, 3
+   jsr strncpy
+   set a, d1
+   set b, d2
+   jsr strcmp
+   set b, 0
+   jsr assert_lts
 
 ; Copy all characters.
- set a, d1
- set b, d2
- set c, 4
- jsr strncpy
+   set a, d1
+   set b, d2
+   set c, 4
+   jsr strncpy
+   set a, d1
+   set b, d2
+   jsr strcmp
+   jsr assert_ez
+   exit
 
- set a, d1
- set b, d2
- jsr strcmp
- jsr assert_ez
+:d1
+   dat "abcd", 0
 
- exit
-
-:d1 dat "abcd", 0
-:d2 dat "abce", 0
+:d2
+   dat "abce", 0

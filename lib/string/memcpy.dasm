@@ -21,15 +21,16 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memcpy
-  ife c, 0
-    set pc, pop
- 
-  set i, a
-  set j, b
+   ife c, 0
+      set pc, pop
+
+   set i, a
+   set j, b
 
 :memcpy_loop
-  sti [i], [j]
-  sub c, 1
-  ifg c, 0
-     set pc, memcpy_loop
-  set pc, pop
+   sti [i], [j]
+   sub c, 1
+   ifg c, 0
+      set pc, memcpy_loop
+
+   set pc, pop

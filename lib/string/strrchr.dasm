@@ -16,27 +16,29 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strrchr
-  ; get string length.
-  set push, a
-  set push, b
-  jsr strlen
-  set c, a
-  set b, pop
-  set a, pop
 
-  ; Scan to end of string.
-  add a, c
+; get string length.
+   set push, a
+   set push, b
+   jsr strlen
+   set c, a
+   set b, pop
+   set a, pop
+
+; Scan to end of string.
+   add a, c
 
 :strrchr_loop
-  ife [a], b
-    set pc, pop
-  ife c, 0
-    set pc, strchr_not_found
-  sub c, 1
-  sub a, 1
-  set pc, strrchr_loop
+   ife [a], b
+      set pc, pop
+
+   ife c, 0
+      set pc, strchr_not_found
+
+   sub c, 1
+   sub a, 1
+   set pc, strrchr_loop
 
 :strchr_not_found
-  set a, 0
-  set pc, pop
-
+   set a, 0
+   set pc, pop

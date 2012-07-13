@@ -24,22 +24,21 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :device_detect
-  set i, a
-  set j, b
-  hwn z
-  sub z, 1
+   set i, a
+   set j, b
+   hwn z
+   sub z, 1
 
 :device_detect_loop
-  hwq z
+   hwq z
+   ife a, i
+      ife b, j
+         set pc, device_detect_ret
 
-  ife a, i
-    ife b, j
-      set pc, device_detect_ret
-
-  sub z, 1
-  ifa z, 0xffff
-    set pc, device_detect_loop
+   sub z, 1
+   ifa z, 0xffff
+      set pc, device_detect_loop
 
 :device_detect_ret
-  set a, z
-  set pc, pop
+   set a, z
+   set pc, pop

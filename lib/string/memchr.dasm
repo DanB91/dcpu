@@ -12,19 +12,20 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :memchr
-  ife 0, c ; num is zero -- No compare needed.
-    set pc, pop
+   ife 0, c ; num is zero -- No compare needed.
+      set pc, pop
 
 :memchr_loop
-  ife [a], b
-    set pc, pop
-  sub c, 1
-  ife c, 0
-    set pc, memchr_ret
-  add a, 1
-  set pc ,memchr_loop
+   ife [a], b
+      set pc, pop
+
+   sub c, 1
+   ife c, 0
+      set pc, memchr_ret
+
+   add a, 1
+   set pc, memchr_loop
 
 :memchr_ret
-  set a, 0
-  set pc, pop
-
+   set a, 0
+   set pc, pop

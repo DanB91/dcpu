@@ -14,12 +14,13 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcpy
-  set i, a
-  set j, b
+   set i, a
+   set j, b
 
 :strcpy_loop
-  set b, [j]
-  sti [i], [j]
-  ifn b, 0
-    set pc, strcpy_loop
-  set pc, pop
+   set b, [j]
+   sti [i], [j]
+   ifn b, 0
+      set pc, strcpy_loop
+
+   set pc, pop

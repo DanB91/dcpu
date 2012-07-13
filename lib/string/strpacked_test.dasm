@@ -1,15 +1,16 @@
 ; Test non-packed string
- set a, s1
- jsr strpacked
- jsr assert_ez
+   set a, s1
+   jsr strpacked
+   jsr assert_ez
 
 ; Test packed string
- set a, s2
- jsr strpacked
- jsr assert_nz
+   set a, s2
+   jsr strpacked
+   jsr assert_nz
+   exit
 
- exit
+:s1
+   dat "abcd", 0
 
-:s1 dat "abcd", 0
-:s2 dat 0x6162, 0x6364, 0
-
+:s2
+   dat 0x6162, 0x6364, 0

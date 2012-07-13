@@ -5,9 +5,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_ez
-  ifn a, 0
-    panic assert_ez_str
-  set pc, pop
+   ifn a, 0
+      panic assert_ez_str
+
+   set pc, pop
 
 :assert_ez_str
-  dat "Assertion failed: A != 0", 0
+   dat "Assertion failed: A != 0", 0

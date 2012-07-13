@@ -1,29 +1,31 @@
 ; Find trailing NULL character.
- set a, d1
- set b, 0
- jsr strrchr
-
- set b, d1
- add b, 3
- jsr assert_eq
+   set a, d1
+   set b, 0
+   jsr strrchr
+   set b, d1
+   add b, 3
+   jsr assert_eq
 
 ; Find last character.
- set a, d1
- set b, [d2]
- jsr strrchr
-
- set b, d1
- add b, 2
- jsr assert_eq
+   set a, d1
+   set b, [d2]
+   jsr strrchr
+   set b, d1
+   add b, 2
+   jsr assert_eq
 
 ; Find non-existing character.
- set a, d1
- set b, [d3]
- jsr strrchr
- jsr assert_ez
+   set a, d1
+   set b, [d3]
+   jsr strrchr
+   jsr assert_ez
+   exit
 
- exit
+:d1
+   dat "abc", 0
 
-:d1 dat "abc", 0
-:d2 dat "c"
-:d3 dat "z"
+:d2
+   dat "c"
+
+:d3
+   dat "z"

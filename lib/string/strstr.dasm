@@ -17,38 +17,41 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strstr
-  set push, x
-  set x, b
-  set c, b
-  set b, [b]
+   set push, x
+   set x, b
+   set c, b
+   set b, [b]
 
 ; Find first occurance of s2[0] in s1.
 :strstr_indexof
-  jsr strchr
-  ife a, 0
-    set pc, strstr_not_found
-  set c, x
-  set y, a
+   jsr strchr
+   ife a, 0
+      set pc, strstr_not_found
+
+   set c, x
+   set y, a
 
 ; Compare s1[n] with s2[n]
 :strstr_compare
-  ife [c], 0
-    set pc, strstr_found
-  ife [a], 0
-    set pc, strstr_not_found
-  ifn [a], [c]
-    set pc, strstr_indexof
-  add a, 1
-  add c, 1
-  set pc, strstr_compare
+   ife [c], 0
+      set pc, strstr_found
+
+   ife [a], 0
+      set pc, strstr_not_found
+
+   ifn [a], [c]
+      set pc, strstr_indexof
+
+   add a, 1
+   add c, 1
+   set pc, strstr_compare
 
 :strstr_found
-  set a, y
-  set x, pop
-  set pc, pop
+   set a, y
+   set x, pop
+   set pc, pop
 
 :strstr_not_found
-  set a, 0
-  set x, pop
-  set pc, pop
-
+   set a, 0
+   set x, pop
+   set pc, pop

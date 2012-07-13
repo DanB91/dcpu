@@ -15,23 +15,26 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strncpy
-  set i, a
-  set j, b
+   set i, a
+   set j, b
 
 :strncpy_loop
-  set b, [j]
-  sti [i], [j]
-  sub c, 1
-  ife b, 0
-    set pc, strncpy_pad
-  ifg c, 0
-    set pc, strncpy_loop
-  set pc, pop
+   set b, [j]
+   sti [i], [j]
+   sub c, 1
+   ife b, 0
+      set pc, strncpy_pad
+
+   ifg c, 0
+      set pc, strncpy_loop
+
+   set pc, pop
 
 :strncpy_pad
-  set [i], 0
-  add i, 1
-  sub c, 1
-  ifg c, 0
-    set pc, strncpy_pad
-  set pc, pop
+   set [i], 0
+   add i, 1
+   sub c, 1
+   ifg c, 0
+      set pc, strncpy_pad
+
+   set pc, pop

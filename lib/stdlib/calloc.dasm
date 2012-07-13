@@ -10,4 +10,4 @@
 ;   0.1.0: Initial definition for spec 1.7.
 ;
 :calloc
-  set pc, pop
+   set pc, pop

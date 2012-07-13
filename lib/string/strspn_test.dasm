@@ -1,20 +1,22 @@
 ; Search in set with existing tokens.
- set a, s1
- set b, s2
- jsr strspn
-
- set b, 3
- jsr assert_eq
+   set a, s1
+   set b, s2
+   jsr strspn
+   set b, 3
+   jsr assert_eq
 
 ; Search in set with non existing tokens.
- set a, s1
- set b, s3
- jsr strspn
- jsr assert_ez
+   set a, s1
+   set b, s3
+   jsr strspn
+   jsr assert_ez
+   exit
 
+:s1
+   dat "129th", 0
 
- exit
- 
-:s1 dat "129th", 0
-:s2 dat "1234567890", 0
-:s3 dat "3456780", 0
+:s2
+   dat "1234567890", 0
+
+:s3
+   dat "3456780", 0

@@ -1,21 +1,23 @@
 ; Search in set with existing tokens.
- set a, s1
- set b, s2
- jsr strcspn
-
- set b, 4
- jsr assert_eq
+   set a, s1
+   set b, s2
+   jsr strcspn
+   set b, 4
+   jsr assert_eq
 
 ; Search in set with non-existing tokens.
- set a, s1
- set b, s3
- jsr strcspn
+   set a, s1
+   set b, s3
+   jsr strcspn
+   set b, 6 ; strlen(s1)
+   jsr assert_eq
+   exit
 
- set b, 6 ; strlen(s1)
- jsr assert_eq
+:s1
+   dat "fcba73", 0
 
- exit
- 
-:s1 dat "fcba73", 0
-:s2 dat "1234567890", 0
-:s3 dat "xyz", 0
+:s2
+   dat "1234567890", 0
+
+:s3
+   dat "xyz", 0

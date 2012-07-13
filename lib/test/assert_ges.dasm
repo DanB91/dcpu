@@ -7,9 +7,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_ges
-  ifu a, b
-     panic assert_ges_str
-  set pc, pop
+   ifu a, b
+      panic assert_ges_str
+
+   set pc, pop
 
 :assert_ges_str
-  dat "Assertion failed: A < B", 0
+   dat "Assertion failed: A < B", 0

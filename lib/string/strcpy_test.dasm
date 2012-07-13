@@ -1,14 +1,15 @@
 ; Copy some stuff
- set a, d1
- set b, d2
- jsr strcpy
+   set a, d1
+   set b, d2
+   jsr strcpy
+   set a, d1
+   set b, d1
+   jsr strcmp
+   jsr assert_ez
+   exit
 
- set a, d1
- set b, d1
- jsr strcmp
- jsr assert_ez
+:d1
+   dat "abcd", 0
 
- exit
-
-:d1 dat "abcd", 0
-:d2 dat "abce", 0
+:d2
+   dat "abce", 0

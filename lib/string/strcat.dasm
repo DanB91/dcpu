@@ -13,20 +13,20 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strcat
-  set i, a
-  set j, b
+   set i, a
+   set j, b
 
 :strcat_find_null
-  add i, 1
-  ifn [i], 0
-    set pc, strcat_find_null
+   add i, 1
+   ifn [i], 0
+      set pc, strcat_find_null
 
 :strcat_add_src
-  sti [i], [j]
-  ifn [j], 0
-    set pc, strcat_add_src
+   sti [i], [j]
+   ifn [j], 0
+      set pc, strcat_add_src
 
-  ; Set trailing NULL.
-  set [i], 0
-  set pc, pop
 
+; Set trailing NULL.
+   set [i], 0
+   set pc, pop

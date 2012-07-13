@@ -1,24 +1,23 @@
 ; Zero length
- set a, d1
- set b, d2
- set c, 0
- jsr memcpy
-
- set b, d1
- jsr assert_eq
+   set a, d1
+   set b, d2
+   set c, 0
+   jsr memcpy
+   set b, d1
+   jsr assert_eq
 
 ; Copy some stuff
- set a, d1
- set b, d2
- set c, 3
- jsr memcpy
- 
- set c, 3
- jsr memcmp
- jsr assert_ez
+   set a, d1
+   set b, d2
+   set c, 3
+   jsr memcpy
+   set c, 3
+   jsr memcmp
+   jsr assert_ez
+   exit
 
+:d1
+   dat 1, 2, 3, 4, 5
 
- exit
-
-:d1 dat 1, 2, 3, 4, 5
-:d2 dat 6, 7, 8, 9, 0
+:d2
+   dat 6, 7, 8, 9, 0

@@ -5,9 +5,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_le
-  ifg a, b
-     panic assert_le_str
-  set pc, pop
+   ifg a, b
+      panic assert_le_str
+
+   set pc, pop
 
 :assert_le_str
-  dat "Assertion failed: A > B", 0
+   dat "Assertion failed: A > B", 0

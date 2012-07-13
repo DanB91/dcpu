@@ -7,9 +7,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_gts
-  ifa a, b
-    set pc, pop
-  panic assert_gts_str
+   ifa a, b
+      set pc, pop
+
+   panic assert_gts_str
 
 :assert_gts_str
-  dat "Assertion failed: A <= B", 0
+   dat "Assertion failed: A <= B", 0

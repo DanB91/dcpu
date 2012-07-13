@@ -1,20 +1,23 @@
 ; Search for existing substring.
- set a, s1
- set b, s2
- jsr strstr
-
- set b, s1
- add b, 10
- jsr assert_eq
+   set a, s1
+   set b, s2
+   jsr strstr
+   set b, s1
+   add b, 10
+   jsr assert_eq
 
 ; Search for non-existing substring.
- set a, s1
- set b, s3
- jsr strstr
- jsr assert_ez
+   set a, s1
+   set b, s3
+   jsr strstr
+   jsr assert_ez
+   exit
 
- exit
- 
-:s1 dat "This is a simple string", 0
-:s2 dat "simple", 0
-:s3 dat "xyz", 0
+:s1
+   dat "This is a simple string", 0
+
+:s2
+   dat "simple", 0
+
+:s3
+   dat "xyz", 0

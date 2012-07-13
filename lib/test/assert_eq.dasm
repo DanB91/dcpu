@@ -5,9 +5,10 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :assert_eq
-  ifn a, b
-    panic assert_eq_str
-  set pc, pop
+   ifn a, b
+      panic assert_eq_str
+
+   set pc, pop
 
 :assert_eq_str
-  dat "Assertion failed: A != B", 0
+   dat "Assertion failed: A != B", 0

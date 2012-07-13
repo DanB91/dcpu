@@ -18,8 +18,9 @@
 ;   0.1.0: Initial implementation for spec 1.7.
 ;
 :strpacked
-  set b, [a]
-  set a, 0
-  ifg b, 0xff
-    set a, 1
-  set pc, pop
+   set b, [a]
+   set a, 0
+   ifg b, 0xff
+      set a, 1
+
+   set pc, pop

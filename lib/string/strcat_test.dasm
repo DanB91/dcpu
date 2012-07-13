@@ -1,16 +1,18 @@
 ; Add d2 to d1
- set a, d1
- set b, d2
- jsr strcat
+   set a, d1
+   set b, d2
+   jsr strcat
+   set b, d3
+   set c, 7
+   jsr memcmp
+   jsr assert_ez
+   exit
 
- set b, d3
- set c, 7
- jsr memcmp
- jsr assert_ez
+:d1
+   dat "abc", 0, 0, 0, 0
 
- exit
+:d2
+   dat "def", 0
 
-:d1 dat "abc", 0, 0, 0, 0
-:d2 dat "def", 0
-:d3 dat "abcdef", 0
-
+:d3
+   dat "abcdef", 0
