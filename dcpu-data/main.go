@@ -65,7 +65,7 @@ func main() {
 func parseArgs() {
 	flag.Usage = func() {
 		fmt.Printf("Usage: %s [options] <file>\n", os.Args[0])
-		fmt.Printf("   or: cat <file> | %s [options]\n\n", os.Args[0])	
+		fmt.Printf("   or: cat <file> | %s [options]\n\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 
