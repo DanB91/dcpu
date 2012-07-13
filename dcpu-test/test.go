@@ -15,6 +15,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -42,17 +43,15 @@ func NewTest(file string, inc []string) *Test {
 // the unit tests defined in it. Additionally, it runs a profiler
 // on the program which can optionally be written to an output file
 // for examination.
-func (t *Test) Run(cfg *Config) (err error) {
-	if cfg.Verbose {
-		fmt.Fprintf(os.Stdout, "[*] %s...\n", t.file)
-	}
+func (t *Test) Run() (err error) {
+	fmt.Fprintf(os.Stdout, "[*] %s...\n", t.file)
 
 	ast, err := t.parse()
 	if err != nil {
 		return
 	}
 
-	c, err := t.compile(ast, cfg)
+	c, err := t.compile(ast)
 	if err != nil {
 		return
 	}
@@ -66,9 +65,11 @@ func (t *Test) Run(cfg *Config) (err error) {
 		}
 	}
 
-	if len(cfg.Profile) > 0 {
+	if *profile {
+		file := strings.Replace(t.file, ".dasm", ".prof", 1)
+
 		var fd *os.File
-		fd, err = os.Create(cfg.Profile)
+		fd, err = os.Create(file)
 
 		if err != nil {
 			return
@@ -103,13 +104,13 @@ func (t *Test) formatTestError(e *cpu.TestError) error {
 	return errors.New(b.String())
 }
 
-// trace builds a callstack for the executing program.
+// parseInstruction builds a callstack for the executing program.
 // This is used for adequate source context when an error occurs.
 //
 // It also optionally prints trace output for each instruction as it is executed.
 // It yields current PC, opcode, operands, all register contents and
 // appends the original line of sourcecode
-func (t *Test) trace(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
+func (t *Test) parseInstruction(pc, op, a, b cpu.Word, s *cpu.Storage, verbose bool) {
 	// Update callstack
 	if op == cpu.EXT && a == cpu.JSR {
 		line := t.getSourceLine(pc)
@@ -159,7 +160,7 @@ func (t *Test) parse() (*dp.AST, error) {
 }
 
 // compile compiles the given AST and returns a CPU instance ready to run the code.
-func (t *Test) compile(ast *dp.AST, cfg *Config) (c *cpu.CPU, err error) {
+func (t *Test) compile(ast *dp.AST) (c *cpu.CPU, err error) {
 	var bin []cpu.Word
 
 	if bin, t.dbg, err = asm.Assemble(ast); err != nil {
@@ -176,9 +177,9 @@ func (t *Test) compile(ast *dp.AST, cfg *Config) (c *cpu.CPU, err error) {
 	c = cpu.New()
 	copy(c.Store.Mem[:], bin)
 
-	c.ClockSpeed = time.Duration(cfg.Clock)
+	c.ClockSpeed = time.Duration(time.Duration(*clock))
 	c.Trace = func(pc, op, a, b cpu.Word, s *cpu.Storage) {
-		t.trace(pc, op, a, b, s, cfg.Trace)
+		t.parseInstruction(pc, op, a, b, s, *trace)
 	}
 
 	c.InstructionHandler = func(pc cpu.Word, s *cpu.Storage) {

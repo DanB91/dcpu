@@ -46,13 +46,14 @@ Example code for a single test unit may look like this:
 	 dat 1, 2, 3, 4, 5
 
 This defines some inputs, then calls `memchr` and compares the value in the
-A register with something we expect it to be. `assert_eq` panics if this
+`A` register with something we expect it to be. `assert_eq` panics if this
 is not the case.
 
 If all tests pass successfully, the tool exits cleanly.
 A failed test yields output as shown here:
 
-    $ dcpu-test -V  .
+    $ dcpu-test .
+	[*] string/memchr_test.dasm...
 	[E] string/memchr_test.dasm: Assertion failed: A != B
 		Call stack:
 		- memchr_test.dasm:7 | jsr asserteq
@@ -68,7 +69,7 @@ and the original source file and line that created this instruction.
 Here is an example of trace output for a test program.
 
     $ cd /path/to/dcpu/lib
-    $ dcpu-test -V -t .
+    $ dcpu-test -t .
 	[*] string/memchr_test.dasm...
 	0000: 0001 0000 001f | 0000 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:1 | set a, data
 	0002: 0001 0001 0024 | 000b 0000 0000 0000 0000 0000 0000 0000 | ffff 0000 0000 | memchr_test.dasm:2 | set b, 3
@@ -92,7 +93,9 @@ can be a powerful debugging tool.
 
 ### Profiling
 
-Using the `-p <path>` switch, we can write profiling data to the given file.
+Using the `-p` switch, we can write profiling data for each test. This file
+is saved in the same location as the input source file, but with a different
+extension: `$filename.dasm` becomes `$filename.prof`.
 The output file can be used by the `dcpu-prof` tool to query and analyze
 profiling data for a given program.
 

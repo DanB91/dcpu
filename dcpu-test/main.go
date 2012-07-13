@@ -12,11 +12,19 @@ import (
 	"strings"
 )
 
+var (
+	input    string   // Input source directory.
+	includes []string // List of paths where we look to resolve source file references.
+	clock    = flag.Int64("c", 1000, "Clock speed in nanoseconds at which to run the tests.")
+	profile  = flag.Bool("p", false, "Save profiling data for each test as file.dasm => file.prof.")
+	trace    = flag.Bool("t", false, "Print trace output for each instruction as it is executed.")
+)
+
 func main() {
 	var err error
 
-	cfg := parseArgs()
-	tests := collectTests(cfg)
+	parseArgs()
+	tests := collectTests()
 
 	for {
 		select {
@@ -25,9 +33,9 @@ func main() {
 				return
 			}
 
-			t := NewTest(file, cfg.Include)
+			t := NewTest(file, includes)
 
-			err = t.Run(cfg)
+			err = t.Run()
 
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -39,26 +47,26 @@ func main() {
 
 // collectTests traverses the input directory and finds all
 // unit test files.
-func collectTests(cfg *Config) <-chan string {
+func collectTests() <-chan string {
 	c := make(chan string)
 
 	go func() {
 		defer close(c)
 
-		stat, _ := os.Lstat(cfg.Input)
+		stat, _ := os.Lstat(input)
 		if !stat.IsDir() {
-			_, name := filepath.Split(cfg.Input)
+			_, name := filepath.Split(input)
 			ok, err := filepath.Match("*_test.dasm", name)
 
 			if !ok || err != nil {
 				return
 			}
 
-			c <- cfg.Input
+			c <- input
 			return
 		}
 
-		filepath.Walk(cfg.Input, func(file string, info os.FileInfo, err error) error {
+		filepath.Walk(input, func(file string, info os.FileInfo, err error) error {
 			if info.IsDir() {
 				return nil
 			}
@@ -79,19 +87,13 @@ func collectTests(cfg *Config) <-chan string {
 }
 
 // process commandline arguments.
-func parseArgs() *Config {
+func parseArgs() {
 	var version, help bool
 	var include string
 
-	c := NewConfig()
-
-	flag.Int64Var(&c.Clock, "c", c.Clock, "Clock speed in nanoseconds at which to run the tests.")
-	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
-	flag.StringVar(&c.Profile, "p", "", "name of output file for profiler data.")
-	flag.BoolVar(&c.Trace, "t", false, "Print trace output for each instruction as it is executed.")
+	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
-	flag.BoolVar(&c.Verbose, "V", false, "Print additional debug output.")
 	flag.Parse()
 
 	if version {
@@ -112,23 +114,28 @@ func parseArgs() *Config {
 	}
 
 	// Ensure we have an existing directory.
-	c.Input = filepath.Clean(flag.Arg(0))
-	if _, err := os.Lstat(c.Input); err != nil {
+	input = filepath.Clean(flag.Arg(0))
+
+	if len(input) == 0 {
+		if wd, err := os.Getwd(); err == nil {
+			input = wd
+		}
+	}
+
+	if _, err := os.Lstat(input); err != nil {
 		fmt.Fprintf(os.Stderr, "Input path: %v\n", err)
 		os.Exit(1)
 	}
 
-	if len(c.Profile) > 0 {
-		c.Profile = filepath.Clean(c.Profile)
-	}
+	includes = append(includes, input)
 
 	// Parse include paths.
 	if len(include) > 0 {
-		c.Include = strings.Split(include, ":")
+		includes = strings.Split(include, ":")
 
-		for i := range c.Include {
-			v := filepath.Clean(c.Include[i])
-			c.Include[i] = v
+		for i := range includes {
+			v := filepath.Clean(includes[i])
+			includes[i] = v
 
 			stat, err := os.Lstat(v)
 			if err != nil {
@@ -143,5 +150,4 @@ func parseArgs() *Config {
 		}
 	}
 
-	return c
 }

@@ -11,7 +11,7 @@ import (
 const (
 	AppName         = "dcpu-test"
 	AppVersionMajor = 0
-	AppVersionMinor = 4
+	AppVersionMinor = 5
 )
 
 // revision part of the program version.
