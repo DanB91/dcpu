@@ -1,7 +1,7 @@
 ## DCPU Data
 
 This is a small tool which generates DCPU assembly source from any given
-input file.s It constructs a listing of `dat` instructions which encode
+input file. It constructs a listing of `dat` instructions which encode
 all the information. Since DCPU deals with 16-bit words, we pack 2 bytes
 into every output word.
 
