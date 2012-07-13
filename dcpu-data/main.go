@@ -63,6 +63,12 @@ func main() {
 }
 
 func parseArgs() {
+	flag.Usage = func() {
+		fmt.Printf("Usage: %s [options] <file>\n", os.Args[0])
+		fmt.Printf("   or: cat <file> | %s [options]\n\n", os.Args[0])	
+		flag.PrintDefaults()
+	}
+
 	outfile := flag.String("o", "", "path to output file. Defaults to stdout.")
 	help := flag.Bool("h", false, "Display this help.")
 	version := flag.Bool("v", false, "Display version information.")
