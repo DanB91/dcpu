@@ -151,12 +151,12 @@ func (t *Test) parseInstruction(pc, op, a, b cpu.Word, s *cpu.Storage, verbose b
 func (t *Test) parse() (*dp.AST, error) {
 	var ast dp.AST
 
-	err := readSource(&ast, t.file)
+	err := dp.ParseInput(&ast, t.file, t.includes)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ast, resolveIncludes(&ast, t.includes)
+	return &ast, nil
 }
 
 // compile compiles the given AST and returns a CPU instance ready to run the code.

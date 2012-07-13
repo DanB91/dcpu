@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,6 +46,8 @@ func main() {
 	}
 }
 
+var _ = io.Copy
+
 // collectTests traverses the input directory and finds all
 // unit test files.
 func collectTests() <-chan string {
@@ -73,9 +76,20 @@ func collectTests() <-chan string {
 
 			_, name := filepath.Split(file)
 			ok, err := filepath.Match("*_test.dasm", name)
-
 			if !ok || err != nil {
 				return err
+			}
+
+			parts := strings.Split(file, string(filepath.Separator))
+
+			for i := range parts {
+				if len(parts[i]) == 0 {
+					continue
+				}
+
+				if parts[i][0] == '_' {
+					return nil
+				}
 			}
 
 			c <- file

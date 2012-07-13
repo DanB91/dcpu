@@ -1,18 +1,27 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package main
+package parser
 
 import (
-	dp "github.com/jteeuwen/dcpu/parser"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+// ParseInput takes the input files and parses their contents into the given AST.
+func ParseInput(ast *AST, input string, includes []string) (err error) {
+	if err = readSource(ast, input); err != nil {
+		return
+	}
+
+	return resolveIncludes(ast, includes)
+}
 
 // readSource reads the given file and parses its contents
 // into the given AST.
-func readSource(ast *dp.AST, file string) error {
+func readSource(ast *AST, file string) error {
 	fd, err := os.Open(file)
 	if err != nil {
 		return err
@@ -25,15 +34,15 @@ func readSource(ast *dp.AST, file string) error {
 // resolveIncludes finds references to undefined labels.
 // It then tries to find the code for these labels in the supplied
 // include paths. Files should be defined as '<labelname>.dasm'.
-func resolveIncludes(ast *dp.AST, includes []string) (err error) {
-	var labels []*dp.Label
-	var refs []*dp.Name
+func resolveIncludes(ast *AST, includes []string) (err error) {
+	var labels []*Label
+	var refs []*Name
 
-	findLabels(ast.Root.Children(), &labels)
-	findReferences(ast.Root.Children(), &refs)
+	FindLabels(ast.Root.Children(), &labels)
+	FindReferences(ast.Root.Children(), &refs)
 
 	refs = findUndefinedRefs(refs, labels)
-	refs = stripDuplicateNames(refs)
+	refs = StripDuplicateNames(refs)
 
 	if len(refs) == 0 {
 		// No undefined references. We're done here.
@@ -43,7 +52,7 @@ func resolveIncludes(ast *dp.AST, includes []string) (err error) {
 	if len(includes) == 0 {
 		// We have unresolved references, but no places to look
 		// for their implementation. This constitutes a booboo.
-		return dp.NewParseError(ast.Files[refs[0].File()], refs[0].Line(), refs[0].Col(),
+		return NewParseError(ast.Files[refs[0].File()], refs[0].Line(), refs[0].Col(),
 			"Undefined reference: %q", refs[0].Data)
 	}
 
@@ -59,20 +68,27 @@ func resolveIncludes(ast *dp.AST, includes []string) (err error) {
 // loadInclude tries to load the given reference as an include file.
 // Parses it into the supplied AST and verifies that it contains what
 // we are looking for.
-func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
+func loadInclude(ast *AST, includes []string, r *Name) (err error) {
 	var file string
 
 	name := r.Data + ".dasm"
 	walker := func(f string, info os.FileInfo, e error) (err error) {
-		fb := filepath.Base(f)
-
-		if len(fb) > 0 && fb[0] == '_' {
-			// Skip files and directories beginning with an underscore.
-			// This ensures behaviour similar to the Go tool chain where
-			// these files are not included in the build cycle.
-			return nil
+		if info.IsDir() {
+			return
 		}
 
+		parts := strings.Split(f, string(filepath.Separator))
+		for i := range parts {
+			if len(parts[i]) == 0 {
+				continue
+			}
+
+			if parts[i][0] == '_' {
+				return nil
+			}
+		}
+
+		fb := parts[len(parts)-1]
 		if fb == name {
 			file, err = filepath.Abs(f)
 			if err != nil {
@@ -93,7 +109,7 @@ func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 	}
 
 	if len(file) == 0 {
-		return dp.NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+		return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
 			"Undefined reference: %q", r.Data)
 	}
 
@@ -103,7 +119,7 @@ func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 
 	// Test if the code actually contains the label we are looking for.
 	if !includeHasLabel(ast, file, r.Data) {
-		return dp.NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
+		return NewParseError(ast.Files[r.File()], r.Line(), r.Col(),
 			"Undefined reference: %q. Include file was found, but "+
 				"it did not define the desired label.", r.Data)
 	}
@@ -116,7 +132,7 @@ func loadInclude(ast *dp.AST, includes []string, r *dp.Name) (err error) {
 // label references. Any reference that is not present in the
 // label list, is considered unresolved and added to the 
 // returned list.
-func findUndefinedRefs(refs []*dp.Name, labels []*dp.Label) []*dp.Name {
+func findUndefinedRefs(refs []*Name, labels []*Label) []*Name {
 	var i, j int
 
 outer:
@@ -135,7 +151,7 @@ outer:
 
 // includeHasLabel checks if a newly parsed include actually
 // contains the label reference we are looking for.
-func includeHasLabel(ast *dp.AST, file string, target string) bool {
+func includeHasLabel(ast *AST, file string, target string) bool {
 	index := fileIndex(ast, file)
 	if index == -1 {
 		return false
@@ -146,15 +162,15 @@ func includeHasLabel(ast *dp.AST, file string, target string) bool {
 
 // hasLabel recursively finds a specific label definition.
 // Returns true if it was found. False otherwise.
-func hasLabel(n []dp.Node, file int, target string) bool {
+func hasLabel(n []Node, file int, target string) bool {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case dp.NodeCollection:
+		case NodeCollection:
 			if hasLabel(tt.Children(), file, target) {
 				return true
 			}
 
-		case *dp.Label:
+		case *Label:
 			if tt.File() == file && tt.Data == target {
 				return true
 			}
@@ -167,7 +183,7 @@ func hasLabel(n []dp.Node, file int, target string) bool {
 }
 
 // fileIndex returns the given file's index as it is stored in the AST.
-func fileIndex(ast *dp.AST, file string) int {
+func fileIndex(ast *AST, file string) int {
 	for i := range ast.Files {
 		if ast.Files[i] == file {
 			return i

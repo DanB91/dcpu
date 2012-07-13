@@ -23,8 +23,8 @@ func (p *Scrambler) Process(ast *dp.AST) (err error) {
 	var refs []*dp.Name
 	var i, j int
 
-	findLabels(ast.Root.Children(), &labels)
-	findReferences(ast.Root.Children(), &refs)
+	dp.FindLabels(ast.Root.Children(), &labels)
+	dp.FindReferences(ast.Root.Children(), &refs)
 
 	for i = range labels {
 		old := labels[i].Data

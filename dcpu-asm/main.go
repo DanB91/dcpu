@@ -35,7 +35,7 @@ func main() {
 	// unresolved label references.
 	var ast parser.AST
 
-	err := parseInput(&ast, infile, includes)
+	err := parser.ParseInput(&ast, infile, includes)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Source reader: %v\n", err)
 		os.Exit(1)

@@ -1,13 +1,9 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package main
-
-import dp "github.com/jteeuwen/dcpu/parser"
+package parser
 
 // Instructions and registers according to spec v1.7
-//
-// With additional 'panic' and 'exit' instructions for this tool.
 
 var (
 	instructions = []string{
@@ -45,27 +41,37 @@ func isInstruction(v string) bool {
 	return false
 }
 
-// findLabels recursively finds Label nodes.
-func findLabels(n []dp.Node, l *[]*dp.Label) {
+// containsName returns true if the given list contains the supplied Name.
+func containsName(r []*Name, data string) bool {
+	for i := range r {
+		if r[i].Data == data {
+			return true
+		}
+	}
+	return false
+}
+
+// FindLabels recursively finds Label nodes.
+func FindLabels(n []Node, l *[]*Label) {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case dp.NodeCollection:
-			findLabels(tt.Children(), l)
+		case NodeCollection:
+			FindLabels(tt.Children(), l)
 
-		case *dp.Label:
+		case *Label:
 			*l = append(*l, tt)
 		}
 	}
 }
 
-// findReferences recursively finds Label references.
-func findReferences(n []dp.Node, l *[]*dp.Name) {
+// FindReferences recursively finds Label references.
+func FindReferences(n []Node, l *[]*Name) {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case dp.NodeCollection:
-			findReferences(tt.Children(), l)
+		case NodeCollection:
+			FindReferences(tt.Children(), l)
 
-		case *dp.Name:
+		case *Name:
 			if isRegister(tt.Data) || isInstruction(tt.Data) {
 				continue
 			}
@@ -75,9 +81,9 @@ func findReferences(n []dp.Node, l *[]*dp.Name) {
 	}
 }
 
-// stripDuplicateNames removes duplicate entries from the given Name list.
-func stripDuplicateNames(r []*dp.Name) []*dp.Name {
-	l := make([]*dp.Name, 0, len(r))
+// StripDuplicateNames removes duplicate entries from the given Name list.
+func StripDuplicateNames(r []*Name) []*Name {
+	l := make([]*Name, 0, len(r))
 
 	for i := range r {
 		if !containsName(l, r[i].Data) {
@@ -86,14 +92,4 @@ func stripDuplicateNames(r []*dp.Name) []*dp.Name {
 	}
 
 	return l
-}
-
-// containsName returns true if the given list contains the supplied Name.
-func containsName(r []*dp.Name, data string) bool {
-	for i := range r {
-		if r[i].Data == data {
-			return true
-		}
-	}
-	return false
 }
