@@ -17,7 +17,6 @@ var (
 	infile    string
 	outfile   string
 	strip     = flag.Bool("s", false, "Strip comments from the input source.")
-	diffs     = flag.Bool("d", true, "Display diffs instead of writing output.")
 	tabs      = flag.Bool("tabs", false, "Indent using tabs instead of space.")
 	tabwidth  = flag.Uint("tabwidth", 3, "Width of a tab.")
 	writefile = flag.Bool("w", false, "Write result to source file instead of stdout.")
