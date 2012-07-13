@@ -6,12 +6,10 @@ package parser
 
 import (
 	"bytes"
-	"github.com/jteeuwen/dcpu/cpu"
 	"io"
 	"path"
 	"path/filepath"
 	"strconv"
-	"unicode/utf8"
 )
 
 // An Abstract Syntax Tree.
@@ -246,9 +244,9 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 				)
 
 			case TokNumber:
-				num := NewNumber(file, tok.Line, tok.Col, 0)
-				num.Parse(tok.Data)
-				expr.children = append(expr.children, num)
+				expr.children = append(expr.children,
+					NewNumber(file, tok.Line, tok.Col, string(tok.Data)),
+				)
 
 			case TokString:
 				data, err := escape(tok.Data)
@@ -271,16 +269,8 @@ func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error
 					return err
 				}
 
-				r, size := utf8.DecodeRune(data)
-
-				// If the encoding is invalid, utf8.DecodeRune yields (RuneError, 1).
-				// This constitutes an impossible result for correct UTF-8.
-				if r == utf8.RuneError && size == 1 {
-					return a.errorf(tok, "Invalid utf8 character literal: %s", tok)
-				}
-
 				expr.children = append(expr.children,
-					NewNumber(file, tok.Line, tok.Col, cpu.Word(r)),
+					NewChar(file, tok.Line, tok.Col, string(data)),
 				)
 
 			case TokBlockStart:
@@ -335,9 +325,19 @@ func (a *AST) readBlock(c <-chan *Token, n *[]Node, tok *Token) (err error) {
 				)
 
 			case TokNumber:
-				num := NewNumber(file, tok.Line, tok.Col, 0)
-				num.Parse(tok.Data)
-				block.children = append(block.children, num)
+				block.children = append(block.children,
+					NewNumber(file, tok.Line, tok.Col, string(tok.Data)),
+				)
+
+			case TokChar:
+				data, err := escape(tok.Data)
+				if err != nil {
+					return err
+				}
+
+				block.children = append(block.children,
+					NewChar(file, tok.Line, tok.Col, string(data)),
+				)
 
 			case TokOperator:
 				block.children = append(block.children,
@@ -382,9 +382,19 @@ func (a *AST) readExpr(c <-chan *Token, n *[]Node, tok *Token) (err error) {
 				return
 
 			case TokNumber:
-				num := NewNumber(file, tok.Line, tok.Col, 0)
-				num.Parse(tok.Data)
-				expr.children = append(expr.children, num)
+				expr.children = append(expr.children,
+					NewNumber(file, tok.Line, tok.Col, string(tok.Data)),
+				)
+
+			case TokChar:
+				data, err := escape(tok.Data)
+				if err != nil {
+					return err
+				}
+
+				expr.children = append(expr.children,
+					NewChar(file, tok.Line, tok.Col, string(data)),
+				)
 
 			case TokOperator:
 				expr.children = append(expr.children,

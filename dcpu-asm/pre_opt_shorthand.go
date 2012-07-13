@@ -32,22 +32,16 @@ type OptShorthand struct{}
 func NewOptShorthand() PreProcessor { return new(OptShorthand) }
 
 func (*OptShorthand) Process(ast *dp.AST) (err error) {
-	var instr *dp.Instruction
-	var argv []dp.Node
-	var name *dp.Name
-	var num *dp.Number
-	var ok bool
-
 	nodes := ast.Root.Children()
 
 	for i := range nodes {
-		instr, ok = nodes[i].(*dp.Instruction)
+		instr, ok := nodes[i].(*dp.Instruction)
 		if !ok {
 			continue
 		}
 
-		argv = instr.Children()
-		name = argv[0].(*dp.Name)
+		argv := instr.Children()
+		name := argv[0].(*dp.Name)
 
 		if name.Data != "ife" && name.Data != "ifn" {
 			continue
@@ -57,9 +51,17 @@ func (*OptShorthand) Process(ast *dp.AST) (err error) {
 			continue
 		}
 
-		num, ok = argv[1].(*dp.Expression).Children()[0].(*dp.Number)
+		num, ok := argv[1].(*dp.Expression).Children()[0].(dp.NumericNode)
+		if !ok {
+			continue
+		}
 
-		if ok && (num.Data == 0xffff || num.Data <= 0x1e) {
+		word, err := num.Parse()
+		if err != nil {
+			return err
+		}
+
+		if ok && (word == 0xffff || word <= 0x1e) {
 			argv[1], argv[2] = argv[2], argv[1]
 		}
 	}

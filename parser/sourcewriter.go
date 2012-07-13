@@ -5,7 +5,6 @@ package parser
 
 import (
 	"fmt"
-	"github.com/jteeuwen/dcpu/cpu"
 	"io"
 )
 
@@ -40,6 +39,8 @@ func writeSourceNode(w io.Writer, n Node) {
 	case *Name:
 		writeSourceLiteral(w, tt.Data)
 	case *Number:
+		writeSourceNumber(w, tt.Data)
+	case *Char:
 		writeSourceNumber(w, tt.Data)
 	case *Operator:
 		writeSourceLiteral(w, tt.Data)
@@ -98,6 +99,6 @@ func writeSourceLiteral(w io.Writer, s string) {
 	fmt.Fprintf(w, "%s", s)
 }
 
-func writeSourceNumber(w io.Writer, n cpu.Word) {
-	fmt.Fprintf(w, "0x%x", n)
+func writeSourceNumber(w io.Writer, s string) {
+	fmt.Fprintf(w, "%s", s)
 }

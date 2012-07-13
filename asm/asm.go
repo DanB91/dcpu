@@ -165,13 +165,18 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.N
 		*argv = append(*argv, 0)
 		return 0x1f, nil
 
-	case *dp.Number:
-		if !first && (tt.Data == 0xffff || tt.Data <= 0x1e) {
-			return tt.Data + 0x21, nil
+	case dp.NumericNode:
+		num, err := tt.Parse()
+		if err != nil {
+			return 0, err
+		}
+
+		if !first && (num == 0xffff || num <= 0x1e) {
+			return num + 0x21, nil
 		}
 
 		*symbols = append(*symbols, tt)
-		*argv = append(*argv, tt.Data)
+		*argv = append(*argv, num)
 		return 0x1f, nil
 
 	case *dp.Block:
@@ -210,9 +215,14 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, symbols *[]dp.Node, b *dp.Block
 			*argv = append(*argv, 0)
 			return 0x1e, nil
 
-		case *dp.Number:
+		case dp.NumericNode:
+			num, err := tt.Parse()
+			if err != nil {
+				return 0, err
+			}
+
 			*symbols = append(*symbols, tt)
-			*argv = append(*argv, tt.Data)
+			*argv = append(*argv, num)
 			return 0x1e, nil
 
 		default:
@@ -277,9 +287,14 @@ func (a *assembler) buildBlockOperand(argv *[]cpu.Word, symbols *[]dp.Node, node
 		*argv = append(*argv, 0)
 		return 0, nil
 
-	case *dp.Number:
+	case dp.NumericNode:
+		num, err := tt.Parse()
+		if err != nil {
+			return 0, err
+		}
+
 		*symbols = append(*symbols, tt)
-		*argv = append(*argv, tt.Data)
+		*argv = append(*argv, num)
 		return 0, nil
 	}
 
@@ -307,9 +322,14 @@ func (a *assembler) buildData(nodes []dp.Node) (err error) {
 				a.code = append(a.code, cpu.Word(r))
 			}
 
-		case *dp.Number:
+		case dp.NumericNode:
+			num, err := tt.Parse()
+			if err != nil {
+				return err
+			}
+
 			a.debug.Emit(tt)
-			a.code = append(a.code, tt.Data)
+			a.code = append(a.code, num)
 		}
 	}
 

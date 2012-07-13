@@ -3,6 +3,8 @@
 
 package parser
 
+import "github.com/jteeuwen/dcpu/cpu"
+
 // Represents a single AST node.
 type Node interface {
 	File() int
@@ -16,6 +18,11 @@ type NodeCollection interface {
 	Node
 	Children() []Node
 	SetChildren([]Node)
+}
+
+type NumericNode interface {
+	Node
+	Parse() (cpu.Word, error)
 }
 
 // Base-type for all nodes. This takes care of some common
