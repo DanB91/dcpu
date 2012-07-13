@@ -32,15 +32,13 @@ func GetSourceLines(file string, start, end int) []string {
 	count := 1 // line number start at 1, not 0.
 
 	for {
-		if data, _, err = r.ReadLine(); err != nil {
-			return nil
-		}
+		data, _, err = r.ReadLine()
 
 		if count >= start && count <= end {
 			lines = append(lines, string(data))
 		}
 
-		if count > end {
+		if err != nil || count > end {
 			break
 		}
 

@@ -21,7 +21,7 @@ func pollInput() <-chan []string {
 		r := bufio.NewReader(os.Stdin)
 
 		fmt.Printf("%s\n", Version())
-		fmt.Printf("Press 'q' to exit or 'help' for help.\n")
+		fmt.Printf("Press 'ctrl-C' to exit or 'help' for help.\n")
 
 		for {
 			line, _, err := r.ReadLine()

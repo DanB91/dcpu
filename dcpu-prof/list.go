@@ -10,7 +10,7 @@ import (
 	"regexp"
 )
 
-var DefaultListFilter = regexp.MustCompile(".+")
+const DefaultListFilter = ".+"
 
 func getLineData(l []prof.ProfileData, start, end cpu.Word, line int) *prof.ProfileData {
 	for pc := start; pc <= end; pc += l[pc].Size {
@@ -23,25 +23,35 @@ func getLineData(l []prof.ProfileData, start, end cpu.Word, line int) *prof.Prof
 }
 
 // Display detailed instruction view for the given filter.
-func list(p *prof.Profile, filter *regexp.Regexp) {
-	funcs := p.Functions()
+func list(p *prof.Profile, filemode bool, filter *regexp.Regexp) {
+	var blocks prof.BlockList
 
-	if len(funcs) == 0 {
+	if filemode {
+		blocks = p.ListFiles()
+	} else {
+		blocks = p.ListFunctions()
+	}
+
+	if len(blocks) == 0 {
 		fmt.Println("0 samples.")
 		return
 	}
 
-	for i := range funcs {
-		if len(funcs[i].Label) == 0 {
-			funcs[i].Label = GetLabel(p, funcs[i].Addr)
-		}
-
-		if !filter.MatchString(funcs[i].Label) {
+	for i := range blocks {
+		if len(blocks[i].Data) == 0 {
 			continue
 		}
 
-		start, end := funcs[i].Range()
-		totalcount, totalcost := funcs[i].Cost()
+		if len(blocks[i].Label) == 0 {
+			blocks[i].Label = GetLabel(p, blocks[i].Addr)
+		}
+
+		if !filter.MatchString(blocks[i].Label) {
+			continue
+		}
+
+		start, end := blocks[i].Range()
+		totalcount, totalcost := blocks[i].Cost()
 
 		file := p.Files[p.Data[start].File]
 		startline := p.Data[start].Line

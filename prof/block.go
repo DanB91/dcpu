@@ -8,7 +8,7 @@ import (
 	"sort"
 )
 
-type FuncDef struct {
+type Block struct {
 	Data  []ProfileData // Profile data for this function's instructions.
 	Label string        // Label/name of this function.
 	Addr  cpu.Word      // start address of function
@@ -16,7 +16,7 @@ type FuncDef struct {
 
 // Cost returns the cumulative cycle cost and count for all
 // instructions in this function.
-func (f *FuncDef) Cost() (count, cost uint64) {
+func (f *Block) Cost() (count, cost uint64) {
 	for pc := 0; pc < len(f.Data); pc++ {
 		count += f.Data[pc].Count
 		cost += f.Data[pc].CumulativeCost()
@@ -26,32 +26,32 @@ func (f *FuncDef) Cost() (count, cost uint64) {
 }
 
 // Range returns the address range for this function.
-func (f *FuncDef) Range() (start, end cpu.Word) {
+func (f *Block) Range() (start, end cpu.Word) {
 	return f.Addr, f.Addr + cpu.Word(len(f.Data)-1)
 }
 
-type FuncList []FuncDef
+type BlockList []Block
 
 // List of functions, sortable by Count.
-type FuncListByCount FuncList
+type BlockListByCount BlockList
 
-func (s FuncListByCount) Len() int { return len(s) }
-func (s FuncListByCount) Less(i, j int) bool {
+func (s BlockListByCount) Len() int { return len(s) }
+func (s BlockListByCount) Less(i, j int) bool {
 	ca, _ := s[i].Cost()
 	cb, _ := s[j].Cost()
 	return ca >= cb
 }
-func (s FuncListByCount) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s FuncListByCount) Sort()         { sort.Sort(s) }
+func (s BlockListByCount) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s BlockListByCount) Sort()         { sort.Sort(s) }
 
 // List of functions, sortable by cumulative cost.
-type FuncListByCost FuncList
+type BlockListByCost BlockList
 
-func (s FuncListByCost) Len() int { return len(s) }
-func (s FuncListByCost) Less(i, j int) bool {
+func (s BlockListByCost) Len() int { return len(s) }
+func (s BlockListByCost) Less(i, j int) bool {
 	_, ca := s[i].Cost()
 	_, cb := s[j].Cost()
 	return ca >= cb
 }
-func (s FuncListByCost) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s FuncListByCost) Sort()         { sort.Sort(s) }
+func (s BlockListByCost) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s BlockListByCost) Sort()         { sort.Sort(s) }

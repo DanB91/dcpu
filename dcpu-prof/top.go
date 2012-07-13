@@ -15,46 +15,51 @@ const (
 )
 
 // Display sorted list of profile data for every function call.
-func top(p *prof.Profile, count int, sort string) {
+func top(p *prof.Profile, filemode bool, count uint, sort string) {
 	var counttotal, costtotal float64
+	var blocks prof.BlockList
 
-	funcs := p.Functions()
+	if filemode {
+		blocks = p.ListFiles()
+	} else {
+		blocks = p.ListFunctions()
+	}
 
-	if len(funcs) == 0 {
+	if len(blocks) == 0 {
 		fmt.Println("0 samples.")
 		return
 	}
 
-	for i := range funcs {
-		if len(funcs[i].Label) == 0 {
-			funcs[i].Label = GetLabel(p, funcs[i].Addr)
+	for i := range blocks {
+		if len(blocks[i].Label) == 0 {
+			blocks[i].Label = GetLabel(p, blocks[i].Addr)
 		}
 
-		a, b := funcs[i].Cost()
+		a, b := blocks[i].Cost()
 		counttotal += float64(a)
 		costtotal += float64(b)
 	}
 
 	switch strings.ToLower(sort) {
 	case "count":
-		prof.FuncListByCount(funcs).Sort()
+		prof.BlockListByCount(blocks).Sort()
 	case "cost":
-		prof.FuncListByCost(funcs).Sort()
+		prof.BlockListByCost(blocks).Sort()
 	}
 
-	if len(funcs) > count {
-		funcs = funcs[:count]
+	if uint(len(blocks)) > count {
+		blocks = blocks[:count]
 	}
 
 	fmt.Printf("%.0f sample(s), %.0f cycle(s)\n", counttotal, costtotal)
 
-	for i := range funcs {
-		count, cost := funcs[i].Cost()
+	for i := range blocks {
+		count, cost := blocks[i].Cost()
 		scount := fmt.Sprintf("%.2f%%", float64(count)/(counttotal*0.01))
 		scost := fmt.Sprintf("%.2f%%", float64(cost)/(costtotal*0.01))
 
 		fmt.Printf(" %8d %7s %8d %7s %s\n",
-			count, scount, cost, scost, funcs[i].Label)
+			count, scount, cost, scost, blocks[i].Label)
 	}
 
 	fmt.Println()

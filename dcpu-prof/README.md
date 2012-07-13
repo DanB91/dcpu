@@ -10,42 +10,39 @@ It accepts a number of textual commands which serve to display various
 types of data in table form. Options to these commands allow us to
 sort the data in different ways and to filter out unnecessary clutter.
 
+
 ### Usage
 
 Read the given file:
 
     $ dcpu-prof data.prof
 
-Run the program with the `-h` flag for a listing of all options.
+Type 'help' in the program for a list of commands.
 
-
-### Example
 
 ### Top Example
+
 Here is an excerpt of an example usage of the `top` command.
-It lists only the usage of functions. This is a good starting point
+It lists only the usage of functions or files. This is a good starting point
 when profiling code. As it gives a rough overview of where most of the CPU
 time is spent without going into too much detail.
 
-	$ gobuild && ./dcpu-prof ../testdata/test.prof 
-	dcpu-prof 0.4.1342128514 (Go runtime go1.0.2).
-	Copyright (c) 2010-2012, Jim Teeuwen.
-	Press 'q' to exit or 'help' for help.
-	
 	top
 	48 sample(s), 110 cycle(s)
 		   42  87.50%       98  89.09% memchr               memchr.dasm:15
 		    4   8.33%        8   7.27% assert_eq            assert_eq.dasm:8
 		    2   4.17%        4   3.64% assert_ez            assert_ez.dasm:8
 
-	top 3 cost
-	48 sample(s), 110 cycle(s)
-		   42  87.50%       98  89.09% memchr               memchr.dasm:15
-		    4   8.33%        8   7.27% assert_eq            assert_eq.dasm:8
-		    2   4.17%        4   3.64% assert_ez            assert_ez.dasm:8
+	top -file
+	108 sample(s), 225 cycle(s)
+		   70  64.81%      157  69.78% memcmp.dasm
+		   28  25.93%       48  21.33% _test.dasm
+		    8   7.41%       16   7.11% assert_eq.dasm
+		    2   1.85%        4   1.78% assert_ez.dasm
 
 
-The table shows 6 columns:
+The table shows 5 or 6 columns, depending on whether you are viewing
+function or file listings:
 
 * **COUNT**: This is the cumulative total number of times each instruction
   inside this function was executed.
@@ -117,10 +114,10 @@ extra data in the first two columns:
   
 The output of this command without a filter can be overwhelming in a large
 codebase, so it is practical to use it in combination with `top`. Use `top`
-to find the function that consumes the most cycles and then list the
-detailed usage with list:
+to find a function or file that consumes the most cycles and then dive into
+the detailed usage with `list`:
 
-	list memchr
+	list -f memchr
 	===> lib/string/memchr.dasm 15-29
 	42 sample(s), 98 cycle(s)
 
@@ -139,6 +136,11 @@ detailed usage with list:
 		                027: :memchr_ret
 		   1        1   028:   set a, 0
 		   1        1   029:   set pc, pop
+
+
+As with `top`, we can specify the `-file` flag in this command to list
+full file contents, instead of just specific functions. This is useful for
+code where no function calls are used.
 
 
 ### Dependencies

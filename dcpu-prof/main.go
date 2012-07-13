@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/jteeuwen/dcpu/prof"
-	"io"
 	"os"
 	"path/filepath"
 )
@@ -20,16 +19,7 @@ func main() {
 	for {
 		select {
 		case cmd := <-input:
-			err := Handle(prof, cmd)
-
-			if err != nil {
-				if err == io.EOF {
-					return
-				}
-
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				os.Exit(1)
-			}
+			Handle(prof, cmd)
 		}
 	}
 }

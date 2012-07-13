@@ -7,6 +7,7 @@ package prof
 import (
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
+	"path"
 )
 
 // Cycle counts per opcode.
@@ -36,8 +37,8 @@ type Profile struct {
 	// It may therefor contain multiple structures for the same opcode.
 	Data []ProfileData
 
-	// List of function definitions. The address at which they start and end.
-	funcs FuncList
+	funcs BlockList // List of function definitions.
+	files BlockList // List of file definitions.
 }
 
 // New creates a new profile for the given code and debug data.
@@ -166,7 +167,7 @@ func (p *Profile) indexFunctions() {
 		return
 	}
 
-	p.funcs = make(FuncList, len(addresslist))
+	p.funcs = make(BlockList, len(addresslist))
 
 	var pc, op, a, b, size cpu.Word
 
@@ -196,10 +197,41 @@ func (p *Profile) indexFunctions() {
 	}
 }
 
-// Functions yields the address ranges of all known functions.
-func (p *Profile) Functions() []FuncDef {
+// indexFiles finds the start and end addresses of all code restricted
+// to a specific source file.
+func (p *Profile) indexFiles() {
+	var start, pc cpu.Word
+	var filename string
+	var file int
+
+	size := cpu.Word(len(p.Data))
+	for pc = start; pc < size; pc++ {
+		if p.Data[pc].File != file || pc == size-1 {
+			_, filename = path.Split(p.Files[file])
+
+			p.files = append(p.files, Block{
+				Data:  p.Data[start:pc],
+				Addr:  start,
+				Label: filename,
+			})
+
+			start = pc
+			file = p.Data[pc].File
+		}
+	}
+}
+
+// ListFiles yields the address ranges of all source files.
+func (p *Profile) ListFiles() []Block {
+	if len(p.files) == 0 {
+		p.indexFiles()
+	}
+	return p.files
+}
+
+// ListFunctions yields the address ranges of all known functions.
+func (p *Profile) ListFunctions() []Block {
 	if len(p.funcs) == 0 {
-		// Functions have not been indexed yet.
 		p.indexFunctions()
 	}
 	return p.funcs
