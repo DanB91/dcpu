@@ -1,7 +1,9 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package parser
+package util
+
+import "github.com/jteeuwen/dcpu/parser"
 
 // Instructions and registers according to spec v1.7
 
@@ -42,7 +44,7 @@ func isInstruction(v string) bool {
 }
 
 // containsName returns true if the given list contains the supplied Name.
-func containsName(r []*Name, data string) bool {
+func containsName(r []*parser.Name, data string) bool {
 	for i := range r {
 		if r[i].Data == data {
 			return true
@@ -52,26 +54,26 @@ func containsName(r []*Name, data string) bool {
 }
 
 // FindLabels recursively finds Label nodes.
-func FindLabels(n []Node, l *[]*Label) {
+func FindLabels(n []parser.Node, l *[]*parser.Label) {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case NodeCollection:
+		case parser.NodeCollection:
 			FindLabels(tt.Children(), l)
 
-		case *Label:
+		case *parser.Label:
 			*l = append(*l, tt)
 		}
 	}
 }
 
 // FindReferences recursively finds Label references.
-func FindReferences(n []Node, l *[]*Name) {
+func FindReferences(n []parser.Node, l *[]*parser.Name) {
 	for i := range n {
 		switch tt := n[i].(type) {
-		case NodeCollection:
+		case parser.NodeCollection:
 			FindReferences(tt.Children(), l)
 
-		case *Name:
+		case *parser.Name:
 			if isRegister(tt.Data) || isInstruction(tt.Data) {
 				continue
 			}
@@ -82,8 +84,8 @@ func FindReferences(n []Node, l *[]*Name) {
 }
 
 // StripDuplicateNames removes duplicate entries from the given Name list.
-func StripDuplicateNames(r []*Name) []*Name {
-	l := make([]*Name, 0, len(r))
+func StripDuplicateNames(r []*parser.Name) []*parser.Name {
+	l := make([]*parser.Name, 0, len(r))
 
 	for i := range r {
 		if !containsName(l, r[i].Data) {

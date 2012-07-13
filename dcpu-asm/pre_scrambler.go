@@ -5,7 +5,8 @@ package main
 
 import (
 	"fmt"
-	dp "github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser/util"
 )
 
 func init() {
@@ -18,13 +19,13 @@ type Scrambler struct{}
 
 func NewScrambler() PreProcessor { return new(Scrambler) }
 
-func (p *Scrambler) Process(ast *dp.AST) (err error) {
-	var labels []*dp.Label
-	var refs []*dp.Name
+func (p *Scrambler) Process(ast *parser.AST) (err error) {
+	var labels []*parser.Label
+	var refs []*parser.Name
 	var i, j int
 
-	dp.FindLabels(ast.Root.Children(), &labels)
-	dp.FindReferences(ast.Root.Children(), &refs)
+	util.FindLabels(ast.Root.Children(), &labels)
+	util.FindReferences(ast.Root.Children(), &refs)
 
 	for i = range labels {
 		old := labels[i].Data

@@ -5,6 +5,7 @@ input file.s It constructs a listing of `dat` instructions which encode
 all the information. Since DCPU deals with 16-bit words, we pack 2 bytes
 into every output word.
 
+
 ### Usage
 
 Turn the given text file into code and write it to `data.dasm`:
@@ -22,6 +23,7 @@ another source file:
     $ cat data.txt | dcpu_data -l mytext >> data.dasm
 
 Run the program with the `-h` flag for a listing of all options.
+
 
 ### License
 

@@ -129,12 +129,6 @@ This would be roughly equivalent to running gcc with the `-O3` switch.
 The optimization processors are described in detail in the OPTIMIZATIONS.md
 file.
 
-### Dependencies
-
-* github.com/jteeuwen/dcpu/asm
-* github.com/jteeuwen/dcpu/cpu
-* github.com/jteeuwen/dcpu/parser
-
 
 ### License
 

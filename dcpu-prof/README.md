@@ -157,13 +157,6 @@ full file contents, instead of just specific functions. This is useful for
 code where no function calls are used.
 
 
-### Dependencies
-
-* github.com/jteeuwen/dcpu/cpu
-* github.com/jteeuwen/dcpu/prof
-* github.com/jteeuwen/dcpu/parser
-
-
 ### License
 
 DCPU, 0x10c and related materials are Copyright 2012 Mojang.

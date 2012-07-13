@@ -12,10 +12,6 @@ that was executed. This is tied to the original source code through the
 use of debug symbols.
 
 
-### Dependencies
-
-* github.com/jteeuwen/dcpu/cpu
-
 ### License
 
 DCPU, 0x10c and related materials are Copyright 2012 Mojang.

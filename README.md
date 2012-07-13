@@ -21,6 +21,8 @@ Packages:
 
 * **parser**: This holds a package that parses assembly source and turns it
   into an Abstract Syntax Tree.
+* **parser/util**: This package contains some parser related utility
+  bits and bobs.
 * **asm**: This holds aan assembler. It turns an AST into a compiled
   program, ready to be passed to the CPU for execution.
 * **cpu**: A CPU emulator implementation. It adds the necessary instructions

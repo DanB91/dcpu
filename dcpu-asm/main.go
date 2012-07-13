@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser/util"
 	"io"
 	"os"
 	"path/filepath"
@@ -35,7 +36,7 @@ func main() {
 	// unresolved label references.
 	var ast parser.AST
 
-	err := parser.ParseInput(&ast, infile, includes)
+	err := util.ReadSource(&ast, infile, includes)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Source reader: %v\n", err)
 		os.Exit(1)

@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser/util"
 	"io"
 	"os"
 )
@@ -25,9 +26,9 @@ func writeSource(ast *parser.AST, file string, doast bool) (err error) {
 	}
 
 	if doast {
-		parser.WriteAst(w, ast)
+		util.NewAstWriter(w, ast).Write()
 	} else {
-		parser.NewSourceWriter(w, ast).Write()
+		util.NewSourceWriter(w, ast).Write()
 	}
 
 	return

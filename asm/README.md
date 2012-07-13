@@ -3,9 +3,6 @@
 This is a DASM assembler. It accepts an AST and turns it into a
 compiled program you can run on the CPU.
 
-### Dependencies
-
-* github.com/jteeuwen/dcpu/parser
 
 ### License
 

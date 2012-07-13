@@ -1,10 +1,11 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-package parser
+package util
 
 import (
 	"fmt"
+	"github.com/jteeuwen/dcpu/parser"
 	"io"
 )
 
@@ -28,7 +29,7 @@ func isBranch(name string) bool {
 // with configurable style.
 type SourceWriter struct {
 	w        io.Writer
-	a        *AST
+	a        *parser.AST
 	TabWidth uint
 	Tabs     bool
 	Comments bool
@@ -37,7 +38,7 @@ type SourceWriter struct {
 
 // NewSourceWriter creates a new source writer for the given ast
 // and output stream.
-func NewSourceWriter(w io.Writer, a *AST) *SourceWriter {
+func NewSourceWriter(w io.Writer, a *parser.AST) *SourceWriter {
 	s := new(SourceWriter)
 	s.w = w
 	s.a = a
@@ -74,17 +75,17 @@ func (sw *SourceWriter) Write() {
 
 	for i, v := range sw.a.Root.Children() {
 		switch v.(type) {
-		case *Comment:
+		case *parser.Comment:
 			if i > 0 && !followsBranch && followsInstruction && !followsComment {
 				sw.w.Write(newline)
 			}
 
-		case *Label:
+		case *parser.Label:
 			if i > 0 && !followsBranch && followsInstruction && !followsComment {
 				sw.w.Write(newline)
 			}
 
-		case *Instruction:
+		case *parser.Instruction:
 			for i := 0; i < nestlevel; i++ {
 				sw.w.Write(indent)
 			}
@@ -97,18 +98,18 @@ func (sw *SourceWriter) Write() {
 		followsInstruction = false
 
 		switch tt := v.(type) {
-		case *Comment:
+		case *parser.Comment:
 			sw.w.Write(newline)
 			followsComment = true
 
-		case *Label:
+		case *parser.Label:
 			sw.w.Write(newline)
 
-		case *Instruction:
+		case *parser.Instruction:
 			sw.w.Write(newline)
 			followsInstruction = true
 
-			name := tt.Children()[0].(*Name).Data
+			name := tt.Children()[0].(*parser.Name).Data
 			if isBranch(name) {
 				nestlevel++
 
@@ -121,32 +122,32 @@ func (sw *SourceWriter) Write() {
 	}
 }
 
-func (sw *SourceWriter) writeNode(n Node) {
+func (sw *SourceWriter) writeNode(n parser.Node) {
 	switch tt := n.(type) {
-	case *Block:
+	case *parser.Block:
 		sw.writeBlock(tt)
-	case *Expression:
+	case *parser.Expression:
 		sw.writeExpression(tt)
-	case *Instruction:
+	case *parser.Instruction:
 		sw.writeInstruction(tt)
-	case *Comment:
+	case *parser.Comment:
 		sw.writeComment(tt.Data)
-	case *Label:
+	case *parser.Label:
 		sw.writeLabel(tt.Data)
-	case *Name:
+	case *parser.Name:
 		sw.writeLiteral(tt.Data)
-	case *Number:
+	case *parser.Number:
 		sw.writeLiteral(tt.Data)
-	case *Char:
+	case *parser.Char:
 		sw.writeLiteral(tt.Data)
-	case *Operator:
+	case *parser.Operator:
 		sw.writeLiteral(tt.Data)
-	case *String:
+	case *parser.String:
 		sw.writeString(tt.Data)
 	}
 }
 
-func (sw *SourceWriter) writeBlock(n *Block) {
+func (sw *SourceWriter) writeBlock(n *parser.Block) {
 	sw.w.Write(lbrack)
 
 	for _, v := range n.Children() {
@@ -156,7 +157,7 @@ func (sw *SourceWriter) writeBlock(n *Block) {
 	sw.w.Write(rbrack)
 }
 
-func (sw *SourceWriter) writeInstruction(n *Instruction) {
+func (sw *SourceWriter) writeInstruction(n *parser.Instruction) {
 	chld := n.Children()
 	for i, v := range chld {
 		sw.writeNode(v)
@@ -170,10 +171,10 @@ func (sw *SourceWriter) writeInstruction(n *Instruction) {
 	}
 }
 
-func (sw *SourceWriter) writeExpression(n *Expression) {
+func (sw *SourceWriter) writeExpression(n *parser.Expression) {
 	for _, v := range n.Children() {
 		switch v.(type) {
-		case *Comment:
+		case *parser.Comment:
 			sw.w.Write(space)
 		}
 

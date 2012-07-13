@@ -104,14 +104,6 @@ that was executed. This is tied to the original source code through the
 use of debug symbols.
 
 
-### Dependencies
-
-* github.com/jteeuwen/dcpu/asm
-* github.com/jteeuwen/dcpu/cpu
-* github.com/jteeuwen/dcpu/parser
-* github.com/jteeuwen/dcpu/prof
-
-
 ### Usage
 
 Run `dcpu-test -h` for a listing of options.

@@ -105,11 +105,6 @@ sub-directoriesrecursively:
 Run the program with the `-h` flag for a listing of all options.
 
 
-### Dependencies
-
-* github.com/jteeuwen/dcpu/parser
-
-
 ### License
 
 DCPU, 0x10c and related materials are Copyright 2012 Mojang.

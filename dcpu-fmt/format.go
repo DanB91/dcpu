@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser/util"
 	"io"
 	"os"
 )
@@ -59,7 +60,7 @@ func Format(in, out string) (err error) {
 	}
 
 	// Write source.
-	sw := parser.NewSourceWriter(fout, &ast)
+	sw := util.NewSourceWriter(fout, &ast)
 	sw.Tabs = *tabs
 	sw.TabWidth = *tabwidth
 	sw.Comments = !*strip

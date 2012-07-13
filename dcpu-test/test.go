@@ -11,6 +11,7 @@ import (
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 	dp "github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser/util"
 	"github.com/jteeuwen/dcpu/prof"
 	"io"
 	"os"
@@ -151,7 +152,7 @@ func (t *Test) parseInstruction(pc, op, a, b cpu.Word, s *cpu.Storage, verbose b
 func (t *Test) parse() (*dp.AST, error) {
 	var ast dp.AST
 
-	err := dp.ParseInput(&ast, t.file, t.includes)
+	err := util.ReadSource(&ast, t.file, t.includes)
 	if err != nil {
 		return nil, err
 	}
