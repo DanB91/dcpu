@@ -9,86 +9,12 @@ import (
 )
 
 var (
-	writeComments bool
-	comma         = []byte{','}
-	space         = []byte{' '}
-	newline       = []byte{'\n'}
-	lbrack        = []byte{'['}
-	rbrack        = []byte{']'}
+	comma   = []byte{','}
+	space   = []byte{' '}
+	newline = []byte{'\n'}
+	lbrack  = []byte{'['}
+	rbrack  = []byte{']'}
 )
-
-// WriteSource writes the given AST out as assembly source code.
-func WriteSource(w io.Writer, a *AST, tabs bool, tabwidth uint, comments bool) {
-	if a.Root == nil || len(a.Root.Children()) == 0 {
-		return
-	}
-
-	writeComments = comments
-
-	var indent []byte
-
-	if tabs {
-		indent = []byte{'\t'}
-	} else {
-		indent = make([]byte, tabwidth)
-		for i := range indent {
-			indent[i] = ' '
-		}
-	}
-
-	followsBranch := false
-	followsInstruction := false
-	followsComment := false
-	nestlevel := 1
-
-	for i, v := range a.Root.Children() {
-		switch v.(type) {
-		case *Comment:
-			if i > 0 && !followsComment {
-				w.Write(newline)
-			}
-
-		case *Label:
-			if i > 0 && !followsBranch && followsInstruction && !followsComment {
-				w.Write(newline)
-			}
-
-		case *Instruction:
-			for i := 0; i < nestlevel; i++ {
-				w.Write(indent)
-			}
-		}
-
-		writeNode(w, v)
-
-		followsBranch = false
-		followsComment = false
-		followsInstruction = false
-
-		switch tt := v.(type) {
-		case *Comment:
-			w.Write(newline)
-			followsComment = true
-
-		case *Label:
-			w.Write(newline)
-
-		case *Instruction:
-			w.Write(newline)
-			followsInstruction = true
-
-			name := tt.Children()[0].(*Name).Data
-			if isBranch(name) {
-				nestlevel++
-
-			} else if nestlevel > 1 {
-				w.Write(newline)
-				nestlevel = 1
-				followsBranch = true
-			}
-		}
-	}
-}
 
 func isBranch(name string) bool {
 	switch name {
@@ -98,80 +24,177 @@ func isBranch(name string) bool {
 	return false
 }
 
-func writeNode(w io.Writer, n Node) {
+// SourceWriter allows us to write an AST out as source code
+// with configurable style.
+type SourceWriter struct {
+	w        io.Writer
+	a        *AST
+	TabWidth uint
+	Tabs     bool
+	Comments bool
+	Indent   bool
+}
+
+// NewSourceWriter creates a new source writer for the given ast
+// and output stream.
+func NewSourceWriter(w io.Writer, a *AST) *SourceWriter {
+	s := new(SourceWriter)
+	s.w = w
+	s.a = a
+	s.Indent = true
+	s.Tabs = false
+	s.TabWidth = 3
+	s.Comments = true
+	return s
+}
+
+// WriteSource writes the given AST out as assembly source code.
+func (sw *SourceWriter) Write() {
+	if sw.a.Root == nil || len(sw.a.Root.Children()) == 0 {
+		return
+	}
+
+	var indent []byte
+
+	if sw.Indent {
+		if sw.Tabs {
+			indent = []byte{'\t'}
+		} else {
+			indent = make([]byte, sw.TabWidth)
+			for i := range indent {
+				indent[i] = ' '
+			}
+		}
+	}
+
+	followsBranch := false
+	followsInstruction := false
+	followsComment := false
+	nestlevel := 1
+
+	for i, v := range sw.a.Root.Children() {
+		switch v.(type) {
+		case *Comment:
+			if i > 0 && !followsComment {
+				sw.w.Write(newline)
+			}
+
+		case *Label:
+			if i > 0 && !followsBranch && followsInstruction && !followsComment {
+				sw.w.Write(newline)
+			}
+
+		case *Instruction:
+			for i := 0; i < nestlevel; i++ {
+				sw.w.Write(indent)
+			}
+		}
+
+		sw.writeNode(v)
+
+		followsBranch = false
+		followsComment = false
+		followsInstruction = false
+
+		switch tt := v.(type) {
+		case *Comment:
+			sw.w.Write(newline)
+			followsComment = true
+
+		case *Label:
+			sw.w.Write(newline)
+
+		case *Instruction:
+			sw.w.Write(newline)
+			followsInstruction = true
+
+			name := tt.Children()[0].(*Name).Data
+			if isBranch(name) {
+				nestlevel++
+
+			} else if nestlevel > 1 {
+				sw.w.Write(newline)
+				nestlevel = 1
+				followsBranch = true
+			}
+		}
+	}
+}
+
+func (sw *SourceWriter) writeNode(n Node) {
 	switch tt := n.(type) {
 	case *Block:
-		writeBlock(w, tt)
+		sw.writeBlock(tt)
 	case *Expression:
-		writeExpression(w, tt)
+		sw.writeExpression(tt)
 	case *Instruction:
-		writeInstruction(w, tt)
+		sw.writeInstruction(tt)
 	case *Comment:
-		writeComment(w, tt.Data)
+		sw.writeComment(tt.Data)
 	case *Label:
-		writeLabel(w, tt.Data)
+		sw.writeLabel(tt.Data)
 	case *Name:
-		writeLiteral(w, tt.Data)
+		sw.writeLiteral(tt.Data)
 	case *Number:
-		writeLiteral(w, tt.Data)
+		sw.writeLiteral(tt.Data)
 	case *Char:
-		writeLiteral(w, tt.Data)
+		sw.writeLiteral(tt.Data)
 	case *Operator:
-		writeLiteral(w, tt.Data)
+		sw.writeLiteral(tt.Data)
 	case *String:
-		writeString(w, tt.Data)
+		sw.writeString(tt.Data)
 	}
 }
 
-func writeBlock(w io.Writer, n *Block) {
-	w.Write(lbrack)
+func (sw *SourceWriter) writeBlock(n *Block) {
+	sw.w.Write(lbrack)
 
 	for _, v := range n.Children() {
-		writeNode(w, v)
+		sw.writeNode(v)
 	}
 
-	w.Write(rbrack)
+	sw.w.Write(rbrack)
 }
 
-func writeInstruction(w io.Writer, n *Instruction) {
+func (sw *SourceWriter) writeInstruction(n *Instruction) {
 	chld := n.Children()
 	for i, v := range chld {
-		writeNode(w, v)
+		sw.writeNode(v)
 
 		if i < len(chld)-1 {
 			if i > 0 {
-				w.Write(comma)
+				sw.w.Write(comma)
 			}
-			w.Write(space)
+			sw.w.Write(space)
 		}
 	}
 }
 
-func writeExpression(w io.Writer, n *Expression) {
+func (sw *SourceWriter) writeExpression(n *Expression) {
 	for _, v := range n.Children() {
 		switch v.(type) {
 		case *Comment:
-			w.Write(space)
+			sw.w.Write(space)
 		}
 
-		writeNode(w, v)
+		sw.writeNode(v)
 	}
 }
 
-func writeLabel(w io.Writer, s string) {
-	fmt.Fprintf(w, ":%s", s)
+func (sw *SourceWriter) writeLabel(s string) {
+	fmt.Fprintf(sw.w, ":%s", s)
 }
 
-func writeString(w io.Writer, s string) {
-	fmt.Fprintf(w, "%q", s)
+func (sw *SourceWriter) writeString(s string) {
+	fmt.Fprintf(sw.w, "%q", s)
 }
 
-func writeLiteral(w io.Writer, s string) {
-	fmt.Fprintf(w, "%s", s)
+func (sw *SourceWriter) writeLiteral(s string) {
+	fmt.Fprintf(sw.w, "%s", s)
 }
 
-func writeComment(w io.Writer, s string) {
-	if writeComments {
-		fmt.Fprintf(w, ";%s", s)
+func (sw *SourceWriter) writeComment(s string) {
+	if sw.Comments {
+		fmt.Fprintf(sw.w, ";%s", s)
 	}
 }
