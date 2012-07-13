@@ -59,6 +59,6 @@ func Format(in, out string) (err error) {
 	}
 
 	// Write source.
-	WriteSource(fout, &ast)
+	parser.WriteSource(fout, &ast, *tabs, *tabwidth, !*strip)
 	return
 }

@@ -27,7 +27,7 @@ func writeSource(ast *parser.AST, file string, doast bool) (err error) {
 	if doast {
 		parser.WriteAst(w, ast)
 	} else {
-		parser.WriteSource(w, ast)
+		parser.WriteSource(w, ast, false, 3, true)
 	}
 
 	return
