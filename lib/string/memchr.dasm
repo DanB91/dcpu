@@ -16,7 +16,7 @@
       set pc, pop
 
 :memchr_loop
-   ifn [a], b
+   ife [a], b
       set pc, pop
 
    sub c, 1

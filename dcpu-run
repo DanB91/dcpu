@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# dcpu-run 0.1
 #
 # This script takes a path to a DCPU source file for which
 # we want to run unit tests and yield profiling data.
