@@ -40,7 +40,7 @@ func main() {
 
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
-				return
+				os.Exit(1)
 			}
 		}
 	}

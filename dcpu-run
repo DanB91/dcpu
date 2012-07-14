@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# dcpu-run 0.1
+# dcpu-run 0.2
 #
 # This script takes a path to a DCPU source file for which
 # we want to run unit tests and yield profiling data.
@@ -32,6 +32,11 @@ PROFILE="$1_test.prof";
 FILTER="`basename $1`.dasm";
 
 dcpu-test -p -i "$DCPU_PATH" $TEST;
+
+if [ $? -ne 0 ]; then
+	exit;
+fi
+
 dcpu-prof -top -file -s cost -n 5 "$PROFILE";
 dcpu-prof -list -file -f "$FILTER" "$PROFILE";
 #rm "$PROFILE";
