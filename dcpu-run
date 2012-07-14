@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#
+# This script takes a path to a DCPU source file for which
+# we want to run unit tests and yield profiling data.
+# The path should not include file extensions.
+# For example:
+#
+#    $ dcpu-run mycode/dcpu/myapp
+#
+# Runs unit tests defined in 'mycode/dcpu/myapp_test.dasm' and
+# saves profiling data in 'mycode/dcpu/myapp_test.prof'.
+# The profiler then uses this file to output relevant information
+# for our target file.
+#
+
+if [ -z $1 ]; then
+	echo "usage: `basename $0` <path>";
+	exit 0;
+fi
+
+if [ -z $DCPU_PATH ]; then
+	echo "The \$DCPU_PATH environment variable is not set.";
+	echo "Please define it and point it to the directory where";
+	echo "your DCPU standard library code is located.";
+	exit 1;
+fi
+
+TEST="$1_test.dasm";
+PROFILE="$1_test.prof";
+FILTER="`basename $1`.dasm";
+
+dcpu-test -p -i "$DCPU_PATH" $TEST;
+dcpu-prof -top -file -s cost -n 5 "$PROFILE";
+dcpu-prof -list -file -f "$FILTER" "$PROFILE";
+#rm "$PROFILE";
+
+exit;
