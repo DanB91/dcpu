@@ -49,6 +49,12 @@ Commandline tools:
 * **dcpu-fmt**: This tool formats DCPU source files according to some
   predefined styling rules.
 
+Shell scripts:
+
+* **dcpu-run**: This shell script ties `dcpu-test` and `dcpu-prof` together
+  to run unit tests on a given input source file. It generates profiling
+  data and then displays a focused overview of this data.
+
 Refer to the README of each individual tool for more info.
 
 
