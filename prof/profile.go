@@ -7,29 +7,14 @@ package prof
 import (
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
-	"path"
+	"os"
+	"strings"
 )
-
-// Cycle counts per opcode.
-var opcodes = [...]uint8{
-	// Basic opcodes
-	0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1,
-	2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 3, 3, 0, 0, 2, 2,
-
-	// Extended opcodes.
-	0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 1, 3, 2, 0, 0, 0,
-	2, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-}
-
-// Cycle counts per operand.
-var operands = [...]uint8{
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1,
-}
 
 // A Profile holds timing and execution information for a single test program.
 type Profile struct {
-	Files []string // List of source files associated with program.
+	Files     []asm.FileInfo // List of source files associated with program.
+	Functions []asm.FuncInfo // List of function definitions.
 
 	// Profile data per instruction.
 	//
@@ -37,16 +22,17 @@ type Profile struct {
 	// It may therefor contain multiple structures for the same opcode.
 	Data []ProfileData
 
-	funcs BlockList // List of function definitions.
-	files BlockList // List of file definitions.
+	fileblocks BlockList
+	funcblocks BlockList
 }
 
 // New creates a new profile for the given code and debug data.
 func New(code []cpu.Word, dbg *asm.DebugInfo) *Profile {
-	var sym *asm.SourceInfo
+	var sym asm.SourceInfo
 
 	p := new(Profile)
 	p.Files = dbg.Files
+	p.Functions = dbg.Functions
 	p.Data = make([]ProfileData, len(code))
 
 	for pc := range code {
@@ -89,78 +75,46 @@ func (p *Profile) getInstructionSizes() {
 	}
 }
 
-// countOpcodes counts the number of times the given opcode is used.
-func (p *Profile) countOpcodes(opcode cpu.Word, extended bool) int {
-	var c int
-	var pc, op, a cpu.Word
+func (p *Profile) ListFiles() BlockList {
+	if len(p.fileblocks) == 0 {
+		p.fileblocks = make(BlockList, len(p.Files))
 
-	for pc = 0; pc < cpu.Word(len(p.Data)); pc += p.Data[pc].Size {
-		op, a, _ = cpu.Decode(p.Data[pc].Data)
+		var s, e cpu.Word
 
-		if extended {
-			if op == cpu.EXT && a == opcode {
-				c++
+		path := os.Getenv("DCPU_PATH")
+
+		for i := range p.fileblocks {
+			s = p.Files[i].Start
+
+			if i < len(p.fileblocks)-1 {
+				e = p.Files[i+1].Start
+			} else {
+				e = cpu.Word(len(p.Data))
 			}
-		} else if op == opcode {
-			c++
+
+			p.fileblocks[i].Data = p.Data[s:e]
+			p.fileblocks[i].Addr = s
+			p.fileblocks[i].Label = strings.Replace(p.Files[i].Name, path, "$DCPU_PATH", 1)
 		}
 	}
 
-	return c
+	return p.fileblocks
 }
 
-func listContains(l []cpu.Word, w cpu.Word) bool {
-	for i := range l {
-		if l[i] == w {
-			return true
+func (p *Profile) ListFunctions() BlockList {
+	if len(p.funcblocks) == 0 {
+		p.funcblocks = make(BlockList, len(p.Functions))
+
+		var s, e cpu.Word
+		for i := range p.funcblocks {
+			s = p.Functions[i].Start
+			s = p.Functions[i].End
+
+			p.funcblocks[i].Data = p.Data[s:e]
+			p.funcblocks[i].Addr = s
+			p.funcblocks[i].Label = p.Functions[i].Name
 		}
 	}
 
-	return false
-}
-
-// indexFunctions finds all function definitions and computes their
-// start and end addresses.
-func (p *Profile) indexFunctions() {
-
-}
-
-// indexFiles finds the start and end addresses of all code restricted
-// to a specific source file.
-func (p *Profile) indexFiles() {
-	var start, pc cpu.Word
-	var filename string
-	var file int
-
-	size := cpu.Word(len(p.Data))
-	for pc = start; pc < size; pc++ {
-		if p.Data[pc].File != file || pc == size-1 {
-			_, filename = path.Split(p.Files[file])
-
-			p.files = append(p.files, Block{
-				Data:  p.Data[start:pc],
-				Addr:  start,
-				Label: filename,
-			})
-
-			start = pc
-			file = p.Data[pc].File
-		}
-	}
-}
-
-// ListFiles yields the address ranges of all source files.
-func (p *Profile) ListFiles() []Block {
-	if len(p.files) == 0 {
-		p.indexFiles()
-	}
-	return p.files
-}
-
-// ListFunctions yields the address ranges of all known functions.
-func (p *Profile) ListFunctions() []Block {
-	if len(p.funcs) == 0 {
-		p.indexFunctions()
-	}
-	return p.funcs
+	return p.funcblocks
 }

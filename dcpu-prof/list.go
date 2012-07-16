@@ -33,7 +33,11 @@ func list(p *prof.Profile, filemode bool, filter *regexp.Regexp) {
 	}
 
 	if len(blocks) == 0 {
-		fmt.Println("0 samples.")
+		fmt.Println("[*] 0 samples.")
+		if !filemode {
+			fmt.Println("[*] This most likely means that there are no function")
+			fmt.Println("    definitions in the source code. Try using -file mode.")
+		}
 		return
 	}
 
@@ -56,10 +60,10 @@ func list(p *prof.Profile, filemode bool, filter *regexp.Regexp) {
 		file := p.Files[p.Data[start].File]
 		startline := p.Data[start].Line
 		endline := p.Data[end].Line
-		source := GetSourceLines(file, startline, endline)
+		source := GetSourceLines(file.Name, startline, endline)
 
-		fmt.Printf("===> %s %d-%d\n", file, startline, endline)
-		fmt.Printf("%d sample(s), %d cycle(s)\n\n", totalcount, totalcost)
+		fmt.Printf("[*] ===> %s %d-%d\n", file.Name, startline, endline)
+		fmt.Printf("[*] %d sample(s), %d cycle(s)\n\n", totalcount, totalcost)
 
 		for j := range source {
 			dp := getLineData(p.Data, start, end, startline+j)

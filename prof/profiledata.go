@@ -5,6 +5,23 @@ package prof
 
 import "github.com/jteeuwen/dcpu/cpu"
 
+// Cycle counts per opcode.
+var opcodes = [...]uint8{
+	// Basic opcodes
+	0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 3, 3, 0, 0, 2, 2,
+
+	// Extended opcodes.
+	0, 2, 0, 0, 0, 0, 0, 0, 4, 1, 1, 3, 2, 0, 0, 0,
+	2, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+}
+
+// Cycle counts per operand.
+var operands = [...]uint8{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1,
+}
+
 // Profile data for a specific opcode.
 type ProfileData struct {
 	Count uint64 // Number of times this opcode was called.

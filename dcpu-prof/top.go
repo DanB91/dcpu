@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DefaultTopCount = 5
+	DefaultTopCount = 10
 	DefaultTopSort  = "cost"
 )
 
@@ -26,7 +26,11 @@ func top(p *prof.Profile, filemode bool, count uint, sort string) {
 	}
 
 	if len(blocks) == 0 {
-		fmt.Println("0 samples.")
+		fmt.Println("[*] 0 samples.")
+		if !filemode {
+			fmt.Println("[*] This most likely means that there are no function")
+			fmt.Println("    definitions in the source code. Try using -file mode.")
+		}
 		return
 	}
 
@@ -51,7 +55,7 @@ func top(p *prof.Profile, filemode bool, count uint, sort string) {
 		blocks = blocks[:count]
 	}
 
-	fmt.Printf("%.0f sample(s), %.0f cycle(s)\n", counttotal, costtotal)
+	fmt.Printf("[*] %.0f sample(s), %.0f cycle(s)\n", counttotal, costtotal)
 
 	for i := range blocks {
 		count, cost := blocks[i].Cost()

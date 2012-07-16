@@ -22,17 +22,12 @@ func TestIdentity(t *testing.T) {
 		cpu.Encode(cpu.SET, 1, 0),
 	}
 
-	dbg := new(asm.DebugInfo)
-	dbg.Files = []string{"a.dasm"}
-	dbg.SourceMapping = []*asm.SourceInfo{
-		new(asm.SourceInfo),
-		new(asm.SourceInfo),
-		new(asm.SourceInfo),
-		new(asm.SourceInfo),
-		new(asm.SourceInfo),
-	}
+	var dbg asm.DebugInfo
+	dbg.Files = []asm.FileInfo{{"a.dasm", 0}}
+	dbg.Functions = []asm.FuncInfo{{"main", 0, 5}}
+	dbg.SourceMapping = make([]asm.SourceInfo, 5)
 
-	a := New(code, dbg)
+	a := New(code, &dbg)
 	a.Update(0, nil)
 	a.Update(2, nil)
 	a.Update(3, nil)
@@ -55,8 +50,30 @@ func TestIdentity(t *testing.T) {
 	}
 
 	for i := range a.Files {
-		if a.Files[i] != b.Files[i] {
-			t.Fatalf("a.Files != b.Files")
+		if a.Files[i].Name != b.Files[i].Name {
+			t.Fatalf("a.Files[i].Name != b.Files[i].Name")
+		}
+
+		if a.Files[i].Start != b.Files[i].Start {
+			t.Fatalf("a.Files[i].Start != b.Files[i].Start")
+		}
+	}
+
+	if len(a.Functions) != len(b.Functions) {
+		t.Fatalf("len(a.Functions) != len(b.Functions)")
+	}
+
+	for i := range a.Functions {
+		if a.Functions[i].Start != b.Functions[i].Start {
+			t.Fatalf("a.Functions[i].Start != b.Functions[i].Start")
+		}
+
+		if a.Functions[i].End != b.Functions[i].End {
+			t.Fatalf("a.Functions[i].End != b.Functions[i].End")
+		}
+
+		if a.Functions[i].Name != b.Functions[i].Name {
+			t.Fatalf("a.Functions[i].Name != b.Functions[i].Name")
 		}
 	}
 

@@ -11,7 +11,7 @@ import (
 type Block struct {
 	Data  []ProfileData // Profile data for this function's instructions.
 	Label string        // Label/name of this function.
-	Addr  cpu.Word      // start address of function
+	Addr  cpu.Word      // start address of function.
 }
 
 // Cost returns the cumulative cycle cost and count for all

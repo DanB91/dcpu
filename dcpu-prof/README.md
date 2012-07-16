@@ -9,34 +9,6 @@ these commands allow us to sort the data in different ways and to
 filter out unnecessary clutter.
 
 
-## Known issues
-
-The profiling mode for functions is flaky because it makes some
-assumptions about code layout which will not be true in all situations.
-
-One of the assumptions is that address references in a JSR instruction can
-not be null (0). This is done to prevent the profiler from interpreting data
-sections as code and mistaking some data for a valid jump. This is not
-100% fool-proof, but it works for the majority of cases.
-
-Additionally, it assumes functions will always return by means of 
-an unconditional `SET PC, POP` instruction. It also assumes this return is
-physically the last instruction in the function. Jumping over it to more code
-would be problematic.
-
-One example of this can be seen in `lib/string/memmove.dasm` at line 36. As far
-as the profiler is concerned, that line is the end of the `memmove` function,
-eventhough it clearly isn't. The consequence of this is that the count and
-cycle cost values for the `memmove` fuction are incorrect.
-
-A solution could be to reorganize the branching statements to make the return
-a part of it, but this is not necessarily an efficient solution when one
-considers the overhead that failed branch checks can incur.
-
-If your code contains a lot of these cases, it is advised to only use
-the file mode listings in this profiler, since it has none of these issues.
-
-
 ### Usage
 
 Read the given file:
@@ -51,12 +23,14 @@ the desired command as commandline flags when invoking `dcpu-prof`.
 This makes it generate the output for our command and then exit.
 For example:
 
-	$ dcpu-prof -top -file ../testdata/test.prof 
-	108 sample(s), 225 cycle(s)
-		   70  64.81%      157  69.78% memcmp.dasm
-		   28  25.93%       48  21.33% _test.dasm
-		    8   7.41%       16   7.11% assert_eq.dasm
-		    2   1.85%        4   1.78% assert_ez.dasm
+	$ dcpu-prof -top -file ../testdata/strpbrk_test.prof 
+	[*] 848 sample(s), 1985 cycle(s)
+		  591  69.69%     1454  73.25% $DCPU_PATH/string/strchr.dasm
+		  152  17.92%      342  17.23% $DCPU_PATH/string/strlen.dasm
+		   90  10.61%      159   8.01% $DCPU_PATH/string/strpbrk.dasm
+		   11   1.30%       22   1.11% $DCPU_PATH/string/strpbrk_test.dasm
+		    2   0.24%        4   0.20% $DCPU_PATH/test/assert_ez.dasm
+		    2   0.24%        4   0.20% $DCPU_PATH/test/assert_eq.dasm
 	$ 
 
 ### Top Example
@@ -67,20 +41,20 @@ when profiling code. As it gives a rough overview of where most of the CPU
 time is spent without going into too much detail.
 
 	top
-	48 sample(s), 110 cycle(s)
-		   42  87.50%       98  89.09% memchr               memchr.dasm:15
-		    4   8.33%        8   7.27% assert_eq            assert_eq.dasm:8
-		    2   4.17%        4   3.64% assert_ez            assert_ez.dasm:8
+	[*] 48 sample(s), 110 cycle(s)
+		   42  87.50%       98  89.09% memchr
+		    4   8.33%        8   7.27% assert_eq
+		    2   4.17%        4   3.64% assert_ez
 
 	top -file
-	108 sample(s), 225 cycle(s)
-		   70  64.81%      157  69.78% memcmp.dasm
-		   28  25.93%       48  21.33% _test.dasm
-		    8   7.41%       16   7.11% assert_eq.dasm
-		    2   1.85%        4   1.78% assert_ez.dasm
+	[*] 108 sample(s), 225 cycle(s)
+		   70  64.81%      157  69.78% $DCPU_PATH/string/memcmp.dasm
+		   28  25.93%       48  21.33% $DCPU_PATH/string/_test.dasm
+		    8   7.41%       16   7.11% $DCPU_PATH/string/assert_eq.dasm
+		    2   1.85%        4   1.78% $DCPU_PATH/string/assert_ez.dasm
 
 
-The table shows 5 or 6 columns, depending on whether you are viewing
+The table shows 5 columns, depending on whether you are viewing
 function or file listings:
 
 * **COUNT**: This is the cumulative total number of times each instruction
@@ -95,11 +69,8 @@ function or file listings:
 * **COST PERC**: This is the cost percentage of the total cost for the
   returned samples.
   
-* **NAME**: This is the name of the function, denoted by the label that
-  directly preceeded its definition.
-  
-* **FILE**: This shows the original source file and line in which the
-  function is defined.
+* **LABEL**: This is the name of the function or the source file,
+  depending on whether we are viewing file mode or not.
 
 
 ### List Example
@@ -107,8 +78,8 @@ function or file listings:
 Here is an example of the `list` command output:
 
 	list
-	===> lib/string/memchr.dasm 15-29
-	42 sample(s), 98 cycle(s)
+	[*] ===> $DCPU_PATH/string/memchr.dasm 15-29
+	[*] 42 sample(s), 98 cycle(s)
 
 		   3       11   015:   ife 0, c ; num is zero -- No compare needed.
 		   1        1   016:     set pc, pop
@@ -126,15 +97,15 @@ Here is an example of the `list` command output:
 		   1        1   028:   set a, 0
 		   1        1   029:   set pc, pop
 
-	===> lib/test/assert_eq.dasm 8-10
-	4 sample(s), 8 cycle(s)
+	[*] ===> $DCPU_PATH/test/assert_eq.dasm 8-10
+	[*] 4 sample(s), 8 cycle(s)
 
 		   2        6   008:   ifn a, b
 		                009:     panic assert_eq_str
 		   2        2   010:   set pc, pop
 
-	===> lib/test/assert_ez.dasm 8-10
-	2 sample(s), 4 cycle(s)
+	[*] ===> $DCPU_PATH/test/assert_ez.dasm 8-10
+	[*] 2 sample(s), 4 cycle(s)
 
 		   1        3   008:   ifn a, 0
 		                009:     panic assert_ez_str
@@ -156,11 +127,20 @@ codebase, so it is practical to use it in combination with `top`. Use `top`
 to find a function or file that consumes the most cycles and then dive into
 the detailed usage with `list`:
 
-	list -f memchr
-	===> lib/string/memchr.dasm 15-29
-	42 sample(s), 98 cycle(s)
-	
-	...
+	list -file -f strchr
+	[*] ===> $DCPU_PATH/string/strchr.dasm 17-26
+	[*] 591 sample(s), 1454 cycle(s)
+
+		 148      441   017:    ife [a], b
+		   3        3   018:       set pc, pop
+		 145      430   019:    ife [a], 0
+		   5       10   020:       set pc, strchr_not_found
+		 140      280   021:    add a, 1
+		 140      280   022:    set pc, strchr
+		                023: 
+		                024: :strchr_not_found
+		   5        5   025:    set a, 0
+		   5        5   026:    set pc, pop
 
 
 As with `top`, we can specify the `-file` flag in this command to list

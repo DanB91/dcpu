@@ -5,6 +5,7 @@ package prof
 
 import (
 	"encoding/binary"
+	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 	"io"
 )
@@ -21,10 +22,14 @@ func Read(r io.Reader) (p *Profile, err error) {
 		return
 	}
 
-	p.Files = make([]string, size)
+	p.Files = make([]asm.FileInfo, size)
 
 	// [2]
 	for i := range p.Files {
+		if err = binary.Read(r, be, &p.Files[i].Start); err != nil {
+			return
+		}
+
 		var size uint16
 		if err = binary.Read(r, be, &size); err != nil {
 			return
@@ -35,7 +40,7 @@ func Read(r io.Reader) (p *Profile, err error) {
 			return
 		}
 
-		p.Files[i] = string(d)
+		p.Files[i].Name = string(d)
 	}
 
 	// [3]
@@ -43,9 +48,39 @@ func Read(r io.Reader) (p *Profile, err error) {
 		return
 	}
 
-	p.Data = make([]ProfileData, size)
+	p.Functions = make([]asm.FuncInfo, size)
 
 	// [4]
+	for i := range p.Functions {
+		if err = binary.Read(r, be, &p.Functions[i].Start); err != nil {
+			return
+		}
+
+		if err = binary.Read(r, be, &p.Functions[i].End); err != nil {
+			return
+		}
+
+		var size uint16
+		if err = binary.Read(r, be, &size); err != nil {
+			return
+		}
+
+		d := make([]byte, size)
+		if _, err = r.Read(d); err != nil {
+			return
+		}
+
+		p.Functions[i].Name = string(d)
+	}
+
+	// [5]
+	if err = binary.Read(r, be, &size); err != nil {
+		return
+	}
+
+	p.Data = make([]ProfileData, size)
+
+	// [6]
 	var d [30]byte
 	for i := range p.Data {
 		if _, err = r.Read(d[:]); err != nil {

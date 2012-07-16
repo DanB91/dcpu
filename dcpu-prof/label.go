@@ -54,8 +54,9 @@ func GetLabel(p *prof.Profile, pc cpu.Word) string {
 	}
 
 	file := p.Files[p.Data[pc].File]
+	fname := file.Name
 	line := p.Data[pc].Line
-	ast, err := GetAST(file)
+	ast, err := GetAST(fname)
 
 	if err != nil {
 		labelCache = append(labelCache, LabelDef{"", pc})
@@ -82,7 +83,7 @@ func GetLabel(p *prof.Profile, pc cpu.Word) string {
 		name = name + " "
 	}
 
-	_, file = path.Split(file)
+	_, fname = path.Split(fname)
 	name = fmt.Sprintf("%s %s:%d", name, file, line)
 
 	if labelCache.IndexOfLabel(name) == -1 {

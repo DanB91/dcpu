@@ -242,8 +242,9 @@ func (t *Test) getSourceLine(pc cpu.Word) string {
 
 	symbol := t.dbg.SourceMapping[pc]
 	file := t.dbg.Files[symbol.File]
+	fname := file.Name
 
-	fd, err := os.Open(file)
+	fd, err := os.Open(fname)
 	if err != nil {
 		t.cache[pc] = ""
 		return ""
@@ -256,7 +257,7 @@ func (t *Test) getSourceLine(pc cpu.Word) string {
 	var count int
 	var line []byte
 
-	_, file = filepath.Split(file)
+	_, fname = filepath.Split(fname)
 
 	for {
 		if line, _, err = r.ReadLine(); err != nil {
@@ -273,7 +274,7 @@ func (t *Test) getSourceLine(pc cpu.Word) string {
 		}
 
 		line = bytes.TrimSpace(line)
-		t.cache[pc] = fmt.Sprintf("%s:%d | %s", file, symbol.Line, line)
+		t.cache[pc] = fmt.Sprintf("%s:%d | %s", fname, symbol.Line, line)
 		return t.cache[pc]
 	}
 

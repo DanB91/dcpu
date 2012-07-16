@@ -15,39 +15,50 @@ var be = binary.BigEndian
 //
 // The layout of the file is as follows:
 //
+//    [N * Source file descriptors]
+//    [N * Function descriptors]
+//    [N * Instruction descriptors]
+//
+// More detailed:
+//
 //    [1] 32-bit unsigned integer:
-//        Number of source file strings.
+//        Number of source files.
 //    
-//    [2] N number of utf-8 strings:
-//        The source file names. Where N is the amount described in [1].
-//        - Each string starts with an unsigned 16 bit value indicating the
-//          length of the string in bytes.
-//    
-//        - Each string is written out as raw bytes.
-//    
+//    [2] N number of source file definitions:
+//        Where N is the amount described in [1].
+//        - An unsigned 16 bit value indicating the start address in the
+//          binary code for this file.
+//        - An unsigned 16 bit value indicating the length of the
+//          file name in bytes.
+//        - Each file name is written out as raw bytes.
+//
 //    [3] 32-bit unsigned integer:
-//        Number of ProfileData entries. One for instruction in
-//        the program.
+//        Number of function definitions.
 //    
-//    [4] N number of ProfileData entries.
+//    [4] N number of function definitions:
 //        Where N is the amount described in [3].
+//        - An unsigned 16 bit int: The functions's start address.
+//        - An unsigned 16 bit int: The functions's end address.
+//        - An unsigned 16 bit int: The length of the function name in bytes.
+//        - Each function name is written out as raw bytes.
 //    
+//    [5] 32-bit unsigned integer:
+//        Number of ProfileData entries.
+//        One for instruction in the program.
+//    
+//    [6] N number of ProfileData entries.
+//        Where N is the amount described in [5].
 //        - 16-bit unsigned integer:
 //          The encoded instruction to which this entry applies.
-//    
 //        - 32-bit unsigned int:
 //          The file index for the original source code.
 //          - This is an index into the list of files in section [2].
-//    
 //        - 32-bit unsigned int:
 //          The line number for the original source code.
-//    
 //        - 32-bit unsigned int:
 //          The column number for the original source code.
-//    
 //        - 64-bit unsigned int:
 //          Number of times we executed this instruction.
-//    
 //        - 64-bit unsigned int:
 //          Cost penalty incurred at runtime.
 //    
@@ -60,26 +71,62 @@ func Write(p *Profile, w io.Writer) (err error) {
 
 	// [2]
 	for i := range p.Files {
-		size := uint16(len(p.Files[i]))
+		err = binary.Write(w, be, p.Files[i].Start)
+		if err != nil {
+			return
+		}
+
+		size := uint16(len(p.Files[i].Name))
 
 		err = binary.Write(w, be, size)
 		if err != nil {
 			return
 		}
 
-		_, err = w.Write([]byte(p.Files[i]))
+		_, err = w.Write([]byte(p.Files[i].Name))
 		if err != nil {
 			return
 		}
 	}
 
 	// [3]
-	size = uint32(len(p.Data))
+	size = uint32(len(p.Functions))
 	if err = binary.Write(w, be, size); err != nil {
 		return
 	}
 
 	// [4]
+	for i := range p.Functions {
+		err = binary.Write(w, be, p.Functions[i].Start)
+		if err != nil {
+			return
+		}
+
+		err = binary.Write(w, be, p.Functions[i].End)
+		if err != nil {
+			return
+		}
+
+		size := uint16(len(p.Functions[i].Name))
+
+		err = binary.Write(w, be, size)
+		if err != nil {
+			return
+		}
+
+		_, err = w.Write([]byte(p.Functions[i].Name))
+		if err != nil {
+			return
+		}
+	}
+
+	// [5]
+	size = uint32(len(p.Data))
+	if err = binary.Write(w, be, size); err != nil {
+		return
+	}
+
+	// [6]
 	var d [30]byte
 	for _, v := range p.Data {
 		d[0] = byte(v.Data >> 8)
