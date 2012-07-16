@@ -22,6 +22,13 @@ func NewNumber(file, line, col int, data string) *Number {
 	}
 }
 
+func (n *Number) Copy(file, line, col int) Node {
+	return &Number{
+		NodeBase: NewNodeBase(file, line, col),
+		Data:     n.Data,
+	}
+}
+
 // Parse attempts to process the node's string data as a number.
 func (n *Number) Parse() (cpu.Word, error) {
 	var v uint64

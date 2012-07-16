@@ -15,3 +15,10 @@ func NewOperator(file, line, col int, value string) *Operator {
 		value,
 	}
 }
+
+func (n *Operator) Copy(file, line, col int) Node {
+	return &Operator{
+		NodeBase: NewNodeBase(file, line, col),
+		Data:     n.Data,
+	}
+}

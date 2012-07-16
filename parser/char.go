@@ -24,6 +24,13 @@ func NewChar(file, line, col int, data string) *Char {
 	}
 }
 
+func (n *Char) Copy(file, line, col int) Node {
+	return &Char{
+		NodeBase: NewNodeBase(file, line, col),
+		Data:     n.Data,
+	}
+}
+
 // Parse attempts to process the node's string data as a number.
 func (n *Char) Parse() (cpu.Word, error) {
 	r, size := utf8.DecodeRuneInString(n.Data)

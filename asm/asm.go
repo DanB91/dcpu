@@ -6,27 +6,41 @@ package asm
 
 import (
 	"github.com/jteeuwen/dcpu/cpu"
-	dp "github.com/jteeuwen/dcpu/parser"
+	"github.com/jteeuwen/dcpu/parser"
 )
 
 // assembler holds some assembler state.
 type assembler struct {
-	ast    *dp.AST               // Source AST.
-	code   []cpu.Word            // Final program.
-	labels map[string]cpu.Word   // Map of defined labels with their address.
-	refs   map[cpu.Word]*dp.Name // Indices into `code` holding unresolved label references.
-	debug  *DebugInfo            // Maps binary instructions to original source locations.
+	ast    *parser.AST               // Source AST.
+	code   []cpu.Word                // Final program.
+	labels map[string]cpu.Word       // Map of defined labels with their address.
+	refs   map[cpu.Word]*parser.Name // Indices into `code` holding unresolved label references.
+	debug  *DebugInfo                // Maps binary instructions to original source locations.
 }
 
 // Assemble takes the given AST and attempts to assemble it into a compiled program.
 //
 // It returns either an error, or the program along with debug symbols.
-func Assemble(ast *dp.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
+func Assemble(ast *parser.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 	var asm assembler
 	asm.ast = ast
 	asm.labels = make(map[string]cpu.Word)
-	asm.refs = make(map[cpu.Word]*dp.Name)
+	asm.refs = make(map[cpu.Word]*parser.Name)
 	asm.debug = NewDebugInfo(ast.Files)
+
+	// Process function definitions.
+	// This also processes function-local constants.
+	if err = parseFunctions(ast); err != nil {
+		return
+	}
+
+	// Process global constants.
+	list, err := parseConstants(ast, ast.Root.Children())
+	if err != nil {
+		return
+	}
+
+	ast.Root.SetChildren(list)
 
 	// Compile program.
 	if err = asm.buildNodes(ast.Root.Children()); err != nil {
@@ -53,22 +67,55 @@ func Assemble(ast *dp.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 }
 
 // buildNodes compiles the given ast root nodes
-func (a *assembler) buildNodes(nodes []dp.Node) (err error) {
+func (a *assembler) buildNodes(nodes []parser.Node) (err error) {
 	for i := range nodes {
 		switch tt := nodes[i].(type) {
-		case *dp.Comment:
+		case *parser.Comment:
 			/* ignore */
 
-		case *dp.Label:
+		case *parser.Label:
 			a.labels[tt.Data] = cpu.Word(len(a.code))
 
-		case *dp.Instruction:
+		case *parser.Function:
+			err = a.buildFunction(tt)
+
+		case *parser.Instruction:
 			err = a.buildInstruction(tt.Children())
 
 		default:
 			err = NewBuildError(
 				a.ast.Files[tt.File()], tt.Line(), tt.Col(),
-				"Unexpected node %T. Want Comment, Label or Instruction.", tt,
+				"Unexpected node %T. Want Comment, Label, Function or Instruction.", tt,
+			)
+		}
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+// buildFunction compiles the given function.
+func (a *assembler) buildFunction(f *parser.Function) (err error) {
+	nodes := f.Children()
+
+	for i := range nodes {
+		switch tt := nodes[i].(type) {
+		case *parser.Comment:
+			/* ignore */
+
+		case *parser.Label:
+			a.labels[tt.Data] = cpu.Word(len(a.code))
+
+		case *parser.Instruction:
+			err = a.buildInstruction(tt.Children())
+
+		default:
+			err = NewBuildError(
+				a.ast.Files[tt.File()], tt.Line(), tt.Col(),
+				"Unexpected node %T. Want Comment, Label, Instruction.", tt,
 			)
 		}
 
@@ -81,8 +128,8 @@ func (a *assembler) buildNodes(nodes []dp.Node) (err error) {
 }
 
 // buildInstruction compiles the given instruction.
-func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
-	name := nodes[0].(*dp.Name)
+func (a *assembler) buildInstruction(nodes []parser.Node) (err error) {
+	name := nodes[0].(*parser.Name)
 
 	if name.Data == "dat" {
 		return a.buildData(nodes)
@@ -106,21 +153,21 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 
 	var va, vb cpu.Word
 	var argv []cpu.Word
-	var symbols []dp.Node
+	var symbols []parser.Node
 
 	symbols = append(symbols, name)
 
 	switch op.argc {
 	case 2:
-		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*dp.Expression).Children()[0], true)
+		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*parser.Expression).Children()[0], true)
 		if err != nil {
 			return
 		}
 
-		vb, err = a.buildOperand(&argv, &symbols, nodes[2].(*dp.Expression).Children()[0], false)
+		vb, err = a.buildOperand(&argv, &symbols, nodes[2].(*parser.Expression).Children()[0], false)
 
 	case 1:
-		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*dp.Expression).Children()[0], false)
+		va, err = a.buildOperand(&argv, &symbols, nodes[1].(*parser.Expression).Children()[0], false)
 	}
 
 	if err != nil {
@@ -143,9 +190,9 @@ func (a *assembler) buildInstruction(nodes []dp.Node) (err error) {
 // The `first` parameter determines if we are parsing the A or B parameter
 // in something like 'set A, B'. This makes a difference when encoding
 // small literal numbers.
-func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.Node, first bool) (val cpu.Word, err error) {
+func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]parser.Node, node parser.Node, first bool) (val cpu.Word, err error) {
 	switch tt := node.(type) {
-	case *dp.Name:
+	case *parser.Name:
 		if reg, ok := registers[tt.Data]; ok {
 			return reg, nil
 		}
@@ -165,7 +212,7 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.N
 		*argv = append(*argv, 0)
 		return 0x1f, nil
 
-	case dp.NumericNode:
+	case parser.NumericNode:
 		num, err := tt.Parse()
 		if err != nil {
 			return 0, err
@@ -179,7 +226,7 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.N
 		*argv = append(*argv, num)
 		return 0x1f, nil
 
-	case *dp.Block:
+	case *parser.Block:
 		return a.buildBlock(argv, symbols, tt)
 
 	default:
@@ -193,13 +240,13 @@ func (a *assembler) buildOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.N
 }
 
 // buildBlock builds a block expression.
-func (a *assembler) buildBlock(argv *[]cpu.Word, symbols *[]dp.Node, b *dp.Block) (val cpu.Word, err error) {
+func (a *assembler) buildBlock(argv *[]cpu.Word, symbols *[]parser.Node, b *parser.Block) (val cpu.Word, err error) {
 	nodes := b.Children()
 
 	switch len(nodes) {
 	case 1:
 		switch tt := nodes[0].(type) {
-		case *dp.Name:
+		case *parser.Name:
 			if reg, ok := registers[tt.Data]; ok {
 				return reg + 0x08, nil
 			}
@@ -215,7 +262,7 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, symbols *[]dp.Node, b *dp.Block
 			*argv = append(*argv, 0)
 			return 0x1e, nil
 
-		case dp.NumericNode:
+		case parser.NumericNode:
 			num, err := tt.Parse()
 			if err != nil {
 				return 0, err
@@ -258,9 +305,9 @@ func (a *assembler) buildBlock(argv *[]cpu.Word, symbols *[]dp.Node, b *dp.Block
 	return
 }
 
-func (a *assembler) buildBlockOperand(argv *[]cpu.Word, symbols *[]dp.Node, node dp.Node) (cpu.Word, error) {
+func (a *assembler) buildBlockOperand(argv *[]cpu.Word, symbols *[]parser.Node, node parser.Node) (cpu.Word, error) {
 	switch tt := node.(type) {
-	case *dp.Name:
+	case *parser.Name:
 		if reg, ok := registers[tt.Data]; ok {
 			if reg <= 0x7 {
 				return reg + 0x10, nil
@@ -287,7 +334,7 @@ func (a *assembler) buildBlockOperand(argv *[]cpu.Word, symbols *[]dp.Node, node
 		*argv = append(*argv, 0)
 		return 0, nil
 
-	case dp.NumericNode:
+	case parser.NumericNode:
 		num, err := tt.Parse()
 		if err != nil {
 			return 0, err
@@ -305,24 +352,24 @@ func (a *assembler) buildBlockOperand(argv *[]cpu.Word, symbols *[]dp.Node, node
 }
 
 // buildData compiles the given data section
-func (a *assembler) buildData(nodes []dp.Node) (err error) {
+func (a *assembler) buildData(nodes []parser.Node) (err error) {
 	var r rune
 	nodes = nodes[1:] // Skip 'dat' instruction.
 
 	for i := range nodes {
-		expr, ok := nodes[i].(*dp.Expression)
+		expr, ok := nodes[i].(*parser.Expression)
 		if !ok {
 			continue
 		}
 
 		switch tt := expr.Children()[0].(type) {
-		case *dp.String:
+		case *parser.String:
 			for _, r = range tt.Data {
 				a.debug.Emit(tt)
 				a.code = append(a.code, cpu.Word(r))
 			}
 
-		case dp.NumericNode:
+		case parser.NumericNode:
 			num, err := tt.Parse()
 			if err != nil {
 				return err

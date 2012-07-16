@@ -7,10 +7,23 @@ import "github.com/jteeuwen/dcpu/cpu"
 
 // Represents a single AST node.
 type Node interface {
+	// Index of the original source file name.
 	File() int
+
+	// Line number in the original source file.
 	Line() int
+
+	// Column number in the original source file.
 	Col() int
+
+	// Yields a pointer to the embedded NodeBase struct.
 	Base() *NodeBase
+
+	// Copy creates a deep copy of this node.
+	//
+	// The file, line and column information is updated for all
+	// newly created nodes.
+	Copy(file, line, col int) Node
 }
 
 // Represents a node that has child nodes.

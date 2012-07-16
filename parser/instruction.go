@@ -19,3 +19,16 @@ func NewInstruction(file, line, col int) *Instruction {
 
 func (i *Instruction) Children() []Node     { return i.children }
 func (i *Instruction) SetChildren(n []Node) { i.children = n }
+
+func (b *Instruction) Copy(file, line, col int) Node {
+	nb := &Instruction{
+		NodeBase: NewNodeBase(file, line, col),
+		children: make([]Node, len(b.children)),
+	}
+
+	for i := range nb.children {
+		nb.children[i] = b.children[i].Copy(file, line, col)
+	}
+
+	return nb
+}

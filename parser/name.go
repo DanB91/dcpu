@@ -15,3 +15,10 @@ func NewName(file, line, col int, value string) *Name {
 		value,
 	}
 }
+
+func (n *Name) Copy(file, line, col int) Node {
+	return &Name{
+		NodeBase: NewNodeBase(file, line, col),
+		Data:     n.Data,
+	}
+}

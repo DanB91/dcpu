@@ -18,3 +18,16 @@ func NewExpression(file, line, col int) *Expression {
 
 func (e *Expression) Children() []Node     { return e.children }
 func (e *Expression) SetChildren(n []Node) { e.children = n }
+
+func (b *Expression) Copy(file, line, col int) Node {
+	nb := &Expression{
+		NodeBase: NewNodeBase(file, line, col),
+		children: make([]Node, len(b.children)),
+	}
+
+	for i := range nb.children {
+		nb.children[i] = b.children[i].Copy(file, line, col)
+	}
+
+	return nb
+}

@@ -167,3 +167,39 @@ func TestDat(t *testing.T) {
 		'u', 'n', 'i', 'v', 'e', 'r', 's', 'e', 0,
 	)
 }
+
+func TestEQU(t *testing.T) {
+	doTest(t,
+		`equ SomeValue, 16
+		 equ AnotherValue, 'A'
+		 set a, SomeValue
+		 add a, AnotherValue
+		`,
+		cpu.Encode(cpu.SET, 0, 0x31), // set a, 16
+		cpu.Encode(cpu.ADD, 0, 0x1f), // add a, 'A'
+		cpu.Word('A'),
+	)
+}
+
+func TestFunc(t *testing.T) {
+	doTest(t,
+		`def main
+			equ LoopLimit, 16
+			set i, 0
+			ife i, LoopLimit
+				return
+			add i, 1
+		end
+		`,
+		cpu.Encode(cpu.SET, 0x18, 6), // set push, i
+
+		cpu.Encode(cpu.SET, 6, 0x21),    // set i, 0
+		cpu.Encode(cpu.IFE, 6, 0x31),    // ife i, 16
+		cpu.Encode(cpu.SET, 0x1c, 0x1f), // set pc, $__main_epilog
+		0x6,
+		cpu.Encode(cpu.ADD, 6, 0x22), // add i, 1
+
+		cpu.Encode(cpu.SET, 6, 0x18),    // $__main_epilog: set i, pop
+		cpu.Encode(cpu.SET, 0x1c, 0x18), // set pc, pop
+	)
+}

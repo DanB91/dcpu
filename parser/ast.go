@@ -49,99 +49,102 @@ func (a *AST) Parse(r io.Reader, filename string) (err error) {
 
 	io.Copy(&buf, r)
 
-	if err = a.readDocument(lex.Run(buf.Bytes()), &a.Root.children); err != nil {
+	err = a.readDocument(lex.Run(buf.Bytes()), &a.Root.children)
+	if err != nil {
 		return
 	}
 
-	constants := make(map[string]Node)
-
-	if err = a.findConstants(constants); err != nil {
+	err = verify(a, a.Root.children)
+	if err != nil {
 		return
 	}
 
-	a.replaceConstants(a.Root.children, constants)
+	a.Root.children, err = a.parseFunctions(a.Root.children)
 	return
 }
 
-// replaceConstants finds al constant references and replaces them
-// with constant values.
-func (a *AST) replaceConstants(nodes []Node, c map[string]Node) {
-	for i := range nodes {
-		switch tt := nodes[i].(type) {
-		case *Name:
-			if node, ok := c[tt.Data]; ok {
-				nodes[i] = node
-			}
+// Functions returns all function definitions.
+func (a *AST) Functions() []*Function {
+	var list []*Function
+	var f *Function
+	var ok bool
 
-		case NodeCollection:
-			a.replaceConstants(tt.Children(), c)
+	for _, v := range a.Root.children {
+		if f, ok = v.(*Function); ok {
+			list = append(list, f)
 		}
 	}
 
-	return
+	return list
 }
 
-// findConstants finds all constant (EQU) definitions.
-// Adds them to the supplied map and removes them from the AST.
-func (a *AST) findConstants(list map[string]Node) (err error) {
-	for i := 0; i < len(a.Root.children); i++ {
-		instr, ok := a.Root.children[i].(*Instruction)
+func indexOfEnd(in []Node) int {
+	var instr *Instruction
+	var name *Name
+	var ok bool
+
+	for i := range in {
+		instr, ok = in[i].(*Instruction)
 		if !ok {
 			continue
 		}
 
-		name := instr.children[0].(*Name)
+		name = instr.children[0].(*Name)
 
-		if name.Data != "equ" {
+		switch name.Data {
+		case "def":
+			return -1
+		case "end":
+			return i
+		}
+	}
+	return -1
+}
+
+// parseFunctions finds function definitions and turns them into proper
+// Function nodes.
+func (a *AST) parseFunctions(in []Node) (out []Node, err error) {
+	var instr *Instruction
+	var expr *Expression
+	var f *Function
+	var name *Name
+	var ok bool
+	var s, e int
+
+	for s = 0; s < len(in); s++ {
+		instr, ok = in[s].(*Instruction)
+		if !ok {
 			continue
 		}
 
-		if len(instr.children) != 3 {
-			return NewParseError(
+		name = instr.children[0].(*Name)
+		if name.Data != "def" {
+			continue
+		}
+
+		e = indexOfEnd(in[s+1:])
+		if e == -1 {
+			return nil, NewParseError(
 				a.Files[instr.File()], instr.Line(), instr.Col(),
-				"Invalid argument count for EQU. Want 2, got %d.",
-				len(instr.children)-1,
+				"Unmatched 'def'.",
 			)
 		}
 
-		exp := instr.children[1].(*Expression)
-		key, ok := exp.children[0].(*Name)
+		e += s + 1
 
-		if !ok {
-			return NewParseError(
-				a.Files[key.File()], key.Line(), key.Col(),
-				"Invalid Node %T. Expected *Name", key,
-			)
-		}
+		expr = instr.children[1].(*Expression)
+		name = expr.children[0].(*Name)
 
-		if _, ok = list[key.Data]; ok {
-			return NewParseError(
-				a.Files[key.File()], key.Line(), key.Col(),
-				"Duplicate constant %q", key.Data,
-			)
-		}
+		f = NewFunction(name.File(), name.Line(), name.Col())
+		f.children = append(f.children, name)
+		f.children = append(f.children, in[s+1:e]...)
+		in[s] = f
 
-		val := instr.children[2].(*Expression).children[0]
-
-		switch val.(type) {
-		case *Name:
-		case *Number:
-		case *String:
-		default:
-			return NewParseError(
-				a.Files[val.File()], val.Line(), val.Col(),
-				"Invalid Node %T. Expected *Name", val,
-			)
-		}
-
-		list[key.Data] = val
-
-		copy(a.Root.children[i:], a.Root.children[i+1:])
-		a.Root.children = a.Root.children[:len(a.Root.children)-1]
-		i--
+		copy(in[s+1:], in[e+1:])
+		in = in[:len(in)-e+s]
 	}
 
-	return
+	return in, nil
 }
 
 // readDocument reads tokens from the given channel and turns them into AST nodes.
@@ -187,7 +190,7 @@ func (a *AST) readDocument(c <-chan *Token, n *[]Node) (err error) {
 // It deals with individual instructions.
 func (a *AST) readInstruction(c <-chan *Token, n *[]Node, tok *Token) (err error) {
 	file := len(a.Files) - 1
-	instr := NewInstruction(len(a.Files)-1, tok.Line, tok.Col)
+	instr := NewInstruction(file, tok.Line, tok.Col)
 	expr := NewExpression(file, 0, 0)
 
 	instr.children = append(instr.children,

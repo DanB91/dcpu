@@ -130,6 +130,8 @@ func (sw *SourceWriter) writeNode(n parser.Node) {
 		sw.writeExpression(tt)
 	case *parser.Instruction:
 		sw.writeInstruction(tt)
+	case *parser.Function:
+		sw.writeFunction(tt)
 	case *parser.Comment:
 		sw.writeComment(tt.Data)
 	case *parser.Label:
@@ -169,6 +171,20 @@ func (sw *SourceWriter) writeInstruction(n *parser.Instruction) {
 			sw.w.Write(space)
 		}
 	}
+}
+
+func (sw *SourceWriter) writeFunction(n *parser.Function) {
+	chld := n.Children()
+
+	name := chld[0].(*parser.Name)
+	fmt.Fprintf(sw.w, "def %s\n", name.Data)
+
+	chld = chld[1:]
+	for _, v := range chld {
+		sw.writeNode(v)
+	}
+
+	sw.w.Write([]byte("end\n"))
 }
 
 func (sw *SourceWriter) writeExpression(n *parser.Expression) {

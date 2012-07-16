@@ -15,3 +15,10 @@ func NewComment(file, line, col int, value string) *Comment {
 		value,
 	}
 }
+
+func (n *Comment) Copy(file, line, col int) Node {
+	return &Comment{
+		NodeBase: NewNodeBase(file, line, col),
+		Data:     n.Data,
+	}
+}

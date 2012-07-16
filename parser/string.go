@@ -16,3 +16,10 @@ func NewString(file, line, col int, data string) *String {
 		data,
 	}
 }
+
+func (n *String) Copy(file, line, col int) Node {
+	return &String{
+		NodeBase: NewNodeBase(file, line, col),
+		Data:     n.Data,
+	}
+}

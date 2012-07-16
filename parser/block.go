@@ -18,3 +18,16 @@ func NewBlock(file, line, col int) *Block {
 
 func (b *Block) Children() []Node     { return b.children }
 func (b *Block) SetChildren(n []Node) { b.children = n }
+
+func (b *Block) Copy(file, line, col int) Node {
+	nb := &Block{
+		NodeBase: NewNodeBase(file, line, col),
+		children: make([]Node, len(b.children)),
+	}
+
+	for i := range nb.children {
+		nb.children[i] = b.children[i].Copy(file, line, col)
+	}
+
+	return nb
+}
