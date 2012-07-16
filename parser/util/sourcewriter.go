@@ -194,9 +194,11 @@ func (sw *SourceWriter) writeExpression(i int, n *parser.Expression) {
 }
 
 func (sw *SourceWriter) writeLabel(i int, s string) {
-	if !sw.hasComment || sw.skipLine {
+	if !sw.hasComment {
 		sw.w.Write(newline)
 		sw.skipLine = false
+	} else {
+		sw.hasComment = false
 	}
 
 	fmt.Fprintf(sw.w, ":%s\n", s)
