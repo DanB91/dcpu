@@ -22,5 +22,4 @@
    set a, 0
    ifg b, 0xff
       set a, 1
-
    set pc, pop

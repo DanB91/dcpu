@@ -19,15 +19,12 @@
 :strcmp
    ifn [a], [b]
       set pc, strcmp_ret
-
    add a, 1
    add b, 1
    ife [a], 0
       set pc, strcmp_ret
-
    ife [b], 0
       set pc, strcmp_ret
-
    set pc, strcmp
 
 :strcmp_ret

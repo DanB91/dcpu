@@ -17,7 +17,6 @@
 :strlen_loop
    ife [a], 0
       set pc, strlen_ret
-
    add a, 1
    set pc, strlen_loop
 

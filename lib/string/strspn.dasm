@@ -26,7 +26,6 @@
    jsr strchr
    ife a, 0
       set pc, strspn_ret
-
    ifg b, 0
       set pc, strspn_loop
 

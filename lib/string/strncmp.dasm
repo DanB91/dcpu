@@ -21,19 +21,15 @@
 :strncmp
    ifn [a], [b]
       set pc, strncmp_ret
-
    sub c, 1
    ife c, 0
       set pc, strncmp_ret
-
    add a, 1
    ife [a], 0
       set pc, strncmp_ret
-
    add b, 1
    ife [b], 0
       set pc, strncmp_ret
-
    set pc, strncmp
 
 :strncmp_ret

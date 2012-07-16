@@ -31,7 +31,6 @@
 ; Copying only one word is special cased.
    ifg c, 1
       set pc, memmove_range
-
    set [a], [b]
    set pc, pop
 
@@ -43,12 +42,10 @@
 ; Destructive overlap == dst >= src && dest < src + n.
    ifl i, j
       set pc, memmove_no_overlap
-
    add b, c
    sub b, 1
    ifg a, b
       set pc, memmove_no_overlap
-
    sub c, 1
    add i, c
    add j, c
@@ -59,7 +56,6 @@
    sub c, 1
    ifg c, 0
       set pc, memmove_overlap
-
    set pc, pop
 
 :memmove_no_overlap
@@ -67,5 +63,4 @@
    sub c, 1
    ifg c, 0
       set pc, memmove_no_overlap
-
    set pc, pop

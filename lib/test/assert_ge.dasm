@@ -7,7 +7,6 @@
 :assert_ge
    ifl a, b
       panic assert_ge_str
-
    set pc, pop
 
 :assert_ge_str

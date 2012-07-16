@@ -27,7 +27,6 @@
    jsr strchr
    ife a, 0
       set pc, strstr_not_found
-
    set c, x
    set y, a
 
@@ -35,13 +34,10 @@
 :strstr_compare
    ife [c], 0
       set pc, strstr_found
-
    ife [a], 0
       set pc, strstr_not_found
-
    ifn [a], [c]
       set pc, strstr_indexof
-
    add a, 1
    add c, 1
    set pc, strstr_compare

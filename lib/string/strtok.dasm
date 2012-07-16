@@ -38,11 +38,11 @@
 :strtok
    ifn a, 0
       set [strtok_ptr], a
-
    ife a, 0
       ife [strtok_ptr], 0
-         set pc, pop ; No (stored) pointer available
+         set pc, pop
 
+; No (stored) pointer available
    set push, x
    set push, y
    set x, [strtok_ptr]
@@ -52,13 +52,11 @@
 :strtok_is_delim
    ife [x], 0
       set pc, strtok_ret
-
    set a, y
    set b, [x]
    jsr strchr
    ifg a, 0
       set pc, strtok_yield
-
    add x, 1
    set pc, strtok_is_delim
 
@@ -66,7 +64,6 @@
 :strtok_yield
    ifn x, [strtok_ptr]
       set pc, strtok_valid_token
-
    add x, 1
    set [strtok_ptr], x
    set pc, strtok_is_delim

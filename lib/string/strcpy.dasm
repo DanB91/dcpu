@@ -22,5 +22,4 @@
    sti [i], [j]
    ifn b, 0
       set pc, strcpy_loop
-
    set pc, pop

@@ -7,7 +7,6 @@
 :assert_nz
    ife a, 0
       panic assert_nz_str
-
    set pc, pop
 
 :assert_nz_str

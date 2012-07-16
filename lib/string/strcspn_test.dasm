@@ -9,7 +9,9 @@
    set a, s1
    set b, s3
    jsr strcspn
-   set b, 6 ; strlen(s1)
+   set b, 6
+
+; strlen(s1)
    jsr assert_eq
    exit
 

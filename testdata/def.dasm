@@ -18,6 +18,9 @@ def foo
 	equ LoopCount, 16
 
 	set i, 0
+
+	; comment on instruction.
+	; And some more.
 	set b, 0
 	set c, 0
 

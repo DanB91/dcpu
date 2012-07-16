@@ -9,7 +9,6 @@
 :assert_gts
    ifa a, b
       set pc, pop
-
    panic assert_gts_str
 
 :assert_gts_str

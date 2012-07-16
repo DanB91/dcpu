@@ -20,17 +20,15 @@ var (
 // SourceWriter allows us to write an AST out as source code
 // with configurable style.
 type SourceWriter struct {
-	w             io.Writer
-	a             *parser.AST
-	indentTokens  []byte
-	nestLevel     int
-	TabWidth      uint
-	Tabs          bool
-	Comments      bool
-	Indent        bool
-	inInstruction bool
-	skipLine      bool
-	hasComment    bool
+	w            io.Writer
+	a            *parser.AST
+	indentTokens []byte
+	nestLevel    int
+	TabWidth     uint
+	Tabs         bool
+	Comments     bool
+	Indent       bool
+	inInstr      bool
 }
 
 // NewSourceWriter creates a new source writer for the given ast
@@ -64,107 +62,117 @@ func (sw *SourceWriter) Write() {
 	}
 
 	sw.nestLevel = 1
-	sw.inInstruction = false
-	sw.skipLine = false
-	sw.hasComment = false
+	sw.inInstr = false
 	sw.writeList(sw.a.Root.Children())
 }
 
-func (sw *SourceWriter) writeList(list []parser.Node) {
-	for i := range list {
-		sw.writeNode(i, list[i])
-	}
-}
-
-func (sw *SourceWriter) writeNode(i int, n parser.Node) {
-	switch tt := n.(type) {
-	case *parser.Block:
-		sw.writeBlock(i, tt)
-	case *parser.Expression:
-		sw.writeExpression(i, tt)
-	case *parser.Instruction:
-		sw.writeInstruction(i, tt)
-	case *parser.Function:
-		sw.writeFunction(i, tt)
-	case *parser.Comment:
-		sw.writeComment(i, tt.Data)
-	case *parser.Label:
-		sw.writeLabel(i, tt.Data)
-	case *parser.Name:
-		sw.writeLiteral(i, tt.Data)
-	case *parser.Number:
-		sw.writeLiteral(i, tt.Data)
-	case *parser.Char:
-		sw.writeChar(i, tt.Data)
-	case *parser.Operator:
-		sw.writeLiteral(i, tt.Data)
-	case *parser.String:
-		sw.writeString(i, tt.Data)
-	}
-}
-
-func (sw *SourceWriter) writeBlock(i int, n *parser.Block) {
-	sw.w.Write(lbrack)
-
-	for i, v := range n.Children() {
-		sw.writeNode(i, v)
-	}
-
-	sw.w.Write(rbrack)
-}
-
-func (sw *SourceWriter) writeInstruction(i int, n *parser.Instruction) {
-	sw.inInstruction = true
-
-	chld := n.Children()
-	name := chld[0].(*parser.Name)
-	doSkip := name.Data == "equ"
-
-	if sw.skipLine {
-		if !doSkip {
-			sw.w.Write(newline)
-		}
-		sw.skipLine = false
-	}
-
+func (sw *SourceWriter) indent() {
 	for i := 0; i < sw.nestLevel; i++ {
 		sw.w.Write(sw.indentTokens)
 	}
+}
+
+func (sw *SourceWriter) writeList(list []parser.Node) {
+	preceedingComment := false
+
+	for i := range list {
+		switch tt := list[i].(type) {
+		case *parser.Block:
+			sw.writeBlock(tt)
+
+		case *parser.Expression:
+			if i > 0 && i < len(list) {
+				sw.w.Write(space)
+			}
+
+			sw.writeExpression(tt)
+
+			if i > 0 && i < len(list)-1 {
+				sw.w.Write(comma)
+			}
+
+		case *parser.Instruction:
+			sw.inInstr = true
+			sw.indent()
+			sw.writeInstruction(tt)
+			sw.w.Write(newline)
+			sw.inInstr = false
+
+		case *parser.Function:
+			sw.writeFunction(tt)
+			sw.w.Write(newline)
+
+		case *parser.Comment:
+			if i > 0 && !sw.inInstr && !preceedingComment {
+				sw.w.Write(newline)
+			}
+
+			if sw.inInstr && i < len(list) {
+				sw.w.Write(space)
+			}
+
+			sw.writeComment(tt.Data)
+
+			if !sw.inInstr {
+				sw.w.Write(newline)
+			}
+
+		case *parser.Label:
+			if i > 0 && !preceedingComment {
+				sw.w.Write(newline)
+			}
+
+			sw.writeLabel(tt.Data)
+			sw.w.Write(newline)
+
+		case *parser.Name:
+			sw.writeLiteral(tt.Data)
+
+		case *parser.Number:
+			sw.writeLiteral(tt.Data)
+
+		case *parser.Char:
+			sw.writeChar(tt.Data)
+
+		case *parser.Operator:
+			sw.writeLiteral(tt.Data)
+
+		case *parser.String:
+			sw.writeString(tt.Data)
+		}
+
+		switch list[i].(type) {
+		case *parser.Comment:
+			preceedingComment = true
+		case *parser.Label:
+			preceedingComment = true
+		default:
+			preceedingComment = false
+		}
+	}
+}
+
+func (sw *SourceWriter) writeBlock(n *parser.Block) {
+	sw.w.Write(lbrack)
+	sw.writeList(n.Children())
+	sw.w.Write(rbrack)
+}
+
+func (sw *SourceWriter) writeInstruction(n *parser.Instruction) {
+	chld := n.Children()
+	name := chld[0].(*parser.Name)
 
 	if parser.IsBranch(name.Data) {
 		sw.nestLevel++
 	} else {
-		if sw.nestLevel > 1 {
-			doSkip = true
-		}
-
 		sw.nestLevel = 1
 	}
 
-	for i, v := range chld {
-		sw.writeNode(i, v)
-
-		if i < len(chld)-1 {
-			if i > 0 {
-				sw.w.Write(comma)
-			}
-			sw.w.Write(space)
-		}
-	}
-
-	sw.w.Write(newline)
-	sw.inInstruction = false
-	sw.skipLine = doSkip
+	sw.writeList(chld)
 }
 
-func (sw *SourceWriter) writeFunction(i int, n *parser.Function) {
+func (sw *SourceWriter) writeFunction(n *parser.Function) {
 	var name string
-
-	if sw.skipLine {
-		sw.w.Write(newline)
-		sw.skipLine = false
-	}
-
 	chld := n.Children()
 
 	switch tt := chld[0].(type) {
@@ -175,63 +183,32 @@ func (sw *SourceWriter) writeFunction(i int, n *parser.Function) {
 	}
 
 	fmt.Fprintf(sw.w, "def %s\n", name)
-
 	sw.writeList(chld[1:])
-
-	sw.w.Write([]byte("end\n"))
-	sw.skipLine = true
+	sw.w.Write([]byte("end"))
 }
 
-func (sw *SourceWriter) writeExpression(i int, n *parser.Expression) {
-	for i, v := range n.Children() {
-		switch v.(type) {
-		case *parser.Comment:
-			sw.w.Write(space)
-		}
-
-		sw.writeNode(i, v)
-	}
+func (sw *SourceWriter) writeExpression(n *parser.Expression) {
+	sw.writeList(n.Children())
 }
 
-func (sw *SourceWriter) writeLabel(i int, s string) {
-	if !sw.hasComment {
-		sw.w.Write(newline)
-		sw.skipLine = false
-	} else {
-		sw.hasComment = false
-	}
-
-	fmt.Fprintf(sw.w, ":%s\n", s)
+func (sw *SourceWriter) writeLabel(s string) {
+	fmt.Fprintf(sw.w, ":%s", s)
 }
 
-func (sw *SourceWriter) writeString(i int, s string) {
+func (sw *SourceWriter) writeString(s string) {
 	fmt.Fprintf(sw.w, "%q", s)
 }
 
-func (sw *SourceWriter) writeChar(i int, s string) {
+func (sw *SourceWriter) writeChar(s string) {
 	fmt.Fprintf(sw.w, "'%s'", s)
 }
 
-func (sw *SourceWriter) writeLiteral(i int, s string) {
+func (sw *SourceWriter) writeLiteral(s string) {
 	fmt.Fprintf(sw.w, "%s", s)
 }
 
-func (sw *SourceWriter) writeComment(i int, s string) {
-	if !sw.Comments {
-		return
+func (sw *SourceWriter) writeComment(s string) {
+	if sw.Comments {
+		fmt.Fprintf(sw.w, ";%s", s)
 	}
-
-	if !sw.inInstruction && i > 0 && sw.skipLine {
-		sw.w.Write(newline)
-		sw.skipLine = false
-	}
-
-	fmt.Fprintf(sw.w, ";%s", s)
-
-	if !sw.inInstruction {
-		sw.w.Write(newline)
-		sw.hasComment = true
-	}
-
-	sw.hasComment = !sw.inInstruction
 }

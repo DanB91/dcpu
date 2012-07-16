@@ -172,6 +172,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <keyword>equ</keyword>
           <keyword>exit</keyword>
           <keyword>panic</keyword>
+          <keyword>def</keyword>
+          <keyword>end</keyword>
         </context>
 
         <context id="types" style-ref="type">

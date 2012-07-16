@@ -7,7 +7,6 @@
 :assert_le
    ifg a, b
       panic assert_le_str
-
    set pc, pop
 
 :assert_le_str

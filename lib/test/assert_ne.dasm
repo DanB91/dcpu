@@ -7,7 +7,6 @@
 :assert_ne
    ife a, b
       panic assert_ne_str
-
    set pc, pop
 
 :assert_ne_str

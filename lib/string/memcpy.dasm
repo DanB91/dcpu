@@ -23,7 +23,6 @@
 :memcpy
    ife c, 0
       set pc, pop
-
    set i, a
    set j, b
 
@@ -32,5 +31,4 @@
    sub c, 1
    ifg c, 0
       set pc, memcpy_loop
-
    set pc, pop

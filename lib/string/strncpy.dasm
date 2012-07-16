@@ -24,10 +24,8 @@
    sub c, 1
    ife b, 0
       set pc, strncpy_pad
-
    ifg c, 0
       set pc, strncpy_loop
-
    set pc, pop
 
 :strncpy_pad
@@ -36,5 +34,4 @@
    sub c, 1
    ifg c, 0
       set pc, strncpy_pad
-
    set pc, pop

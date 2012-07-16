@@ -16,7 +16,6 @@
 :memset
    ife 0, c ; zero size - exit.
       set pc, pop
-
    set push, i
    set push, j
    set i, a

@@ -9,7 +9,6 @@
 :assert_lts
    ifu a, b
       set pc, pop
-
    panic assert_lts_str
 
 :assert_lts_str

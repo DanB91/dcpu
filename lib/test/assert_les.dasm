@@ -9,7 +9,6 @@
 :assert_les
    ifa a, b
       panic assert_les_str
-
    set pc, pop
 
 :assert_les_str

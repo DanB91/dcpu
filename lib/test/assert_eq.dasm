@@ -7,7 +7,6 @@
 :assert_eq
    ifn a, b
       panic assert_eq_str
-
    set pc, pop
 
 :assert_eq_str

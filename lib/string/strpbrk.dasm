@@ -39,21 +39,18 @@
 :strpbrk_indexof
    set a, x
    set b, [y]
-   jsr strchr ; ch = strchr(str1, *str2)
-   ifg a, 0 ; if (ch != NULL)
-      ifl a, c ; if (ch < c)
-         set c, a ; c = ch
-
+   jsr strchr ;      ch = strchr(str1, *str2)
+   ifg a, 0 ;        if (ch != NULL)
+      ifl a, c ;     if (ch < c)
+         set c, a ;  c = ch
    add y, 1
    ife [y], 0
       set pc, strpbrk_ret
-
    set pc, strpbrk_indexof
 
 :strpbrk_ret
    ife c, pop
       set c, 0
-
    set a, c
 
 ; Restore register backups.

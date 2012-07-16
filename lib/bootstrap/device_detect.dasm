@@ -34,7 +34,6 @@
    ife a, i
       ife b, j
          set pc, device_detect_ret
-
    sub z, 1
    ifa z, 0xffff
       set pc, device_detect_loop

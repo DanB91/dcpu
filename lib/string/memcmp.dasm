@@ -24,11 +24,9 @@
 :memcmp_loop
    ifn [a], [b]
       set pc, memcmp_ret
-
    sub c, 1
    ife c, 0
       set pc, memcmp_ret
-
    add a, 1
    add b, 1
    set pc, memcmp_loop

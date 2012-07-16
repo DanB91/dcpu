@@ -18,7 +18,6 @@
    ifn [a], 0
       ifl [a], 0x100
          set pc, strpack_getlen
-
    set a, 0
    set pc, pop
 
@@ -35,20 +34,17 @@
    jsr malloc
    ife a, 0
       set pc, pop
-
    set push, x
    set x, a
 
 :strpack_loop
    ife [c], 0
       set pc, strpack_ret
-
    set [a], [c]
    shl [a], 8
    add c, 1
    ife [c], 0
       set pc, strpack_ret
-
    add [i], [c]
    add a, 1
    set pc, strpack_loop

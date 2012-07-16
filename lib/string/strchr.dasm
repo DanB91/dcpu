@@ -16,10 +16,8 @@
 :strchr
    ife [a], b
       set pc, pop
-
    ife [a], 0
       set pc, strchr_not_found
-
    add a, 1
    set pc, strchr
 

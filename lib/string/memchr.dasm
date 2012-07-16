@@ -18,11 +18,9 @@
 :memchr_loop
    ife [a], b
       set pc, pop
-
    sub c, 1
    ife c, 0
       set pc, memchr_ret
-
    add a, 1
    set pc, memchr_loop
 
