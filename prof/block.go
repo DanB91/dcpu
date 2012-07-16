@@ -11,7 +11,8 @@ import (
 type Block struct {
 	Data  []ProfileData // Profile data for this function's instructions.
 	Label string        // Label/name of this function.
-	Addr  cpu.Word      // start address of function.
+	Start cpu.Word      // Start address of function.
+	End   cpu.Word      // End address of function.
 }
 
 // Cost returns the cumulative cycle cost and count for all
@@ -23,11 +24,6 @@ func (f *Block) Cost() (count, cost uint64) {
 	}
 
 	return
-}
-
-// Range returns the address range for this function.
-func (f *Block) Range() (start, end cpu.Word) {
-	return f.Addr, f.Addr + cpu.Word(len(f.Data)-1)
 }
 
 type BlockList []Block

@@ -12,19 +12,23 @@ import (
 
 const DefaultListFilter = ".+"
 
-func getLineData(l []prof.ProfileData, start, end cpu.Word, line int) *prof.ProfileData {
-	for pc := start; pc <= end; pc += l[pc].Size {
-		if l[pc].Line == line && l[pc].Count > 0 {
-			return &l[pc]
+func getLineData(l []prof.ProfileData, start, end cpu.Word, line int) prof.Block {
+	var b prof.Block
+
+	for pc := start; pc < end; pc += l[pc].Size {
+		if l[pc].Line == line {
+			b.Data = append(b.Data, l[pc])
 		}
 	}
 
-	return nil
+	return b
 }
 
 // Display detailed instruction view for the given filter.
 func list(p *prof.Profile, filemode bool, filter *regexp.Regexp) {
 	var blocks prof.BlockList
+	var linedata prof.Block
+	var count, cost uint64
 
 	if filemode {
 		blocks = p.ListFiles()
@@ -42,37 +46,29 @@ func list(p *prof.Profile, filemode bool, filter *regexp.Regexp) {
 	}
 
 	for i := range blocks {
-		if len(blocks[i].Data) == 0 {
-			continue
-		}
-
-		if len(blocks[i].Label) == 0 {
-			blocks[i].Label = GetLabel(p, blocks[i].Addr)
-		}
-
 		if !filter.MatchString(blocks[i].Label) {
 			continue
 		}
 
-		start, end := blocks[i].Range()
+		start, end := blocks[i].Start, blocks[i].End
 		totalcount, totalcost := blocks[i].Cost()
 
 		file := p.Files[p.Data[start].File]
 		startline := p.Data[start].Line
-		endline := p.Data[end].Line
+		endline := p.Data[end-1].Line
 		source := GetSourceLines(file.Name, startline, endline)
 
-		fmt.Printf("[*] ===> %s %d-%d\n", file.Name, startline, endline)
+		fmt.Printf("[*] ===> %s\n", blocks[i].Label)
 		fmt.Printf("[*] %d sample(s), %d cycle(s)\n\n", totalcount, totalcost)
 
 		for j := range source {
-			dp := getLineData(p.Data, start, end, startline+j)
+			linedata = getLineData(p.Data, start, end, startline+j)
+			count, cost = linedata.Cost()
 
-			if dp == nil {
+			if count == 0 {
 				fmt.Printf("                    %03d: %s\n", startline+j, source[j])
 			} else {
-				fmt.Printf("%8d %8d   %03d: %s\n",
-					dp.Count, dp.CumulativeCost(), startline+j, source[j])
+				fmt.Printf("%8d %8d   %03d: %s\n", count, cost, startline+j, source[j])
 			}
 		}
 

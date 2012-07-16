@@ -5,9 +5,11 @@
 package prof
 
 import (
+	"fmt"
 	"github.com/jteeuwen/dcpu/asm"
 	"github.com/jteeuwen/dcpu/cpu"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -89,11 +91,12 @@ func (p *Profile) ListFiles() BlockList {
 			if i < len(p.fileblocks)-1 {
 				e = p.Files[i+1].Start
 			} else {
-				e = cpu.Word(len(p.Data))
+				e = cpu.Word(len(p.Data) - 1)
 			}
 
 			p.fileblocks[i].Data = p.Data[s:e]
-			p.fileblocks[i].Addr = s
+			p.fileblocks[i].Start = s
+			p.fileblocks[i].End = e
 			p.fileblocks[i].Label = strings.Replace(p.Files[i].Name, path, "$DCPU_PATH", 1)
 		}
 	}
@@ -101,18 +104,38 @@ func (p *Profile) ListFiles() BlockList {
 	return p.fileblocks
 }
 
+// getFileName finds the filename associated with a given function.
+func (p *Profile) getFileName(addr cpu.Word) string {
+	files := p.ListFiles()
+
+	for i := range files {
+		if addr >= files[i].Start && addr < files[i].End {
+			return files[i].Label
+		}
+	}
+
+	return ""
+}
+
 func (p *Profile) ListFunctions() BlockList {
 	if len(p.funcblocks) == 0 {
 		p.funcblocks = make(BlockList, len(p.Functions))
 
 		var s, e cpu.Word
+		var fname string
+
 		for i := range p.funcblocks {
 			s = p.Functions[i].Start
-			s = p.Functions[i].End
+			e = p.Functions[i].End
+
+			fname = p.getFileName(s)
+			_, fname = path.Split(fname)
 
 			p.funcblocks[i].Data = p.Data[s:e]
-			p.funcblocks[i].Addr = s
-			p.funcblocks[i].Label = p.Functions[i].Name
+			p.funcblocks[i].Start = s
+			p.funcblocks[i].End = e
+			p.funcblocks[i].Label = fmt.Sprintf("%s (%s)",
+				p.Functions[i].Name, fname)
 		}
 	}
 

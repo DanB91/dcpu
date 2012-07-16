@@ -1,0 +1,20 @@
+	jsr main
+	exit
+
+def main
+	set a, 0xffff
+	jsr foo
+end
+
+def foo
+	set i, 0
+
+:foo_loop
+	ife i, 10
+		return
+	add i, 1
+	shr a, 1
+	set pc, foo_loop
+end
+
+

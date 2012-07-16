@@ -14,7 +14,7 @@ var (
 		"ias", "rfi", "iaq", "hwn", "hwq", "hwi",
 
 		// Non-standard and pseudo instructions.
-		"dat", "panic", "exit", "equ",
+		"dat", "panic", "exit", "equ", "return",
 	}
 
 	registers = [...]string{

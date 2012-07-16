@@ -41,17 +41,13 @@ when profiling code. As it gives a rough overview of where most of the CPU
 time is spent without going into too much detail.
 
 	top
-	[*] 48 sample(s), 110 cycle(s)
-		   42  87.50%       98  89.09% memchr
-		    4   8.33%        8   7.27% assert_eq
-		    2   4.17%        4   3.64% assert_ez
+	[*] 46 sample(s), 68 cycle(s)
+		   43  93.48%       64  94.12% foo
+		    3   6.52%        4   5.88% main
 
 	top -file
-	[*] 108 sample(s), 225 cycle(s)
-		   70  64.81%      157  69.78% $DCPU_PATH/string/memcmp.dasm
-		   28  25.93%       48  21.33% $DCPU_PATH/string/_test.dasm
-		    8   7.41%       16   7.11% $DCPU_PATH/string/assert_eq.dasm
-		    2   1.85%        4   1.78% $DCPU_PATH/string/assert_ez.dasm
+	[*] 48 sample(s), 72 cycle(s)
+		   48 100.00%       72 100.00% testdata/func_test.dasm
 
 
 The table shows 5 columns, depending on whether you are viewing
@@ -78,39 +74,49 @@ function or file listings:
 Here is an example of the `list` command output:
 
 	list
-	[*] ===> $DCPU_PATH/string/memchr.dasm 15-29
-	[*] 42 sample(s), 98 cycle(s)
+	[*] ===> foo (func_test.dasm)
+	[*] 46 sample(s), 78 cycle(s)
 
-		   3       11   015:   ife 0, c ; num is zero -- No compare needed.
-		   1        1   016:     set pc, pop
-		                017: 
-		                018: :memchr_loop
-		   8       23   019:   ife [a], b
-		   1        1   020:     set pc, pop
-		   7       14   021:   sub c, 1
-		   7       20   022:   ife c, 0
-		   1        2   023:     set pc, memchr_ret
-		   6       12   024:   add a, 1
-		   6       12   025:   set pc ,memchr_loop
-		                026: 
-		                027: :memchr_ret
-		   1        1   028:   set a, 0
-		   1        1   029:   set pc, pop
+		   1        1   009: def foo
+		   1        1   010: 	set i, 0
+		                011: 
+		                012: :foo_loop
+		  11       32   013: 	ife i, 10
+		   1        2   014: 		return
+		  10       20   015: 	add i, 1
+		  10       10   016: 	shr a, 1
+		  10       10   017: 	set pc, foo_loop
+		   2        2   018: end
 
-	[*] ===> $DCPU_PATH/test/assert_eq.dasm 8-10
-	[*] 4 sample(s), 8 cycle(s)
+	[*] ===> main (func_test.dasm)
+	[*] 3 sample(s), 4 cycle(s)
 
-		   2        6   008:   ifn a, b
-		                009:     panic assert_eq_str
-		   2        2   010:   set pc, pop
+		   1        1   005: 	set a, 0xffff
+		   1        2   006: 	jsr foo
+		   1        1   007: end
 
-	[*] ===> $DCPU_PATH/test/assert_ez.dasm 8-10
-	[*] 2 sample(s), 4 cycle(s)
+	list -file
+	[*] ===> dcpu/testdata/func_test.dasm
+	[*] 50 sample(s), 85 cycle(s)
 
-		   1        3   008:   ifn a, 0
-		                009:     panic assert_ez_str
-		   1        1   010:   set pc, pop
-
+		   1        2   001: 	jsr main
+		   1        2   002: 	exit
+		                003: 
+		                004: def main
+		   1        1   005: 	set a, 0xffff
+		   1        2   006: 	jsr foo
+		   1        1   007: end
+		                008: 
+		   1        1   009: def foo
+		   1        1   010: 	set i, 0
+		                011: 
+		                012: :foo_loop
+		  11       32   013: 	ife i, 10
+		   1        2   014: 		return
+		  10       20   015: 	add i, 1
+		  10       10   016: 	shr a, 1
+		  10       10   017: 	set pc, foo_loop
+		   1        1   018: end
 
 
 It lists the sources for all functions that match the filter specified in

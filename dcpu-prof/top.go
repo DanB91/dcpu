@@ -35,10 +35,6 @@ func top(p *prof.Profile, filemode bool, count uint, sort string) {
 	}
 
 	for i := range blocks {
-		if len(blocks[i].Label) == 0 {
-			blocks[i].Label = GetLabel(p, blocks[i].Addr)
-		}
-
 		a, b := blocks[i].Cost()
 		counttotal += float64(a)
 		costtotal += float64(b)

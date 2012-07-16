@@ -109,7 +109,7 @@ func usage() {
 	fmt.Println(`List of known commands:
 
  -top [-n -s -file]
-   List the top N number of samples for all function calls where.
+   List the top N number of samples for all function calls.
    
        -n : The number of results to limit the output to.
        -s : The sort value denotes the field by which the table should be
