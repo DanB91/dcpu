@@ -1,0 +1,197 @@
+{
+ "Files": [
+  {
+   "Name": "/a/code/go/src/github.com/jteeuwen/dcpu/testdata/def.dasm",
+   "Start": 0
+  }
+ ],
+ "Functions": [
+  {
+   "Name": "main",
+   "Start": 3,
+   "End": 8
+  },
+  {
+   "Name": "foo",
+   "Start": 8,
+   "End": 35
+  }
+ ],
+ "SourceMapping": [
+  {
+   "File": 0,
+   "Line": 3,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 3,
+   "Col": 6
+  },
+  {
+   "File": 0,
+   "Line": 4,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 10,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 6,
+   "Col": 17
+  },
+  {
+   "File": 0,
+   "Line": 11,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 11,
+   "Col": 6
+  },
+  {
+   "File": 0,
+   "Line": 12,
+   "Col": 1
+  },
+  {
+   "File": 0,
+   "Line": 16,
+   "Col": 5
+  },
+  {
+   "File": 0,
+   "Line": 20,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 24,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 25,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 28,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 29,
+   "Col": 3
+  },
+  {
+   "File": 0,
+   "Line": 30,
+   "Col": 4
+  },
+  {
+   "File": 0,
+   "Line": 30,
+   "Col": 12
+  },
+  {
+   "File": 0,
+   "Line": 32,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 33,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 34,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 35,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 36,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 37,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 38,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 39,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 40,
+   "Col": 3
+  },
+  {
+   "File": 0,
+   "Line": 40,
+   "Col": 11
+  },
+  {
+   "File": 0,
+   "Line": 42,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 43,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 44,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 47,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 48,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 51,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 52,
+   "Col": 2
+  },
+  {
+   "File": 0,
+   "Line": 53,
+   "Col": 1
+  },
+  {
+   "File": 0,
+   "Line": 53,
+   "Col": 1
+  }
+ ]
+}

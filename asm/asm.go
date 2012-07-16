@@ -26,7 +26,7 @@ func Assemble(ast *parser.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 	asm.ast = ast
 	asm.labels = make(map[string]cpu.Word)
 	asm.refs = make(map[cpu.Word]*parser.Name)
-	asm.debug = NewDebugInfo(ast.Files)
+	asm.debug = new(DebugInfo)
 
 	// Process function definitions.
 	// This also processes function-local constants.
@@ -60,6 +60,8 @@ func Assemble(ast *parser.AST) (prog []cpu.Word, dbg *DebugInfo, err error) {
 			ast.Files[v.File()], v.Line(), v.Col(),
 			"Unknown label reference %q.", v.Data)
 	}
+
+	asm.debug.SetFileDefs(ast.Files)
 
 	prog = asm.code
 	dbg = asm.debug
@@ -100,6 +102,9 @@ func (a *assembler) buildNodes(nodes []parser.Node) (err error) {
 // buildFunction compiles the given function.
 func (a *assembler) buildFunction(f *parser.Function) (err error) {
 	nodes := f.Children()
+	name := nodes[0].(*parser.Label)
+
+	a.debug.SetFunctionStart(cpu.Word(len(a.code)), name.Data)
 
 	for i := range nodes {
 		switch tt := nodes[i].(type) {
@@ -124,6 +129,7 @@ func (a *assembler) buildFunction(f *parser.Function) (err error) {
 		}
 	}
 
+	a.debug.SetFunctionEnd(cpu.Word(len(a.code)))
 	return
 }
 

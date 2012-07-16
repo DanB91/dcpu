@@ -35,7 +35,7 @@ func FindReferences(n []parser.Node, l *[]*parser.Name) {
 	}
 }
 
-// FindFunctions finds all function names.
+// FindFunctions finds all function definitions.
 func FindFunctions(n []parser.Node, l *[]*parser.Function) {
 	for i := range n {
 		switch tt := n[i].(type) {

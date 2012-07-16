@@ -9,7 +9,7 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 		"ifn":0, "ifg":0, "ifa":0, "ifl":0, "ifu":0, "adx":0,
 		"sbx":0, "sti":0, "std":0, "jsr":0, "int":0, "iag":0,
 		"ias":0, "rfi":0, "iaq":0, "hwn":0, "hwq":0, "hwi":0,
-		"dat":0, "panic":0, "exit":0,
+		"dat":0, "panic":0, "exit":0, "def":0, "end":0,
 	};
 
 	var atoms = {

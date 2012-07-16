@@ -39,6 +39,6 @@ fi
 
 dcpu-prof -top -file -s cost -n 5 "$PROFILE";
 dcpu-prof -list -file -f "$FILTER" "$PROFILE";
-#rm "$PROFILE";
+rm -f "$PROFILE";
 
 exit;

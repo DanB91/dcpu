@@ -3,7 +3,10 @@
 
 package main
 
-import dp "github.com/jteeuwen/dcpu/parser"
+import (
+	"github.com/jteeuwen/dcpu/cpu"
+	"github.com/jteeuwen/dcpu/parser"
+)
 
 func init() {
 	RegisterPreProcessor("shorthand",
@@ -31,17 +34,23 @@ type OptShorthand struct{}
 
 func NewOptShorthand() PreProcessor { return new(OptShorthand) }
 
-func (*OptShorthand) Process(ast *dp.AST) (err error) {
+func (*OptShorthand) Process(ast *parser.AST) (err error) {
+	var instr *parser.Instruction
+	var num parser.NumericNode
+	var argv []parser.Node
+	var name *parser.Name
+	var word cpu.Word
+	var ok bool
+
 	nodes := ast.Root.Children()
 
 	for i := range nodes {
-		instr, ok := nodes[i].(*dp.Instruction)
-		if !ok {
+		if instr, ok = nodes[i].(*parser.Instruction); !ok {
 			continue
 		}
 
-		argv := instr.Children()
-		name := argv[0].(*dp.Name)
+		argv = instr.Children()
+		name = argv[0].(*parser.Name)
 
 		if name.Data != "ife" && name.Data != "ifn" {
 			continue
@@ -51,13 +60,12 @@ func (*OptShorthand) Process(ast *dp.AST) (err error) {
 			continue
 		}
 
-		num, ok := argv[1].(*dp.Expression).Children()[0].(dp.NumericNode)
+		num, ok = argv[1].(*parser.Expression).Children()[0].(parser.NumericNode)
 		if !ok {
 			continue
 		}
 
-		word, err := num.Parse()
-		if err != nil {
+		if word, err = num.Parse(); err != nil {
 			return err
 		}
 
