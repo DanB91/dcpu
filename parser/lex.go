@@ -76,8 +76,10 @@ func (l *Lexer) emit(tt TokenType) {
 	tok.Col = l.col[1]
 	tok.Data = l.data[l.start:l.pos]
 
-	if tt == TokIdent || tt == TokLabel {
-		tok.Data = bytes.ToLower(tok.Data)
+	if tt == TokIdent {
+		if IsSpecialName(string(tok.Data)) {
+			tok.Data = bytes.ToLower(tok.Data)
+		}
 	}
 
 	l.ch <- &tok

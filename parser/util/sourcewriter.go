@@ -17,23 +17,20 @@ var (
 	rbrack  = []byte{']'}
 )
 
-func isBranch(name string) bool {
-	switch name {
-	case "ifb", "ifc", "ife", "ifn", "ifg", "ifa", "ifl", "ifu":
-		return true
-	}
-	return false
-}
-
 // SourceWriter allows us to write an AST out as source code
 // with configurable style.
 type SourceWriter struct {
-	w        io.Writer
-	a        *parser.AST
-	TabWidth uint
-	Tabs     bool
-	Comments bool
-	Indent   bool
+	w             io.Writer
+	a             *parser.AST
+	indentTokens  []byte
+	nestLevel     int
+	TabWidth      uint
+	Tabs          bool
+	Comments      bool
+	Indent        bool
+	inInstruction bool
+	skipLine      bool
+	hasComment    bool
 }
 
 // NewSourceWriter creates a new source writer for the given ast
@@ -55,114 +52,97 @@ func (sw *SourceWriter) Write() {
 		return
 	}
 
-	var indent []byte
-
 	if sw.Indent {
 		if sw.Tabs {
-			indent = []byte{'\t'}
+			sw.indentTokens = []byte{'\t'}
 		} else {
-			indent = make([]byte, sw.TabWidth)
-			for i := range indent {
-				indent[i] = ' '
+			sw.indentTokens = make([]byte, sw.TabWidth)
+			for i := range sw.indentTokens {
+				sw.indentTokens[i] = ' '
 			}
 		}
 	}
 
-	followsBranch := false
-	followsInstruction := false
-	followsComment := false
-	nestlevel := 1
+	sw.nestLevel = 1
+	sw.inInstruction = false
+	sw.skipLine = false
+	sw.hasComment = false
+	sw.writeList(sw.a.Root.Children())
+}
 
-	for i, v := range sw.a.Root.Children() {
-		switch v.(type) {
-		case *parser.Comment:
-			if i > 0 && !followsBranch && followsInstruction && !followsComment {
-				sw.w.Write(newline)
-			}
-
-		case *parser.Label:
-			if i > 0 && !followsBranch && followsInstruction && !followsComment {
-				sw.w.Write(newline)
-			}
-
-		case *parser.Instruction:
-			for i := 0; i < nestlevel; i++ {
-				sw.w.Write(indent)
-			}
-		}
-
-		sw.writeNode(v)
-
-		followsBranch = false
-		followsComment = false
-		followsInstruction = false
-
-		switch tt := v.(type) {
-		case *parser.Comment:
-			sw.w.Write(newline)
-			followsComment = true
-
-		case *parser.Label:
-			sw.w.Write(newline)
-
-		case *parser.Instruction:
-			sw.w.Write(newline)
-			followsInstruction = true
-
-			name := tt.Children()[0].(*parser.Name).Data
-			if isBranch(name) {
-				nestlevel++
-
-			} else if nestlevel > 1 {
-				sw.w.Write(newline)
-				nestlevel = 1
-				followsBranch = true
-			}
-		}
+func (sw *SourceWriter) writeList(list []parser.Node) {
+	for i := range list {
+		sw.writeNode(i, list[i])
 	}
 }
 
-func (sw *SourceWriter) writeNode(n parser.Node) {
+func (sw *SourceWriter) writeNode(i int, n parser.Node) {
 	switch tt := n.(type) {
 	case *parser.Block:
-		sw.writeBlock(tt)
+		sw.writeBlock(i, tt)
 	case *parser.Expression:
-		sw.writeExpression(tt)
+		sw.writeExpression(i, tt)
 	case *parser.Instruction:
-		sw.writeInstruction(tt)
+		sw.writeInstruction(i, tt)
 	case *parser.Function:
-		sw.writeFunction(tt)
+		sw.writeFunction(i, tt)
 	case *parser.Comment:
-		sw.writeComment(tt.Data)
+		sw.writeComment(i, tt.Data)
 	case *parser.Label:
-		sw.writeLabel(tt.Data)
+		sw.writeLabel(i, tt.Data)
 	case *parser.Name:
-		sw.writeLiteral(tt.Data)
+		sw.writeLiteral(i, tt.Data)
 	case *parser.Number:
-		sw.writeLiteral(tt.Data)
+		sw.writeLiteral(i, tt.Data)
 	case *parser.Char:
-		sw.writeLiteral(tt.Data)
+		sw.writeChar(i, tt.Data)
 	case *parser.Operator:
-		sw.writeLiteral(tt.Data)
+		sw.writeLiteral(i, tt.Data)
 	case *parser.String:
-		sw.writeString(tt.Data)
+		sw.writeString(i, tt.Data)
 	}
 }
 
-func (sw *SourceWriter) writeBlock(n *parser.Block) {
+func (sw *SourceWriter) writeBlock(i int, n *parser.Block) {
 	sw.w.Write(lbrack)
 
-	for _, v := range n.Children() {
-		sw.writeNode(v)
+	for i, v := range n.Children() {
+		sw.writeNode(i, v)
 	}
 
 	sw.w.Write(rbrack)
 }
 
-func (sw *SourceWriter) writeInstruction(n *parser.Instruction) {
+func (sw *SourceWriter) writeInstruction(i int, n *parser.Instruction) {
+	sw.inInstruction = true
+
 	chld := n.Children()
+	name := chld[0].(*parser.Name)
+	doSkip := name.Data == "equ"
+
+	if sw.skipLine {
+		if !doSkip {
+			sw.w.Write(newline)
+		}
+		sw.skipLine = false
+	}
+
+	for i := 0; i < sw.nestLevel; i++ {
+		sw.w.Write(sw.indentTokens)
+	}
+
+	if parser.IsBranch(name.Data) {
+		sw.nestLevel++
+	} else {
+		if sw.nestLevel > 1 {
+			doSkip = true
+		}
+
+		sw.nestLevel = 1
+	}
+
 	for i, v := range chld {
-		sw.writeNode(v)
+		sw.writeNode(i, v)
 
 		if i < len(chld)-1 {
 			if i > 0 {
@@ -171,47 +151,85 @@ func (sw *SourceWriter) writeInstruction(n *parser.Instruction) {
 			sw.w.Write(space)
 		}
 	}
+
+	sw.w.Write(newline)
+	sw.inInstruction = false
+	sw.skipLine = doSkip
 }
 
-func (sw *SourceWriter) writeFunction(n *parser.Function) {
-	chld := n.Children()
+func (sw *SourceWriter) writeFunction(i int, n *parser.Function) {
+	var name string
 
-	name := chld[0].(*parser.Name)
-	fmt.Fprintf(sw.w, "def %s\n", name.Data)
-
-	chld = chld[1:]
-	for _, v := range chld {
-		sw.writeNode(v)
+	if sw.skipLine {
+		sw.w.Write(newline)
+		sw.skipLine = false
 	}
 
+	chld := n.Children()
+
+	switch tt := chld[0].(type) {
+	case *parser.Name:
+		name = tt.Data
+	case *parser.Label:
+		name = tt.Data
+	}
+
+	fmt.Fprintf(sw.w, "def %s\n", name)
+
+	sw.writeList(chld[1:])
+
 	sw.w.Write([]byte("end\n"))
+	sw.skipLine = true
 }
 
-func (sw *SourceWriter) writeExpression(n *parser.Expression) {
-	for _, v := range n.Children() {
+func (sw *SourceWriter) writeExpression(i int, n *parser.Expression) {
+	for i, v := range n.Children() {
 		switch v.(type) {
 		case *parser.Comment:
 			sw.w.Write(space)
 		}
 
-		sw.writeNode(v)
+		sw.writeNode(i, v)
 	}
 }
 
-func (sw *SourceWriter) writeLabel(s string) {
-	fmt.Fprintf(sw.w, ":%s", s)
+func (sw *SourceWriter) writeLabel(i int, s string) {
+	if !sw.hasComment || sw.skipLine {
+		sw.w.Write(newline)
+		sw.skipLine = false
+	}
+
+	fmt.Fprintf(sw.w, ":%s\n", s)
 }
 
-func (sw *SourceWriter) writeString(s string) {
+func (sw *SourceWriter) writeString(i int, s string) {
 	fmt.Fprintf(sw.w, "%q", s)
 }
 
-func (sw *SourceWriter) writeLiteral(s string) {
+func (sw *SourceWriter) writeChar(i int, s string) {
+	fmt.Fprintf(sw.w, "'%s'", s)
+}
+
+func (sw *SourceWriter) writeLiteral(i int, s string) {
 	fmt.Fprintf(sw.w, "%s", s)
 }
 
-func (sw *SourceWriter) writeComment(s string) {
-	if sw.Comments {
-		fmt.Fprintf(sw.w, ";%s", s)
+func (sw *SourceWriter) writeComment(i int, s string) {
+	if !sw.Comments {
+		return
 	}
+
+	if !sw.inInstruction && i > 0 && sw.skipLine {
+		sw.w.Write(newline)
+		sw.skipLine = false
+	}
+
+	fmt.Fprintf(sw.w, ";%s", s)
+
+	if !sw.inInstruction {
+		sw.w.Write(newline)
+		sw.hasComment = true
+	}
+
+	sw.hasComment = !sw.inInstruction
 }

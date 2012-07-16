@@ -1,6 +1,9 @@
+   equ SomeValue, 123
+   equ AnotherValue, 'B'
+
 :main
-   set a, 0xa
-   set b, 0xb
+   set a, SomeValue
+   set b, AnotherValue
    jsr init_display
    exit
 

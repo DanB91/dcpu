@@ -5,55 +5,7 @@ package util
 
 import "github.com/jteeuwen/dcpu/parser"
 
-// Instructions and registers according to spec v1.7
-
-var (
-	instructions = []string{
-		"set", "add", "sub", "mul", "mli", "div", "dvi", "mod", "mdi", "and",
-		"bor", "xor", "shr", "asr", "shl", "ifb", "ifc", "ife", "ifn", "ifg",
-		"ifa", "ifl", "ifu", "adx", "sbx", "sti", "std", "jsr", "int", "iag",
-		"ias", "rfi", "iaq", "hwn", "hwq", "hwi", "dat", "panic", "exit",
-	}
-
-	regs = []string{
-		"a", "b", "c", "x", "y", "z", "i", "j", "ia",
-		"ex", "peek", "push", "pop", "pc", "sp",
-	}
-)
-
-// isRegister returns true if the given value qualifies as
-// a valid register name.
-func isRegister(v string) bool {
-	for i := range regs {
-		if regs[i] == v {
-			return true
-		}
-	}
-	return false
-}
-
-// isInstruction returns true if the given value qualifies as
-// a valid instruction name.
-func isInstruction(v string) bool {
-	for i := range instructions {
-		if instructions[i] == v {
-			return true
-		}
-	}
-	return false
-}
-
-// containsName returns true if the given list contains the supplied Name.
-func containsName(r []*parser.Name, data string) bool {
-	for i := range r {
-		if r[i].Data == data {
-			return true
-		}
-	}
-	return false
-}
-
-// FindLabels recursively finds Label nodes.
+// FindLabels finds Label all nodes.
 func FindLabels(n []parser.Node, l *[]*parser.Label) {
 	for i := range n {
 		switch tt := n[i].(type) {
@@ -66,7 +18,7 @@ func FindLabels(n []parser.Node, l *[]*parser.Label) {
 	}
 }
 
-// FindReferences recursively finds Label references.
+// FindReferences finds all Label references.
 func FindReferences(n []parser.Node, l *[]*parser.Name) {
 	for i := range n {
 		switch tt := n[i].(type) {
@@ -74,8 +26,8 @@ func FindReferences(n []parser.Node, l *[]*parser.Name) {
 			FindReferences(tt.Children(), l)
 
 		case *parser.Name:
-			if isRegister(tt.Data) || isInstruction(tt.Data) {
-				continue
+			if parser.IsRegister(tt.Data) || parser.IsInstruction(tt.Data) {
+				break
 			}
 
 			*l = append(*l, tt)
@@ -83,15 +35,89 @@ func FindReferences(n []parser.Node, l *[]*parser.Name) {
 	}
 }
 
-// StripDuplicateNames removes duplicate entries from the given Name list.
-func StripDuplicateNames(r []*parser.Name) []*parser.Name {
-	l := make([]*parser.Name, 0, len(r))
+// FindFunctions finds all function names.
+func FindFunctions(n []parser.Node, l *[]*parser.Function) {
+	for i := range n {
+		switch tt := n[i].(type) {
+		case *parser.Function:
+			*l = append(*l, tt)
 
-	for i := range r {
-		if !containsName(l, r[i].Data) {
-			l = append(l, r[i])
+		case parser.NodeCollection:
+			FindFunctions(tt.Children(), l)
 		}
 	}
+}
 
-	return l
+// FindConstants finds all constant names.
+func FindConstants(n []parser.Node, l *[]*parser.Name) {
+	for i := range n {
+		switch tt := n[i].(type) {
+		case *parser.Instruction:
+			list := tt.Children()
+			name := list[0].(*parser.Name)
+
+			if name.Data != "equ" {
+				break
+			}
+
+			expr := list[1].(*parser.Expression)
+			name = expr.Children()[0].(*parser.Name)
+			*l = append(*l, name)
+
+		case parser.NodeCollection:
+			FindConstants(tt.Children(), l)
+		}
+	}
+}
+
+func containsString(in []string, data string) bool {
+	for i := range in {
+		if in[i] == data {
+			return true
+		}
+	}
+	return false
+}
+
+func containsLabel(in []*parser.Label, v string) bool {
+	for i := range in {
+		if in[i].Data == v {
+			return true
+		}
+	}
+	return false
+}
+
+func containsName(in []*parser.Name, v string) bool {
+	for i := range in {
+		if in[i].Data == v {
+			return true
+		}
+	}
+	return false
+}
+
+func containsFunction(in []*parser.Function, v string) bool {
+	var name *parser.Name
+	var list []parser.Node
+	var lbl *parser.Label
+	var ok bool
+
+	for i := range in {
+		list = in[i].Children()
+
+		if name, ok = list[0].(*parser.Name); ok {
+			if name.Data == v {
+				return true
+			}
+			continue
+		}
+
+		if lbl, ok = list[0].(*parser.Label); ok {
+			if lbl.Data == v {
+				return true
+			}
+		}
+	}
+	return false
 }

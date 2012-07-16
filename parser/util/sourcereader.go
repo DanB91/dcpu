@@ -38,12 +38,15 @@ func readSource(ast *parser.AST, file string) error {
 func resolveIncludes(ast *parser.AST, includes []string) (err error) {
 	var labels []*parser.Label
 	var refs []*parser.Name
+	var consts []*parser.Name
+	var funcs []*parser.Function
 
 	FindLabels(ast.Root.Children(), &labels)
 	FindReferences(ast.Root.Children(), &refs)
+	FindConstants(ast.Root.Children(), &consts)
+	FindFunctions(ast.Root.Children(), &funcs)
 
-	refs = findUndefinedRefs(refs, labels)
-	refs = StripDuplicateNames(refs)
+	refs = findUndefinedRefs(refs, consts, labels, funcs)
 
 	if len(refs) == 0 {
 		// No undefined references. We're done here.
@@ -131,23 +134,32 @@ func loadInclude(ast *parser.AST, includes []string, r *parser.Name) (err error)
 
 // findUndefinedRefs compares both given lists of labels and
 // label references. Any reference that is not present in the
-// label list, is considered unresolved and added to the 
-// returned list.
-func findUndefinedRefs(refs []*parser.Name, labels []*parser.Label) []*parser.Name {
-	var i, j int
+// label list, is a defined constant or function, is considered unresolved
+// and added to the returned list.
+func findUndefinedRefs(refs, consts []*parser.Name, labels []*parser.Label, funcs []*parser.Function) []*parser.Name {
+	out := make([]*parser.Name, 0, len(refs))
 
-outer:
-	for i = range refs {
-		for j = range labels {
-			if labels[j].Data == refs[i].Data {
-				copy(refs[i:], refs[i+1:])
-				refs = refs[:len(refs)-1]
-				goto outer
-			}
+	for i := range refs {
+		if containsLabel(labels, refs[i].Data) {
+			continue
 		}
+
+		if containsName(consts, refs[i].Data) {
+			continue
+		}
+
+		if containsFunction(funcs, refs[i].Data) {
+			continue
+		}
+
+		if containsName(out, refs[i].Data) {
+			continue
+		}
+
+		out = append(out, refs[i])
 	}
 
-	return refs
+	return out
 }
 
 // includeHasLabel checks if a newly parsed include actually

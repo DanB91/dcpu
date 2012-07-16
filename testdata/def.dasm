@@ -1,47 +1,50 @@
 ; Testing function definitions.
 
-def main
-	set a, 12345
-	jsr sqrt
-	set pc, halt
-end
-
-:halt
+	jsr main
 	sub pc, 1
 
-def sqrt
-	equ SqrtShift, 14
+	equ SomeValue, 12345
+
+; Main function -- entry point
+def main
+	set a, SomeValue
+	jsr foo
+end
+
+; Pretend we're doing something important to the given integer.
+; More comment and stuff.
+def foo
+	equ ShiftCount, 14 ; inline comment
 	equ LoopCount, 16
 
-	set push, i
 	set i, 0
 	set b, 0
 	set c, 0
 
-:sqrt_loop
+:foo_loop
 	ife i, LoopCount
-		set pc, sqrt_ret
+		ifg a, b
+			set pc, foo_ret
 	
 	add i, 1
 	shl c, 1
 	shl b, 2
-	shr a, SqrtShift
+	shr a, ShiftCount
 	add b, a
 	shl a, 2
 	add c, 1
 	ifg c, b
-		set pc, sqrt_loop_sub
+		set pc, foo_loop_sub
 
 	sub b, c
 	add c, 1
-	set pc, sqrt_loop
+	set pc, foo_loop
 
-:sqrt_loop_sub
+:foo_loop_sub
 	sub c, 1
-	set pc, sqrt_loop
+	set pc, foo_loop
 
-:sqrt_ret
-	set i, pop
+:foo_ret
 	shr c, 1
 	set a, c
 end
