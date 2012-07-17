@@ -7,7 +7,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,8 +44,6 @@ func main() {
 		}
 	}
 }
-
-var _ = io.Copy
 
 // collectTests traverses the input directory and finds all
 // unit test files.
