@@ -12,25 +12,16 @@ var api map[string]ApiHandler
 
 func init() {
 	api = make(map[string]ApiHandler)
-
-	api["/cake"] = func(r *http.Request, ar *ApiResponse) {
-		ar.Msg = "Cake rocks."
-	}
+	api["/api/config"] = api_config
 }
 
 // A handler for api calls.
-type ApiHandler func(*http.Request, *ApiResponse)
+type ApiHandler func(*http.Request) ([]byte, int)
 
-// A single Api response.
-type ApiResponse struct {
-	Msg        string `json:",omitempty"`
-	HttpStatus int    `json:"-"`
-}
-
-// Pack turns the response struct into a JSON encoded byte slice.
+// Pack turns the given value into a JSON encoded byte slice.
 // It panics if something went wrong.
-func (ar *ApiResponse) Pack() []byte {
-	data, err := json.Marshal(ar)
+func Pack(v interface{}) []byte {
+	data, err := json.Marshal(v)
 
 	if err != nil {
 		panic(err)

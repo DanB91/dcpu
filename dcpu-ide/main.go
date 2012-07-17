@@ -11,9 +11,11 @@ import (
 	"os"
 )
 
+var config *Config
+
 func main() {
-	addr := parseArgs()
-	err := Run(addr)
+	parseArgs()
+	err := Run(config.Address)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "RunServer: %v\n", err)
@@ -21,14 +23,11 @@ func main() {
 	}
 }
 
-func parseArgs() string {
-	addr := ":7070"
+func parseArgs() {
+	config = NewConfig()
 
-	if v := os.Getenv("DCPU_IDE_ADDRESS"); len(v) > 0 {
-		addr = v
-	}
-
-	flag.StringVar(&addr, "a", addr, "The HTTP service address on which to run the server.")
+	flag.StringVar(&config.Address, "a", config.Address,
+		"The HTTP service address on which to run the server.")
 	version := flag.Bool("v", false, "Display version information.")
 
 	flag.Parse()
@@ -37,6 +36,4 @@ func parseArgs() string {
 		fmt.Printf("%s\n", Version())
 		os.Exit(0)
 	}
-
-	return addr
 }

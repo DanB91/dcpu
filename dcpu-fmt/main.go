@@ -59,18 +59,12 @@ func parseArgs() {
 		flag.PrintDefaults()
 	}
 
-	help := flag.Bool("h", false, "Display this help.")
 	version := flag.Bool("v", false, "Display version information.")
 
 	flag.Parse()
 
 	if *version {
 		fmt.Printf("%s\n", Version())
-		os.Exit(0)
-	}
-
-	if *help {
-		flag.Usage()
 		os.Exit(0)
 	}
 

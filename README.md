@@ -54,9 +54,6 @@ Misc stuff:
   compatible editors (like Gedit). It should be installed in the
   language-specs directory.
   For me this is at: `/usr/share/gtksourceview-3.0/language-specs/`. 
-* **dasm.js**: This is a DASM 'mode' file for the [CodeMirror](http://codemirror.net)
-  code editor. It is used by `dcpu-ide`, but can be plugged into any
-  website that uses CodeMirror.
 * **dcpu-run**: This shell script ties `dcpu-test` and `dcpu-prof` together
   to run unit tests on a given input source file. It generates profiling
   data and then displays a focused overview of this data.

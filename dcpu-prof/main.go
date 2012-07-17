@@ -62,7 +62,6 @@ func parseArgs() *prof.Profile {
 		flag.PrintDefaults()
 	}
 
-	help := flag.Bool("h", false, "")
 	version := flag.Bool("v", false, "")
 
 	flag.Usage = func() {
@@ -74,11 +73,6 @@ func parseArgs() *prof.Profile {
 
 	if *version {
 		fmt.Printf("%s\n", Version())
-		os.Exit(0)
-	}
-
-	if *help {
-		flag.Usage()
 		os.Exit(0)
 	}
 

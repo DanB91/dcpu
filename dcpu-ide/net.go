@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+// An expiration date somewhere in the distant past.
+// Used in response handler for API calls. They should not be cached.
+var AncientHistory string
+
 // gzipResponseWriter wraps the http.ResponseWriter in a gzip compressor.
 type gzipResponseWriter struct {
 	io.Writer
@@ -25,8 +29,12 @@ func (this gzipResponseWriter) Write(p []byte) (int, error) {
 
 // Run starts the webserver on the given address.
 func Run(address string) (err error) {
-	http.HandleFunc("/", wrappedHandler(handler))
+	t := time.Unix(0, 0).UTC()
 
+	AncientHistory = t.Format(time.RFC1123)
+	AncientHistory = AncientHistory[:len(AncientHistory)-4] + " GMT"
+
+	http.HandleFunc("/", wrappedHandler(handler))
 	log.Printf("Listening on %q.\n", address)
 
 	return http.ListenAndServe(address, nil)
@@ -46,12 +54,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		hdr.Set("Content-Type", file.ContentType)
 
 		// These files do not change, so give them a liberal cache policy.
-		t := time.Now().UTC()
-		t = t.Add(time.Duration(t.Second()+3600) * time.Second)
+		// One month into the future should be enough.
+		t := time.Now().UTC().Add(time.Hour * 24 * 30)
 		ts := t.Format(time.RFC1123)
+		ts = ts[:len(ts)-4] + " GMT"
 
 		hdr.Set("Cache-Control", "public")
-		hdr.Set("Expires", ts[:len(ts)-4]+" GMT")
+		hdr.Set("Expires", ts)
 
 		w.Write(file.Data())
 		return
@@ -63,22 +72,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		hdr.Set("Content-Type", "application/x-javascript")
 
 		// These should expire immediately.
-		t := time.Unix(0, 0).UTC()
-		ts := t.Format(time.RFC1123)
-
 		hdr.Set("Cache-Control", "private")
-		hdr.Set("Expires", ts[:len(ts)-4]+" GMT")
+		hdr.Set("Expires", AncientHistory)
 
-		var ar ApiResponse
-		ar.HttpStatus = 200
+		data, status := handler(r)
 
-		handler(r, &ar)
-
-		w.WriteHeader(ar.HttpStatus)
-		w.Write(ar.Pack())
+		w.WriteHeader(status)
+		w.Write(data)
 		return
 	}
 
+	// Whatever it is we're looking for, it aint here.
 	w.WriteHeader(404)
 }
 
@@ -88,14 +92,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func wrappedHandler(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		hdr := w.Header()
-		hdr.Set("Server", fmt.Sprintf("%s/%d.%d.%s",
-			AppName, AppVersionMajor, AppVersionMinor, AppVersionRev))
+		hdr.Set("Server", fmt.Sprintf("%s/%d.%d",
+			AppName, AppVersionMajor, AppVersionMinor))
 
+		// If the client does not support gzip compression,
+		// we should just write our response out normally.
 		if strings.Index(r.Header.Get("Accept-Encoding"), "gzip") == -1 {
 			fn(w, r)
 			return
 		}
 
+		// They do accept gzip compressed content; make it so.
 		hdr.Set("Content-Encoding", "gzip")
 		gz := gzip.NewWriter(w)
 

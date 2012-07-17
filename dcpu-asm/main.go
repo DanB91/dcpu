@@ -88,7 +88,6 @@ func main() {
 
 func parseArgs() {
 	include := flag.String("i", "", "Colon separated list of additional include paths.")
-	help := flag.Bool("h", false, "Display this help.")
 	version := flag.Bool("v", false, "Display version information.")
 
 	CreatePreProcessorFlags()
@@ -99,11 +98,6 @@ func parseArgs() {
 
 	if *version {
 		fmt.Printf("%s\n", Version())
-		os.Exit(0)
-	}
-
-	if *help {
-		flag.Usage()
 		os.Exit(0)
 	}
 

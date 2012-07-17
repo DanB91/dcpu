@@ -102,22 +102,20 @@ func collectTests() <-chan string {
 
 // process commandline arguments.
 func parseArgs() {
-	var version, help bool
+	var version bool
 	var include string
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stdout, "Usage: %s [options] path\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
 	flag.StringVar(&include, "i", "", "Colon-separated list of additional include paths.")
-	flag.BoolVar(&help, "h", false, "Display this help.")
 	flag.BoolVar(&version, "v", false, "Display version information.")
 	flag.Parse()
 
 	if version {
 		fmt.Fprintf(os.Stdout, "%s\n", Version())
-		os.Exit(0)
-	}
-
-	if help {
-		fmt.Fprintf(os.Stdout, "Usage: %s [options] path\n", os.Args[0])
-		flag.PrintDefaults()
 		os.Exit(0)
 	}
 

@@ -9,7 +9,7 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 		"ifn":0, "ifg":0, "ifa":0, "ifl":0, "ifu":0, "adx":0,
 		"sbx":0, "sti":0, "std":0, "jsr":0, "int":0, "iag":0,
 		"ias":0, "rfi":0, "iaq":0, "hwn":0, "hwq":0, "hwi":0,
-		"dat":0, "panic":0, "exit":0,
+		"dat":0, "panic":0, "exit":0, "def":0, "end":0, "return":0
 	};
 
 	var atoms = {
@@ -81,7 +81,7 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 
 	function tokenString(quote) {
 		return function(stream, state) {
-			var escaped = false, next;
+			var escaped = false, next = 0;
 
 			while ((next = stream.next()) != null) {
 				if (next == quote && !escaped) {
@@ -112,20 +112,29 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 		},
 
 		indent: function(state, textAfter) {
-			var ch = textAfter.charAt(0);
-			if (ch == ':' || ch == ';') {
+			// label definitions, non-inline comments, 'def' and 'end'
+			// should be moved to the beginning of a line.
+			//
+			// We can't match on the whole 'def' keyword here for
+			// some reason. Presumably because the 'e' is an
+			// electricChar as well and will cause the parser to
+			// stop handling 'def' as a whole. We therefor match on
+			// just 'de'.
+			//
+			// This is a bit of a hack, but it seems to work.
+			// As long as the DCPU spec doesn't introduce a
+			// keyword that starts with 'de', we are fine.
+			if (textAfter.match(/^([:;]|de|end)/)) {
 				return 0;
 			}
 
-			var n = state.branchDepth * indentUnit;
-			if (state.indented != n) {
-				state.indented = n;
-			}
-
+			state.indented = state.branchDepth * indentUnit;
 			return state.indented;
 		},
 
-		electricChars: ":"
+		// 'd' and 'e' are the first chars in 'def' and 'end',
+		// which should also be reindented.
+		electricChars: ":;de"
 	};
 });
 
