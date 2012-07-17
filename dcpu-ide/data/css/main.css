@@ -1,33 +1,92 @@
 /* This file is subject to a 1-clause BSD license.
    Its contents can be found in the enclosed LICENSE file. */
 
-@font-face {
- font-family: 'Goudy Bookletter 1911';
- src: url('../fonts/goudy_bookletter_1911.ttf') format('truetype'),
-      url('../fonts/goudy_bookletter_1911.svg#font') format('svg');
- font-style: normal;
-}
-
 html, body {
- font-family: 'Goudy Bookletter 1911', 'Georgia', serif;
- font-size: 1em;
- background-color: #f3f3f3;
+ cursor: default;
  color: #fff;
+ background-color: #111;
+ overflow: hidden;
  padding: 0;
  margin: 0;
+ font-family: verdana;
+ font-size: 1em;
 }
 
-a, em, abbr, h1, h2, h3, h4, h5, h6 { color: #a33 }
-h1, h2, h3, h4, h5, h6 {
- margin-bottom: 10px;
- margin-top: 10px;
+#menu {
+ z-index: 90;
+ margin: 0;
+ padding: 0;
+ background-color: #555;
+ background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
+ background: -moz-linear-gradient(bottom, #333, #555);
+ background: linear-gradient(bottom, #333, #555);
+ position: absolute;
+ overflow: hidden;
+ top: 0; left: 0; right: 0; 
+ box-shadow: 0px 0px 15px #000;
+ visibility: visible;
+}
+
+#menu .items {
+ padding: 20px;
+ margin: 0;
+ width: 180px;
+}
+
+#menu .overview {
+ position: absolute;
+ right: 10px;
+ top: 10px;
+ bottom: 10px;
+ left: 210px;
+ margin: 0;
+ padding: 10px;
+ border-radius: 10px 10px 10px 10px;
+ border: 1px solid #222;
+ background-color: #555;
+ background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
+ background: -moz-linear-gradient(bottom, #333, #555);
+ background: linear-gradient(bottom, #333, #555);
+}
+
+#menu .items ul {
  padding: 0;
  margin: 0;
+ list-style: none;
 }
 
-abbr {
- border-bottom: 1px dotted #a33;
- cursor: help;
+#menu .items li {
+ text-align: right;
 }
 
+#menu .items button {
+ font-size: 1em;
+ padding: 3px;
+ margin: 1px;
+ color: #ccc;
+ background-color: transparent;
+ border: 0;
+ border-bottom: 1px solid transparent;
+ cursor: pointer;
+ text-align: right;
+ width: 100%;
+}
 
+#menu .items button:hover {
+ border-bottom: 1px solid #aaa;
+}
+
+#menu .items button.active {
+ border-bottom: 1px solid #9f0;
+ color: #9f0;
+}
+
+#workspace {
+ z-index: 1;
+ margin: 0;
+ padding: 0;
+ background-color: #222;
+ top: 0; left: 0; right: 0; bottom: 0;
+ position: absolute;
+ overflow: hidden;
+}
