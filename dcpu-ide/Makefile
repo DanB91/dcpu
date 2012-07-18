@@ -6,7 +6,7 @@ DATADIR = data
 DEPLOYDIR = deploy
 CODEDIR = ../
 PREFIX = data_
-LDFLAGS = -ldflags "-X main.AppVersionRev `date -u +%s` -s"
+LDFLAGS = -ldflags "-X main.AppVersionRev `date -u +%s`"
 CLEANFILES = static.go $(PREFIX)*.go $(DEPLOYDIR)
 
 all: build
@@ -17,7 +17,7 @@ build:
 
 install: compress
 	cd codegen && go run *.go -i ../$(DEPLOYDIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
-	go install $(LDFLAGS)
+	go install $(LDFLAGS) -s
 
 compress:
 	./compress_data.sh

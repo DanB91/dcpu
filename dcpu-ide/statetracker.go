@@ -5,7 +5,6 @@ package main
 
 import (
 	"log"
-	"os"
 	"sync/atomic"
 	"time"
 )
@@ -40,19 +39,27 @@ func (s *StateTracker) Ping() {
 
 // Poll runs in the background and compares the current
 // time with the stored last request time. If we exceed
-// the given timeout, this will radically shut down the server.
-func (s *StateTracker) Poll() {
-	for {
-		select {
-		case t := <-time.After(time.Second):
-			a := t.UnixNano()
-			b := atomic.LoadInt64(&s.lastRequest)
+// the given timeout, this will send a termination signal
+// down the returned channel.
+func (s *StateTracker) Poll() <-chan struct{} {
+	c := make(chan struct{})
 
-			if a-b >= s.timeout {
-				log.Printf("Idle for %d second(s). Shutting down.",
-					(a-b)/int64(time.Second))
-				os.Exit(0)
+	go func() {
+		defer close(c)
+		for {
+			select {
+			case t := <-time.After(time.Second):
+				a := t.UnixNano()
+				b := atomic.LoadInt64(&s.lastRequest)
+
+				if a-b >= s.timeout {
+					log.Printf("Idle for %d second(s). Shutting down.",
+						(a-b)/int64(time.Second))
+					c <- struct{}{}
+				}
 			}
 		}
-	}
+	}()
+
+	return c
 }

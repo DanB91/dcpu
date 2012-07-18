@@ -45,9 +45,9 @@ code {
 }
 
 #dashboardItems {
- padding: 20px;
  margin: 0;
- width: 150px;
+ padding: 0;
+ width: 170px;
 }
 
 #dashboardItems ul {
@@ -58,12 +58,14 @@ code {
 
 #dashboardItems li {
  text-align: right;
+ padding: 3px;
+ padding-left: 10px;
 }
 
 #dashboardItems button {
  font-size: 1em;
- padding: 3px;
- margin: 1px;
+ padding: 0;
+ margin: 0;
  color: #ccc;
  background-color: transparent;
  border: 0;
@@ -83,12 +85,11 @@ code {
 
 #dashboardOverview {
  position: absolute;
- right: 10px;
- top: 10px;
- bottom: 10px;
+ right: 0;
+ top: 0;
+ bottom: 0;
  left: 180px;
  margin: 0;
- padding: 10px;
  padding-left: 20px;
  padding-right: 20px;
  border-left: 1px solid #09f;
@@ -97,6 +98,7 @@ code {
  background: -moz-linear-gradient(bottom, #444, #666);
  background: linear-gradient(bottom, #444, #666);
  overflow: auto;
+ box-shadow: inset 5px 0 10px #333;
 }
 
 #dashboardOverview ul {
@@ -109,6 +111,8 @@ code {
  margin: 0;
  padding: 0;
  background-color: #222;
+ background-image: url("/img/fabric.png");
+ background-repeat: repeat;
  top: 0; left: 0; right: 0; bottom: 0;
  position: absolute;
  overflow: hidden;

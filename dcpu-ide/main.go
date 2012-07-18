@@ -21,12 +21,12 @@ func main() {
 
 	tracker = NewStateTracker(config.Timeout)
 
-	go tracker.Poll()
+	quit := tracker.Poll()
+
 	go startServer(config.Address)
+	go launchBrowser(config.Address)
 
-	launchBrowser(config.Address)
-
-	select {}
+	<-quit
 }
 
 func parseArgs() {
