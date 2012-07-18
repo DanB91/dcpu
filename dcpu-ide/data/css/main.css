@@ -8,58 +8,40 @@ html, body {
  overflow: hidden;
  padding: 0;
  margin: 0;
- font-family: verdana;
+ font-family: verdana, sans-serif;
  font-size: 1em;
 }
 
-#menu {
+#dashboard {
  z-index: 90;
- margin: 0;
- padding: 0;
  background-color: #555;
  background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
  background: -moz-linear-gradient(bottom, #333, #555);
  background: linear-gradient(bottom, #333, #555);
  position: absolute;
- overflow: hidden;
- top: 0; left: 0; right: 0; 
+ top: 0; left: 0; right: 0;
  box-shadow: 0px 0px 15px #000;
- visibility: visible;
+ height: 50%;
+ min-height: 200px;
 }
 
-#menu .items {
+#dashboardItems {
  padding: 20px;
  margin: 0;
  width: 180px;
 }
 
-#menu .overview {
- position: absolute;
- right: 10px;
- top: 10px;
- bottom: 10px;
- left: 210px;
- margin: 0;
- padding: 10px;
- border-radius: 10px 10px 10px 10px;
- border: 1px solid #222;
- background-color: #555;
- background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
- background: -moz-linear-gradient(bottom, #333, #555);
- background: linear-gradient(bottom, #333, #555);
-}
-
-#menu .items ul {
+#dashboardItems ul {
  padding: 0;
  margin: 0;
  list-style: none;
 }
 
-#menu .items li {
+#dashboardItems li {
  text-align: right;
 }
 
-#menu .items button {
+#dashboardItems button {
  font-size: 1em;
  padding: 3px;
  margin: 1px;
@@ -72,13 +54,29 @@ html, body {
  width: 100%;
 }
 
-#menu .items button:hover {
- border-bottom: 1px solid #aaa;
+#dashboardItems button:hover {
+ border-bottom: 1px solid #ccc;
 }
 
-#menu .items button.active {
- border-bottom: 1px solid #9f0;
+#dashboardItems button.active {
  color: #9f0;
+}
+
+#dashboardOverview {
+ position: absolute;
+ right: 10px;
+ top: 10px;
+ bottom: 10px;
+ left: 210px;
+ margin: 0;
+ padding: 10px;
+ padding-left: 20px;
+ border-radius: 10px 10px 10px 10px;
+ background-color: #555;
+ background: -webkit-gradient(linear, left bottom, left top, from(#444), to(#666));
+ background: -moz-linear-gradient(bottom, #444, #666);
+ background: linear-gradient(bottom, #444, #666);
+ overflow: hidden;
 }
 
 #workspace {

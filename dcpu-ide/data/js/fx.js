@@ -15,7 +15,7 @@ var fx = {
 		return this;
 	},
 
-	// show makes the given element invisible.
+	// hide makes the given element invisible.
 	hide : function (e) {
 		if (e) {
 			e.style.visibility = 'hidden';
@@ -24,7 +24,7 @@ var fx = {
 		return this;
 	},
 
-	// metrics returns the element's absolute pixel coordinates and dimensions.
+	// metrics returns the element's pixel coordinates and dimensions.
 	metrics : function (e) {
 		var t = parseInt(e.style.top) || parseInt(e.clientTop) || 0;
 		var l = parseInt(e.style.left) || parseInt(e.clientLeft) || 0;
@@ -36,25 +36,29 @@ var fx = {
 	// slideTo moves the element to a specific location using an animation.
 	// It accepts a number of options as part of the input object:
 	//
-	// - node: The target node.
-	// - top: top location to move to (pixels).
-	// - left: left location to move to (pixels).
-	// - duration: Number of milliseconds the animation should take.
-	// - onFinish: An optional event handler which is fired when the
-	//   animation is done.
+	// - node:     The target node.
+	// - top:      (optional) top location to move to.
+	// - left:     (optional) left location to move to.
+	// - duration: (optional) Number of milliseconds the animation should take.
+	// - unit:     (optional) The coordinate unit. Defaults to 'px'.
+	// - onFinish: (optional) An event handler which is fired when the
+	//                        animation is done.
 	slideTo : function (cfg)
 	{
 		if (!cfg.node || cfg.node._fx_busy) {
 			return;
 		}
 
+		// Ensure we don't get stuck in more than one animation.
 		cfg.node._fx_busy = true;
-
-		// Sanity checks.
+		
 		var m = fx.metrics(cfg.node);
-
 		if (cfg.left == m.left && cfg.top == m.top) {
 			return; // Nothing to do.
+		}
+
+		if (!cfg.unit) {
+			cfg.unit = 'px';
 		}
 
 		// Number of steps we can fit in to @duration with
@@ -80,8 +84,8 @@ var fx = {
 				return;
 			}
 
-			style.left = (parseInt(style.left) || 0) + dx + "px";
-			style.top = (parseInt(style.top) || 0) + dy + "px";
+			style.left = (parseInt(style.left) || 0) + dx + cfg.unit;
+			style.top = (parseInt(style.top) || 0) + dy + cfg.unit;
 			steps--;
 		}, FxFrameTime);
 

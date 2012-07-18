@@ -8,6 +8,6 @@ import (
 )
 
 // Returns the current configuration data.
-func api_config(r *http.Request) ([]byte, int) {
+func apiConfig(r *http.Request) ([]byte, int) {
 	return Pack(config), 200
 }

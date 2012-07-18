@@ -1,20 +1,20 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
-var menu      = null;
 var workspace = null;
-var editor    = null;
+var dashboard = null;
 
 window.onload = function ()
 {
 	// Find our UI elements.
-	if ((menu = document.getElementById('menu')) == null) {
-		console.error("Failed to acquire menu element.");
+	if ((workspace = document.getElementById('workspace')) == null) {
+		console.error("Failed to acquire workspace element.");
 		return;
 	}
 
-	if ((workspace = document.getElementById('workspace')) == null) {
-		console.error("Failed to acquire workspace element.");
+	dashboard = new Dashboard();
+	if (!dashboard.init()) {
+		console.error("Failed to initialize dashboard.");
 		return;
 	}
 
@@ -33,7 +33,7 @@ function onKeyDown (e)
 	
 	switch (key) {
 	case 192: // ~
-		toggleMenu();
+		dashboard.toggle();
 		break;
 	}
 }
@@ -61,24 +61,6 @@ function onMouseUp (e)
 function onMouseWheel (e)
 {
 	
-}
-
-function toggleMenu()
-{
-	var m = fx.metrics(menu);
-	var hide = m.top == 0;
-
-	fx.show(menu)
-	  .slideTo({
-		node:     menu,
-		top:      hide ? -m.height : 0,
-		duration: 500,
-		onFinish: function() {
-			if (hide) {
-				fx.hide(menu);
-			}
-		},
-	});
 }
 
 /*

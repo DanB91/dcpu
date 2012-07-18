@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<!-- This file is subject to a 1-clause BSD license.
-     Its contents can be found in the enclosed LICENSE file. -->
 <html>
  <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -11,29 +9,20 @@
   <script type="text/javascript" src="js/dasm.js"></script>
   <script type="text/javascript" src="js/api.js"></script>
   <script type="text/javascript" src="js/fx.js"></script>
+  <script type="text/javascript" src="js/dashboard.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
-  <link rel="index" title="dcpu-ide &#x2af9;&#x2afa;" href="/" />
+  <link rel="index" title="dcpu-ide" href="/" />
   <link rel="shortcut icon" href="/img/icon.png" type="image/x-icon" />
   <link rel="icon" href="/img/icon.png" type="image/x-icon" />
   <link rel="stylesheet" type="text/css" href="css/codemirror.css" />
   <link rel="stylesheet" type="text/css" href="css/eclipse.css" />
   <link rel="stylesheet" type="text/css" href="css/main.css" />
-  <title>dcpu-ide &#x2af9;&#x2afa;</title>
+  <title>dcpu-ide</title>
  </head>
  <body>
-  <div id="menu">
-   <div class="items">
-    <ul>
-     <li><h3>dcpu-ide &#x2af9;&#x2afa;</h3></li>
-     <li><button class="active" title="New Project (N)">New Project</button></li>
-     <li><button title="Save all open documents (S)">Save project</button></li>
-     <li><button title="Configure keyboard shortcuts (K)">Keyboard setup</button></li>
-     <li><button title="Help (H)">Help</button></li>
-    <ul>
-   </div>
-   <div class="overview">
-    
-   </div>
+  <div id="dashboard">
+   <div id="dashboardItems"></div>
+   <div id="dashboardOverview"></div>
   </div>
   <div id="workspace"></div>
  </body>
