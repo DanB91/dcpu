@@ -6,6 +6,9 @@ Some warnings ahead of time:
 * The release build will only work on unix systems. This should be fixed
   at some point, but I have other priorities now. The debug build should be
   ok on any Go-capable platform, since it involves only Go tools.
+* The important parts of this application are tested in both Firefox 13+ and
+  Chrome 20+, but Chrome remains my primary target browser. Support for any
+  other browsers /may/ come at some point, but don't hold your breath.
 
 This is a webbrowser based development environment for DCPU assembly
 projects. It consists of a Go backend and an HTML/Javascript frontend.
@@ -27,7 +30,7 @@ precedence.
 This is an interactive web application that runs in your browser.
 It is configured to connect to the backend server running on localhost.
 It uses this server to transparently call the DCPU tools in this repository.
-
+ 
 
 ### Usage
 

@@ -6,6 +6,7 @@ const AppTitle = 'dcpu-ide &#x2af9;&#x2afa;';
 var stateTracker = null;
 var workspace    = null;
 var dashboard    = null;
+var config       = null;
 
 window.onbeforeunload = function() {
 	//TODO: implement clean shutdown.
@@ -30,6 +31,17 @@ window.onload = function ()
 		console.error("Failed to initialize state tracker.");
 		return;
 	}
+
+	// Load configuration data.
+	api.request({
+		url: '/api/config',
+		onData : function (data) {
+			config = data;
+		},
+		onError : function (msg, status) {
+			console.error("Failed to load configuration data.");
+		},
+	});
 
 	// Hook some events.
 	document.onkeydown = onKeyDown;

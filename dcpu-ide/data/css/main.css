@@ -12,6 +12,24 @@ html, body {
  font-size: 1em;
 }
 
+p {
+ font-size: 0.8em;
+ text-align: justify;
+}
+
+a {
+ color: #ccc;
+ font-weight: bold;
+}
+
+code {
+ background-color: #444;
+ border: 1px solid #666;
+ padding-left: 3px;
+ padding-right: 3px;
+ border-radius: 2px 2px 2px 2px;
+}
+
 #dashboard {
  z-index: 90;
  background-color: #555;
@@ -20,15 +38,16 @@ html, body {
  background: linear-gradient(bottom, #333, #555);
  box-shadow: 0px 0px 15px #000;
  position: absolute;
- top: 0; left: 0; right: 0;
- height: 50%;
- min-height: 250px;
+ top: 0; left: 0; bottom: 0;
+ width: 50%;
+ min-width: 180px;
+ max-width: 600px;
 }
 
 #dashboardItems {
  padding: 20px;
  margin: 0;
- width: 180px;
+ width: 150px;
 }
 
 #dashboardItems ul {
@@ -67,17 +86,22 @@ html, body {
  right: 10px;
  top: 10px;
  bottom: 10px;
- left: 210px;
+ left: 180px;
  margin: 0;
  padding: 10px;
  padding-left: 20px;
+ padding-right: 20px;
  border-left: 1px solid #09f;
- border-radius: 10px 10px 10px 10px;
  background-color: #555;
  background: -webkit-gradient(linear, left bottom, left top, from(#444), to(#666));
  background: -moz-linear-gradient(bottom, #444, #666);
  background: linear-gradient(bottom, #444, #666);
- overflow: hidden;
+ overflow: auto;
+}
+
+#dashboardOverview ul {
+ position: relative;
+ left: -20px;
 }
 
 #workspace {
@@ -91,9 +115,9 @@ html, body {
 }
 
 #statetracker {
- z-index: 2;
+ z-index: 80;
  position: absolute;
- bottom: 10px; left: 10px;
+ bottom: 10px; right: 10px;
  overflow: hidden;
  margin: 0;
  padding: 5px;
@@ -104,4 +128,23 @@ html, body {
  background-repeat: no-repeat;
  background-position: center center;
  color: #fff;
+}
+
+::-webkit-scrollbar {
+ width: 5px;
+ height: 5px;
+}
+ 
+::-webkit-scrollbar-track {
+ box-shadow: inset 0 0 6px #000; 
+}
+ 
+::-webkit-scrollbar-thumb {
+ box-shadow: 1px 1px #000; 
+ border: 1px inset #333;
+ background-color: #aaa;
+}
+
+::-webkit-scrollbar-corner {
+ background-color: #222;
 }

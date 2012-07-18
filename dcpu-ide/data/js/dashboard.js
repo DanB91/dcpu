@@ -9,25 +9,36 @@ function Dashboard ()
 		{
 			id:    'diGettingStarted',
 			title: 'Getting started',
-			src:    '/dashboard/getting_started.html', 
+			src:   '/dashboard/getting_started.html', 
+			data:  '', 
 		},
 		{
 			id:    'diNewProject',
 			title: 'New Project',
 			src:   '/dashboard/new_project.html', 
 			key:   'N',
+			data:  '',
 		},
 		{
-			id:    'diConfigureKeyboard',
-			title: 'Configure keyboard',
-			src:   '/dashboard/configure_keyboard.html', 
-			key:   'K',
+			id:    'diOpenProject',
+			title: 'Open Project',
+			src:   '/dashboard/open_project.html', 
+			key:   'O',
+			data:  '',
+		},
+		{
+			id:    'diConfig',
+			title: 'Configuration',
+			src:   '/dashboard/config.html', 
+			key:   'C',
+			data:  '',
 		},
 		{
 			id:    'diHelp',
 			title: 'Help',
 			src:   '/dashboard/help.html', 
 			key:   'H',
+			data:  '',
 		},
 	];
 	this.selectedItem = -1;
@@ -49,6 +60,11 @@ Dashboard.prototype.init = function (id)
 	}
 
 	// Create list for item buttons.
+	var items = document.getElementById('dashboardItems');
+	if (!items) {
+		return false;
+	}
+
 	var ul = document.createElement('ul');
 	if (!ul) {
 		return false;
@@ -61,7 +77,7 @@ Dashboard.prototype.init = function (id)
 	li.appendChild(h3);
 	ul.appendChild(li);
 
-	// Add menu item buttons.
+	// Add menu item buttons and pre-load the menu content,
 	var me = this;
 	for (var n = 0; n < this.items.length; n++) {
 		var li = document.createElement('li');
@@ -83,16 +99,29 @@ Dashboard.prototype.init = function (id)
 
 		li.appendChild(btn);
 		ul.appendChild(li);
-	}
 
-	var items = document.getElementById('dashboardItems');
-	if (!items) {
-		return false;
+		(function(idx) {
+			api.request({
+				refresh: true,
+				url: me.items[idx].src,
+				onData : function (data) {
+					me.items[idx].data = data;
+
+					if (idx == 0) {
+						// Set the first view as the active one,
+						// once it is done loading.
+						me.select(0);
+					}
+				},
+				onError : function (msg, status) {
+					console.error('Dashboard.init: ',
+						me.items[idx].src, status, msg);
+				},
+			});
+		}(n));
 	}
 
 	items.appendChild(ul);
-
-	this.select(0);
 	return true;
 }
 
@@ -102,13 +131,13 @@ Dashboard.prototype.onKey = function (e) {
 	var key = (e.which != 0) ? e.which : e.keyCode;
 
 	if (!e.altKey) {
-		switch (key) {
-		case 192: // ~
-			this.toggle();
-			break;
-		}
-
 		return;
+	}
+
+	switch (key) {
+	case 192: // ~
+		this.toggle();
+		break;
 	}
 
 	var ch = String.fromCharCode(key);
@@ -138,40 +167,31 @@ Dashboard.prototype.select = function (index)
 		return;
 	}
 
-	var me = this;
-	api.request({
-		refresh: true,
-		url: me.items[index].src,
-		onData : function (data) {
-			me.overview.innerHTML = data;
+	this.overview.innerHTML = this.items[index].data;
 
-			for (var n = 0; n < me.items.length; n++) {
-				var e = document.getElementById(me.items[n].id);
-				e.className = '';
-			}
+	// Clear 'active' state on all buttons.
+	for (var n = 0; n < this.items.length; n++) {
+		var e = document.getElementById(this.items[n].id);
+		e.className = '';
+	}
 
-			var e = document.getElementById(me.items[index].id);
-			e.className = 'active';
-			me.selectedItem = index;
-		},
-		onError : function (msg, status) {
-			console.error('Dashboard.select: ',
-				me.items[index].src, status, msg);
-		},
-	});
+	// Set button for current item to 'active'
+	var e = document.getElementById(this.items[index].id);
+	e.className = 'active';
+	this.selectedItem = n;
 }
 
 // toggle shows or hides the dashboard using a sliding animation.
 Dashboard.prototype.toggle = function ()
 {
 	var m = fx.metrics(this.node);
-	var hide = m.top == 0;
+	var hide = m.left == 0;
 	var node = this.node;
 
 	fx.show(node)
 	  .slideTo({
 		node:     node,
-		top:      hide ? -m.height : 0,
+		left:      hide ? -m.width : 0,
 		duration: 500,
 		unit:     'px',
 		onFinish: function() {

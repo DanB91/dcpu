@@ -58,7 +58,7 @@ StateTracker.prototype.toggle = function ()
 	fx.show(node)
 	  .slideTo({
 		node:     node,
-		bottom:   hide ? -m.height : 0,
+		bottom:   hide ? -m.height : 10,
 		duration: 1000,
 		unit:     'px',
 		onFinish: function() {
