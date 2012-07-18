@@ -20,14 +20,13 @@ func main() {
 	parseArgs()
 
 	tracker = NewStateTracker(config.Timeout)
+
 	go tracker.Poll()
+	go startServer(config.Address)
 
-	err := Run(config.Address)
+	launchBrowser(config.Address)
 
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "RunServer: %v\n", err)
-		os.Exit(1)
-	}
+	select {}
 }
 
 func parseArgs() {

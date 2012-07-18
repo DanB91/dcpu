@@ -27,8 +27,8 @@ func (this gzipResponseWriter) Write(p []byte) (int, error) {
 	return this.Writer.Write(p)
 }
 
-// Run starts the webserver on the given address.
-func Run(address string) (err error) {
+// startServer starts the webserver on the given address.
+func startServer(address string) {
 	t := time.Unix(0, 0).UTC()
 
 	AncientHistory = t.Format(time.RFC1123)
@@ -37,7 +37,9 @@ func Run(address string) (err error) {
 	http.HandleFunc("/", wrappedHandler(handler))
 	log.Printf("Listening on %q.\n", address)
 
-	return http.ListenAndServe(address, nil)
+	if err := http.ListenAndServe(address, nil); err != nil {
+		log.Fatalf("%v\n", err)
+	}
 }
 
 // handler handles each incoming HTTP request.
