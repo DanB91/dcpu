@@ -1,6 +1,11 @@
 ## DCPU IDE
 
-**Note**: This is work in progress.
+Some warnings ahead of time:
+
+* This is work in progress and thus subject to lots of breaking changes.
+* The release build will only work on unix systems. This should be fixed
+  at some point, but I have other priorities now. The debug build should be
+  ok on any Go-capable platform, since it involves only Go tools.
 
 This is a webbrowser based development environment for DCPU assembly
 projects. It consists of a Go backend and an HTML/Javascript frontend.
@@ -30,10 +35,37 @@ This application does some automated code generation on build.
 Which means we require that the Makefile is used to build it.
 Not doing so, will cause incorrect builds.
 
+
+### Debug build
+
+Building in debug mode is simple and has none of the external
+tool requirements that are listed in the section for release builds.
+
+    $ make 
+
+
+### Release build
+
+Building in release mode:
+
     $ make install
 
-To run the ide, invoke the `dcpu-ide` program. It starts the server
-and automatically launches a browser, pointing it to the correct page.
+This mode ensures that all the static web app content is first
+minified/compressed and then embedded in the server application. This allows
+us to move the `dcpu-ide` binary anywhere we want, without having to worry
+about dependencies on external files.
+
+During this build, the Makefile invokes `compress_data.sh`.
+This script goes through the static web data and compresses/minifies
+everything it can (html, js, css, png, etc). For this purpose
+it requires some external tools to be present. If these tools do
+not exist on your system, build behaviour is undefined.
+
+The external tools are:
+
+* [htmlcompressor](https://aur.archlinux.org/packages.php?ID=48832)
+* [yuicompressor](https://aur.archlinux.org/packages.php?ID=22058)
+* [pngcrush](https://aur.archlinux.org/packages.php?ID=22877)
 
 
 ### License

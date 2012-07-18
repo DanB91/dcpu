@@ -72,9 +72,9 @@ var fx = {
 		var style = cfg.node.style;
 
 		// Perform incremental move to new area.
-		var int = setInterval(function() {
+		var interval = setInterval(function() {
 			if (steps <= 0) {
-				clearInterval(int);
+				clearInterval(interval);
 				cfg.node._fx_busy = false;
 
 				if (cfg.onFinish) {
