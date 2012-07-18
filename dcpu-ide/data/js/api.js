@@ -62,7 +62,7 @@ var api = {
 		// force a refetch from the server.
 		//
 		// The server will still refer to the same page and simply
-		// ignore the timestamp querystring component.
+		// ignore the querystring component.
 		var t = new Date();
 		e.url += '?' + t.getYear() + t.getMonth() + t.getDay() + 
 			t.getHours() + t.getMinutes() + t.getSeconds();

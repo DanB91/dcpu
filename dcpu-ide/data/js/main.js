@@ -1,8 +1,14 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+const AppTitle = 'dcpu-ide &#x2af9;&#x2afa;';
+
 var workspace = null;
 var dashboard = null;
+
+window.onbeforeunload = function() {
+	
+};
 
 window.onload = function ()
 {
@@ -25,22 +31,16 @@ window.onload = function ()
 	document.onmousedown = onMouseDown;
 	document.onmouseup = onMouseUp;
 	document.onmousewheel = onMouseWheel;
-}
+};
 
 function onKeyDown (e)
 {
-	var key = (e.which != 0) ? e.which : e.keyCode;
-	
-	switch (key) {
-	case 192: // ~
-		dashboard.toggle();
-		break;
-	}
+	dashboard.onKey(e);
 }
 
 function onKeyUp (e)
 {
-	var key = (e.which != 0) ? e.which : e.keyCode;
+	
 }
 
 function onMouseMove (e)

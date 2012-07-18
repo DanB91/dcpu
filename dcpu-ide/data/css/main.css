@@ -22,7 +22,7 @@ html, body {
  top: 0; left: 0; right: 0;
  box-shadow: 0px 0px 15px #000;
  height: 50%;
- min-height: 200px;
+ min-height: 250px;
 }
 
 #dashboardItems {
@@ -59,7 +59,7 @@ html, body {
 }
 
 #dashboardItems button.active {
- color: #9f0;
+ color: #09f;
 }
 
 #dashboardOverview {
@@ -71,6 +71,7 @@ html, body {
  margin: 0;
  padding: 10px;
  padding-left: 20px;
+ border-left: 1px solid #09f;
  border-radius: 10px 10px 10px 10px;
  background-color: #555;
  background: -webkit-gradient(linear, left bottom, left top, from(#444), to(#666));

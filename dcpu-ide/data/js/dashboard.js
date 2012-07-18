@@ -15,19 +15,19 @@ function Dashboard ()
 			id:    'diNewProject',
 			title: 'New Project',
 			src:   '/dashboard/new_project.html', 
-			key:   'n',
+			key:   'N',
 		},
 		{
 			id:    'diConfigureKeyboard',
 			title: 'Configure keyboard',
 			src:   '/dashboard/configure_keyboard.html', 
-			key:   'k',
+			key:   'K',
 		},
 		{
 			id:    'diHelp',
 			title: 'Help',
 			src:   '/dashboard/help.html', 
-			key:   'h',
+			key:   'H',
 		},
 	];
 	this.selectedItem = -1;
@@ -37,28 +37,31 @@ function Dashboard ()
 Dashboard.prototype.init = function (id)
 {
 	this.node = document.getElementById('dashboard');
-
 	if (!this.node) {
 		return false;
 	}
+
+	fx.show(this.node);
 
 	this.overview = document.getElementById('dashboardOverview');
 	if (!this.overview) {
 		return false;
 	}
 
-	// Create buttons for items.
+	// Create list for item buttons.
 	var ul = document.createElement('ul');
 	if (!ul) {
 		return false;
 	}
 
+	// Title of dashboard is in first list element.
 	var li = document.createElement('li');
 	var h3 = document.createElement('h3');
-	h3.innerHTML = 'dcpu-ide &#x2af9;&#x2afa;';
+	h3.innerHTML = AppTitle;
 	li.appendChild(h3);
 	ul.appendChild(li);
 
+	// Add menu item buttons.
 	var me = this;
 	for (var n = 0; n < this.items.length; n++) {
 		var li = document.createElement('li');
@@ -69,7 +72,7 @@ Dashboard.prototype.init = function (id)
 		btn.innerHTML = btn.title;
 
 		if (this.items[n].key) {
-			btn.title += ' (' + this.items[n].key + ')';
+			btn.title += ' (alt+' + this.items[n].key + ')';
 		}
 
 		(function(idx) {
@@ -91,6 +94,41 @@ Dashboard.prototype.init = function (id)
 
 	this.select(0);
 	return true;
+}
+
+// onKey is called whenever a keypress event occurs.
+// The parameter holds the key event data.
+Dashboard.prototype.onKey = function (e) {
+	var key = (e.which != 0) ? e.which : e.keyCode;
+
+	if (!e.altKey) {
+		switch (key) {
+		case 192: // ~
+			this.toggle();
+			break;
+		}
+
+		return;
+	}
+
+	var ch = String.fromCharCode(key);
+
+	for (var n = 0; n < this.items.length; n++) {
+		if (!this.items[n].key) {
+			continue;
+		}
+
+		if (ch != this.items[n].key) {
+			continue;
+		}
+
+		if (!fx.isVisible(this.node)) {
+			this.toggle();
+		}
+
+		this.select(n);
+		e.cancelBubble = true;
+	}
 }
 
 // select changes the currently active dashboard item to the given index.

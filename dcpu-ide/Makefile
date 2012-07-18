@@ -1,13 +1,6 @@
 # This file is subject to a 1-clause BSD license.
 # Its contents can be found in the enclosed LICENSE file.
 
-# External dependencies on release build:
-#
-# - htmlcompressor
-# - yuicompressor
-# - pngcrush
-#
-
 TOC = ../static.go
 DATADIR = data
 DEPLOYDIR = deploy
@@ -22,10 +15,12 @@ build:
 	cd codegen && go run *.go -d -i ../$(DATADIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
 	go build $(LDFLAGS)
 
-install:
-	./compress_data.sh
+install: compress
 	cd codegen && go run *.go -i ../$(DEPLOYDIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
 	go install $(LDFLAGS)
+
+compress:
+	./compress_data.sh
 
 clean:
 	go clean ./...

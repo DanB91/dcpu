@@ -8,20 +8,21 @@ const FxFrameTime = 1000/FxFrameRate;
 var fx = {
 	// show makes the given element visible.
 	show : function (e) {
-		if (e) {
-			e.style.visibility = 'visible';
-			e.style.display = 'block';
-		}
+		e.style.visibility = 'visible';
+		e.style.display = 'block';
 		return this;
 	},
 
 	// hide makes the given element invisible.
 	hide : function (e) {
-		if (e) {
-			e.style.visibility = 'hidden';
-			e.style.display = 'none';
-		}
+		e.style.visibility = 'hidden';
+		e.style.display = 'none';
 		return this;
+	},
+
+	// isVisible returns true if the given element is currently visible.
+	isVisible : function (e) {
+		return e.style.visibility == 'visible';
 	},
 
 	// metrics returns the element's pixel coordinates and dimensions.
