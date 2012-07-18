@@ -42,6 +42,10 @@ func Run(address string) (err error) {
 
 // handler handles each incoming HTTP request.
 func handler(w http.ResponseWriter, r *http.Request) {
+	if tracker != nil {
+		tracker.Ping()
+	}
+
 	log.Printf("%s %s\n", r.RemoteAddr, r.URL)
 
 	if r.URL.Path == "/" {

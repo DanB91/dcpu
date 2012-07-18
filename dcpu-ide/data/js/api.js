@@ -30,6 +30,9 @@ var api = {
 	// onError:  (optional) A handler we call when an error occurred.
 	//                      It gets two parameters holding the error message
 	//                      and http status code.
+	// refresh:  (optional) If this is true, we force a new fetch from the
+	//                      server instead of relying on cached data. Defaults
+	//                      to false.
 	request : function (e)
 	{
 		if (!e.method) {
@@ -63,9 +66,11 @@ var api = {
 		//
 		// The server will still refer to the same page and simply
 		// ignore the querystring component.
-		var t = new Date();
-		e.url += '?' + t.getYear() + t.getMonth() + t.getDay() + 
-			t.getHours() + t.getMinutes() + t.getSeconds();
+		if (e.refresh) {
+			var t = new Date();
+			e.url += '?' + t.getYear() + t.getMonth() +
+				t.getDay() + t.getHours() + t.getMinutes() + t.getSeconds();
+		}
 
 		xhr.open(e.method, e.url, true);
 		xhr.send(e.data);

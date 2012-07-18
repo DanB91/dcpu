@@ -13,6 +13,7 @@ var api map[string]ApiHandler
 func init() {
 	api = make(map[string]ApiHandler)
 	api["/api/config"] = apiConfig
+	api["/api/ping"] = apiPing
 }
 
 // A handler for api calls.

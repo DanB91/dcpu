@@ -18,9 +18,9 @@ html, body {
  background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
  background: -moz-linear-gradient(bottom, #333, #555);
  background: linear-gradient(bottom, #333, #555);
+ box-shadow: 0px 0px 15px #000;
  position: absolute;
  top: 0; left: 0; right: 0;
- box-shadow: 0px 0px 15px #000;
  height: 50%;
  min-height: 250px;
 }
@@ -88,4 +88,20 @@ html, body {
  top: 0; left: 0; right: 0; bottom: 0;
  position: absolute;
  overflow: hidden;
+}
+
+#statetracker {
+ z-index: 2;
+ position: absolute;
+ bottom: 10px; left: 10px;
+ overflow: hidden;
+ margin: 0;
+ padding: 5px;
+ width: 50px;
+ height: 50px;
+ background-color: transparent;
+ background-image: url("/img/network-error.png");
+ background-repeat: no-repeat;
+ background-position: center center;
+ color: #fff;
 }

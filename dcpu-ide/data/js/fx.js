@@ -31,7 +31,9 @@ var fx = {
 		var l = parseInt(e.style.left) || parseInt(e.clientLeft) || 0;
 		var w = parseInt(e.clientWidth) || 0;
 		var h = parseInt(e.clientHeight) || 0;
-		return {top: t, left: l, bottom: t+h, right: l+w, width: w, height: h};
+		var b = parseInt(e.style.bottom) || t + h;
+		var r = parseInt(e.style.right) || l + w;
+		return {top: t, left: l, bottom: b, right: r, width: w, height: h};
 	},
 
 	// slideTo moves the element to a specific location using an animation.
@@ -40,10 +42,15 @@ var fx = {
 	// - node:     The target node.
 	// - top:      (optional) top location to move to.
 	// - left:     (optional) left location to move to.
+	// - bottom:   (optional) bottom location to move to.
+	// - right:    (optional) right location to move to.
 	// - duration: (optional) Number of milliseconds the animation should take.
 	// - unit:     (optional) The coordinate unit. Defaults to 'px'.
 	// - onFinish: (optional) An event handler which is fired when the
 	//                        animation is done.
+	//
+	// As far as the target coords go, we require that at least the
+	// following are specified: (left or right) and/or (top or bottom).
 	slideTo : function (cfg)
 	{
 		if (!cfg.node || cfg.node._fx_busy) {
@@ -52,11 +59,6 @@ var fx = {
 
 		// Ensure we don't get stuck in more than one animation.
 		cfg.node._fx_busy = true;
-		
-		var m = fx.metrics(cfg.node);
-		if (cfg.left == m.left && cfg.top == m.top) {
-			return; // Nothing to do.
-		}
 
 		if (!cfg.unit) {
 			cfg.unit = 'px';
@@ -65,12 +67,33 @@ var fx = {
 		// Number of steps we can fit in to @duration with
 		// the established framerate.
 		var steps = Math.ceil((parseInt(cfg.duration) || 100) / FxFrameRate);
-
-		// Distance per step to new point.
-		var dx = Math.floor((cfg.left - m.left) / steps);
-		var dy = Math.floor((cfg.top - m.top) / steps);
-
 		var style = cfg.node.style;
+		var m = fx.metrics(cfg.node);
+		var dx = 0, dy = 0;
+		var sx, sy;
+
+		// Find distance between points on x axis.
+		if (cfg.left != undefined) {
+			dx = Math.floor((cfg.left - m.left) / steps);
+			sx = 'left';
+		} else if (cfg.right != undefined) {
+			dx = Math.floor((cfg.right - m.right) / steps);
+			sx = 'right';
+		}
+
+		// Find distance between points on y axis.
+		if (cfg.top != undefined) {
+			dy = Math.floor((cfg.top - m.top) / steps);
+			sy = 'top';
+		} else if (cfg.bottom != undefined) {
+			dy = Math.floor((cfg.bottom - m.bottom) / steps);
+			sy = 'bottom';
+		}
+
+		// Nothing to do?
+		if (!sx && !sy) {
+			return;
+		}
 
 		// Perform incremental move to new area.
 		var interval = setInterval(function() {
@@ -85,8 +108,14 @@ var fx = {
 				return;
 			}
 
-			style.left = (parseInt(style.left) || 0) + dx + cfg.unit;
-			style.top = (parseInt(style.top) || 0) + dy + cfg.unit;
+			if (sx) {
+				style[sx] = (parseInt(style[sx]) || 0) + dx + cfg.unit;
+			}
+
+			if (sy) {
+				style[sy] = (parseInt(style[sy]) || 0) + dy + cfg.unit;
+			}
+
 			steps--;
 		}, FxFrameTime);
 

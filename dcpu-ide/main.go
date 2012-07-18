@@ -11,10 +11,17 @@ import (
 	"os"
 )
 
-var config *Config
+var (
+	config  *Config
+	tracker *StateTracker
+)
 
 func main() {
 	parseArgs()
+
+	tracker = NewStateTracker(config.Timeout)
+	go tracker.Poll()
+
 	err := Run(config.Address)
 
 	if err != nil {
@@ -26,8 +33,12 @@ func main() {
 func parseArgs() {
 	config = NewConfig()
 
+	flag.UintVar(&config.Timeout, "t", config.Timeout,
+		"Shut the server down when it has been idle for t seconds.")
+
 	flag.StringVar(&config.Address, "a", config.Address,
 		"The HTTP service address on which to run the server.")
+
 	version := flag.Bool("v", false, "Display version information.")
 
 	flag.Parse()

@@ -3,11 +3,12 @@
 
 const AppTitle = 'dcpu-ide &#x2af9;&#x2afa;';
 
-var workspace = null;
-var dashboard = null;
+var stateTracker = null;
+var workspace    = null;
+var dashboard    = null;
 
 window.onbeforeunload = function() {
-	
+	//TODO: implement clean shutdown.
 };
 
 window.onload = function ()
@@ -21,6 +22,12 @@ window.onload = function ()
 	dashboard = new Dashboard();
 	if (!dashboard.init()) {
 		console.error("Failed to initialize dashboard.");
+		return;
+	}
+
+	stateTracker = new StateTracker();
+	if (!stateTracker.init()) {
+		console.error("Failed to initialize state tracker.");
 		return;
 	}
 

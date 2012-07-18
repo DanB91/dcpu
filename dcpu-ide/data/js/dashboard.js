@@ -140,6 +140,7 @@ Dashboard.prototype.select = function (index)
 
 	var me = this;
 	api.request({
+		refresh: true,
 		url: me.items[index].src,
 		onData : function (data) {
 			me.overview.innerHTML = data;
