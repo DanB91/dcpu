@@ -27,8 +27,8 @@ func (this gzipResponseWriter) Write(p []byte) (int, error) {
 	return this.Writer.Write(p)
 }
 
-// startServer starts the webserver on the given address.
-func startServer(address string) {
+// launchServer starts the webserver on the given address.
+func launchServer(address string) {
 	t := time.Unix(0, 0).UTC()
 
 	AncientHistory = t.Format(time.RFC1123)

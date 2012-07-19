@@ -23,7 +23,7 @@ func main() {
 
 	quit := tracker.Poll()
 
-	go startServer(config.Address)
+	go launchServer(config.Address)
 	go launchBrowser(config.Address)
 
 	<-quit
