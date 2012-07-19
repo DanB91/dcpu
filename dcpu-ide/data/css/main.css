@@ -17,6 +17,11 @@ p {
  text-align: justify;
 }
 
+p.tiny {
+ font-size: 0.6em;
+ text-align: left;
+}
+
 a {
  color: #ccc;
  font-weight: bold;
@@ -28,6 +33,15 @@ code {
  padding-left: 3px;
  padding-right: 3px;
  border-radius: 2px 2px 2px 2px;
+}
+
+dt {
+ font-size: 0.7em;
+ font-weight: bold;
+}
+
+dd {
+ font-size: 0.7em;
 }
 
 #dashboard {

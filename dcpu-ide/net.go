@@ -68,7 +68,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		hdr.Set("Cache-Control", "public")
 		hdr.Set("Expires", ts)
 
-		w.Write(file.Data())
+		if !strings.HasPrefix(file.ContentType, "text/html") {
+			w.Write(file.Data())
+			return
+		}
+
+		// HTML content might need some extra processing.
+		data, err := parseTemplate(file.Data())
+
+		if err != nil {
+			log.Printf("Template error for %s: %v", r.URL.Path, err)
+			w.WriteHeader(500)
+			return
+		}
+
+		w.Write(data)
 		return
 	}
 
