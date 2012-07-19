@@ -19,23 +19,24 @@ var (
 )
 
 func main() {
-	parseArgs()
-
-	tracker = NewStateTracker(config.Timeout)
-
-	quit := tracker.Poll()
+	quit := startup()
 
 	go launchServer(config.Address)
 	go launchBrowser(config.Address)
-
 	<-quit
 
 	shutdown()
 }
 
+func startup() <-chan struct{} {
+	parseArgs()
+	tracker = NewStateTracker(config.Timeout)
+	return tracker.Poll()
+}
+
 func shutdown() {
-	log.Printf("Shutting down.")
-	config.Save(cfgpath)
+	log.Printf("Idle for %d secon(s). Shutting down.", config.Timeout)
+	//config.Save(cfgpath)
 }
 
 func parseArgs() {
@@ -43,12 +44,9 @@ func parseArgs() {
 	config = NewConfig()
 
 	flag.StringVar(&cfgpath, "c", cfgpath, "Path to configuration file.")
-	flag.UintVar(&config.Timeout, "t", config.Timeout,
-		"Shut the server down when it has been idle for t seconds.")
 
-	flag.StringVar(&config.Address, "a", config.Address,
-		"The HTTP service address on which to run the server.")
-
+	timeout := flag.Uint("t", 0, "Shut the server down when it has been idle for t seconds.")
+	addr := flag.String("a", "", "The HTTP service address on which to run the server.")
 	version := flag.Bool("v", false, "Display version information.")
 
 	flag.Parse()
@@ -59,4 +57,15 @@ func parseArgs() {
 	}
 
 	config.Load(cfgpath)
+
+	// These commandline flags take precedence over the values
+	// defined in the config file. So if they are set, overwrite 
+	// config with their value.
+	if len(*addr) > 0 {
+		config.Address = *addr
+	}
+
+	if *timeout > 0 {
+		config.Timeout = *timeout
+	}
 }

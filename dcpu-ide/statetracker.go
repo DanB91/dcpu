@@ -38,7 +38,7 @@ func (s *StateTracker) Ping() {
 
 // Poll runs in the background and compares the current
 // time with the stored last request time. If we exceed
-// the given timeout, this will send a termination signal
+// a given timeout, this will send a termination signal
 // down the returned channel.
 func (s *StateTracker) Poll() <-chan struct{} {
 	c := make(chan struct{})
@@ -53,6 +53,7 @@ func (s *StateTracker) Poll() <-chan struct{} {
 
 				if a-b >= s.timeout {
 					c <- struct{}{}
+					return
 				}
 			}
 		}
