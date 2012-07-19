@@ -9,10 +9,12 @@ import (
 )
 
 type Block struct {
-	Data  []ProfileData // Profile data for this function's instructions.
-	Label string        // Label/name of this function.
-	Start cpu.Word      // Start address of function.
-	End   cpu.Word      // End address of function.
+	Data      []ProfileData // Profile data for this block's instructions.
+	Label     string        // Label/name of this block.
+	StartAddr cpu.Word      // Start address of block.
+	EndAddr   cpu.Word      // End address of block.
+	StartLine int           // Start line of block.
+	EndLine   int           // End line of block.
 }
 
 // Cost returns the cumulative cycle cost and count for all

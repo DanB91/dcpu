@@ -95,8 +95,8 @@ func (p *Profile) ListFiles() BlockList {
 			}
 
 			p.fileblocks[i].Data = p.Data[s:e]
-			p.fileblocks[i].Start = s
-			p.fileblocks[i].End = e
+			p.fileblocks[i].StartAddr = s
+			p.fileblocks[i].EndAddr = e
 			p.fileblocks[i].Label = strings.Replace(p.Files[i].Name, path, "$DCPU_PATH", 1)
 		}
 	}
@@ -109,7 +109,7 @@ func (p *Profile) getFileName(addr cpu.Word) string {
 	files := p.ListFiles()
 
 	for i := range files {
-		if addr >= files[i].Start && addr < files[i].End {
+		if addr >= files[i].StartAddr && addr < files[i].EndAddr {
 			return files[i].Label
 		}
 	}
@@ -132,8 +132,10 @@ func (p *Profile) ListFunctions() BlockList {
 			_, fname = path.Split(fname)
 
 			p.funcblocks[i].Data = p.Data[s:e]
-			p.funcblocks[i].Start = s
-			p.funcblocks[i].End = e
+			p.funcblocks[i].StartAddr = s
+			p.funcblocks[i].EndAddr = e
+			p.funcblocks[i].StartLine = p.Functions[i].StartLine
+			p.funcblocks[i].EndLine = p.Functions[i].EndLine
 			p.funcblocks[i].Label = fmt.Sprintf("%s (%s)",
 				p.Functions[i].Name, fname)
 		}
