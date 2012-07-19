@@ -10,6 +10,42 @@ import (
 	"runtime"
 )
 
+// Find the user's home directory.
+func getHomeDir() string {
+	var dir string
+
+	switch runtime.GOOS {
+	case "windows":
+		dir = os.Getenv("USERPROFILE")
+
+		if len(dir) == 0 {
+			hd := os.Getenv("HOMEDRIVE")
+			hp := os.Getenv("HOMEPATH")
+
+			if len(hd) > 0 && len(hp) > 0 {
+				dir = path.Join(hd, hp)
+			}
+		}
+
+		if len(dir) == 0 {
+			// This is only relevant if we are running under cygwin.
+			dir = os.Getenv("HOME")
+		}
+
+	case "freebsd", "linux", "darwin":
+		dir = os.Getenv("HOME")
+
+		if len(dir) == 0 {
+			usr, err := user.Current()
+			if err == nil {
+				dir = path.Join("/home", usr.Username)
+			}
+		}
+	}
+
+	return dir
+}
+
 // Find suitable location for the configuration file.
 func getConfigPath(file string) string {
 	var dir string

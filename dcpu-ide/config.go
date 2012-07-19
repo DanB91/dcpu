@@ -10,21 +10,23 @@ import (
 )
 
 type Config struct {
-	DcpuPath string `json:"-"` // DCPU path, pointing to standard library
-	Address  string // Listen address for server.
-	Timeout  uint   // Shut the server down after X seconds of idleness.
+	Address     string `json:"-"` // Listen address for server.
+	Timeout     uint   // Shut the server down after X seconds of idleness.
+	IncludePath string // DCPU path, pointing to standard library.
+	ProjectPath string // Base directory for code projects.
 }
 
 func NewConfig() *Config {
 	c := new(Config)
 	c.Timeout = 10
 	c.Address = os.Getenv("DCPU_IDE_ADDRESS")
-	c.DcpuPath = os.Getenv("DCPU_PATH")
+	c.IncludePath = os.Getenv("DCPU_PATH")
 
 	if len(c.Address) == 0 {
 		c.Address = ":7070"
 	}
 
+	c.ProjectPath = getHomeDir()
 	return c
 }
 
@@ -44,13 +46,15 @@ func (c *Config) Save(file string) {
 	// 
 	// We can't use struct field tags here because the config
 	// struct is also used directly in the apiConfig call.
-	// It has different requirements.
+	// It has different requirements for which tags are in place.
 
 	cfg := struct {
-		Address string
-		Timeout uint
+		Address     string
+		ProjectPath string
+		Timeout     uint
 	}{
 		config.Address,
+		config.ProjectPath,
 		config.Timeout,
 	}
 

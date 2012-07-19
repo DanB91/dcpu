@@ -33,6 +33,11 @@ var api = {
 	// refresh:  (optional) If this is true, we force a new fetch from the
 	//                      server instead of relying on cached data. Defaults
 	//                      to false.
+	// type:     (optional) This determines in what format the data parameter
+	//                      comes in the onData handler. Possible type are:
+	//                      'json' and 'text'. This defaults to text. 'json'
+	//                      type will attempt to parse the returned
+	//                      data as a json encoded object and return it.
 	request : function (e)
 	{
 		if (!e.method) {
@@ -47,9 +52,22 @@ var api = {
 
 			switch (xhr.status) {
 			case 200:
-				if (e.onData) {
-					e.onData(xhr.responseText);
+				if (!e.onData) {
+					break;
 				}
+	
+				switch (e.type) {
+				case 'json':
+					var _data = {};
+					eval('data = ' + xhr.responseText);
+					e.onData(data);
+					break;
+
+				default:
+					e.onData(xhr.responseText);
+					break;
+				}
+
 				break;
 				
 			default:

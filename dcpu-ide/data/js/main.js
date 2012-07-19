@@ -35,6 +35,7 @@ window.onload = function ()
 	// Load configuration data.
 	api.request({
 		url: '/api/config',
+		type: "json",
 		onData : function (data) {
 			config = data;
 		},

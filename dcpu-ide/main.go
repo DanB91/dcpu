@@ -48,8 +48,9 @@ func parseArgs() {
 
 	flag.StringVar(&cfgpath, "c", cfgpath, "Path to configuration file.")
 
-	timeout := flag.Uint("t", 0, "Shut the server down when it has been idle for t seconds.")
 	addr := flag.String("a", "", "The HTTP service address on which to run the server.")
+	projdir := flag.String("p", "", "Path to directory where DASM projects are stored.")
+	timeout := flag.Uint("t", 0, "Shut the server down when it has been idle for t seconds.")
 	version := flag.Bool("v", false, "Display version information.")
 
 	flag.Parse()
@@ -73,5 +74,9 @@ func parseArgs() {
 
 	if *timeout > 0 {
 		config.Timeout = *timeout
+	}
+
+	if len(*projdir) > 0 {
+		config.ProjectPath = *projdir
 	}
 }
