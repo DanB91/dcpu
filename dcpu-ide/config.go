@@ -40,7 +40,21 @@ func (c *Config) Load(file string) {
 
 // Load saves configuration data from to a file.
 func (c *Config) Save(file string) {
-	data, err := json.MarshalIndent(c, "", "  ")
+	// Cherry-pick the fields we want to store.
+	// 
+	// We can't use struct field tags here because the config
+	// struct is also used directly in the apiConfig call.
+	// It has different requirements.
+
+	cfg := struct {
+		Address string
+		Timeout uint
+	}{
+		config.Address,
+		config.Timeout,
+	}
+
+	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return
 	}

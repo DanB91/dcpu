@@ -6,21 +6,8 @@ package main
 import "net/http"
 
 // apiConfig returns the current configuration data.
-// We cherry-pick only the parts which are relevant to the client.
-//
-// This can not be done through struct field tags, because we already have
-// some in place for the config.Load/Save routines.
 func apiConfig(r *http.Request) ([]byte, int) {
-	data := struct {
-		DcpuPath string
-		Address  string
-		Timeout  uint
-	}{
-		config.DcpuPath,
-		config.Address,
-		config.Timeout,
-	}
-	return Pack(data), 200
+	return Pack(config), 200
 }
 
 // apiPing serves as a keep-alive pump. This is a no-op.
