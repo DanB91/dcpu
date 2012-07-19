@@ -19,24 +19,23 @@ var (
 )
 
 func main() {
-	quit := startup()
-
-	go launchServer(config.Address)
-	go launchBrowser(config.Address)
-	<-quit
-
+	<-startup()
 	shutdown()
 }
 
 func startup() <-chan struct{} {
 	parseArgs()
 	tracker = NewStateTracker(config.Timeout)
+
+	go launchServer(config.Address)
+	go launchBrowser(config.Address)
+
 	return tracker.Poll()
 }
 
 func shutdown() {
 	log.Printf("Idle for %d secon(s). Shutting down.", config.Timeout)
-	//config.Save(cfgpath)
+	config.Save(cfgpath)
 }
 
 func parseArgs() {

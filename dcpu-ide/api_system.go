@@ -13,9 +13,11 @@ import "net/http"
 func apiConfig(r *http.Request) ([]byte, int) {
 	data := struct {
 		DcpuPath string
+		Address  string
 		Timeout  uint
 	}{
 		config.DcpuPath,
+		config.Address,
 		config.Timeout,
 	}
 	return Pack(data), 200

@@ -45,9 +45,11 @@ func (s *StateTracker) Poll() <-chan struct{} {
 
 	go func() {
 		defer close(c)
+		tick := time.Tick(time.Second)
+
 		for {
 			select {
-			case t := <-time.After(time.Second):
+			case t := <-tick:
 				a := t.UnixNano()
 				b := atomic.LoadInt64(&s.lastRequest)
 

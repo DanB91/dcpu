@@ -20,9 +20,9 @@ This is a Go web server which runs on localhost and serves to mediate
 commands from the frontend to the dcpu toolchain.
 
 The server listens on `[::1]:7070` by default. This can be changed through the
-`-a` commandline flag, or by setting the `DCPU_IDE_ADDRESS` environment
-variable. If both of these are specified, the commandline flag takes
-precedence.
+`-a` commandline flag, altering the `.dcpu-ide` configuration file, or by
+setting the `DCPU_IDE_ADDRESS` environment variable. The commandline flags
+always takes precedence.
 
 
 ### Frontend
