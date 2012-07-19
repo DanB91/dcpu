@@ -6,7 +6,7 @@ This is a floppy that can be plugged into the HMD2043 drive.
 It is backed by a file, so we can have its data persisted across
 different sessions. It strictly reads/writes data in whole sectors.
 
-Create a blank backing file is easy enough:
+Creating a blank backing file is easy enough:
 
     $ dd if=/dev/zero of=myfile.fdd ibs=1024 count=1440
 
