@@ -2,7 +2,8 @@
 // Its contents can be found in the enclosed LICENSE file.
 
 if (typeof XMLHttpRequest == "undefined") {
-	XMLHttpRequest = function () {
+	XMLHttpRequest = function ()
+	{
 		try {
 			return new ActiveXObject("Msxml2.XMLHTTP.6.0");
 		} catch (e) { }
@@ -45,7 +46,8 @@ var api = {
 		}
 
 		var xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = function () {
+		xhr.onreadystatechange = function ()
+		{
 			if (xhr.readyState != 4) {
 				return;
 			}

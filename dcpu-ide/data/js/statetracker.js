@@ -29,16 +29,19 @@ StateTracker.prototype.init = function ()
 StateTracker.prototype.poll = function ()
 {
 	var me = this;
-	var interval = setInterval(function () {
+	var interval = setInterval(function ()
+	{
 		api.request({
 			url: '/api/ping',
-			onData : function (data) {
+			onData : function (data)
+			{
 				if (!me.isConnected) {
 					me.isConnected = true;
 					me.toggle();
 				}
 			},
-			onError : function (msg, status) {
+			onError : function (msg, status)
+			{
 				if (me.isConnected) {
 					me.isConnected = false;
 					me.toggle();
@@ -61,7 +64,8 @@ StateTracker.prototype.toggle = function ()
 		bottom:   hide ? -m.height : 10,
 		duration: 1000,
 		unit:     'px',
-		onFinish: function() {
+		onFinish: function()
+		{
 			if (hide) {
 				fx.hide(node);
 			}

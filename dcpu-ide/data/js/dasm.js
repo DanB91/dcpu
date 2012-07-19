@@ -1,4 +1,5 @@
-CodeMirror.defineMode("dasm", function(config, parserConfig) {
+CodeMirror.defineMode("dasm", function(config, parserConfig)
+{
 	var isOperatorChar = /[+\-*&^%=<>!|\/]/;
 	var indentUnit = config.indentUnit;
 
@@ -23,7 +24,8 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 		"ifg":0, "ifa":0, "ifl":0, "ifu":0
 	};
 
-	function tokenBase(stream, state) {
+	function tokenBase(stream, state)
+	{
 		var ch = stream.next();
 
 		if (ch == '"' || ch == "'") {
@@ -79,8 +81,10 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 		return "word";
 	}
 
-	function tokenString(quote) {
-		return function(stream, state) {
+	function tokenString(quote)
+	{
+		return function(stream, state)
+		{
 			var escaped = false, next = 0;
 
 			while ((next = stream.next()) != null) {
@@ -97,13 +101,15 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 	}
 
 	return {
-		startState: function(basecolumn) {
+		startState: function(basecolumn)
+		{
 			return {
 				branchDepth: 1,
 			};
 		},
 
-		token: function(stream, state) {
+		token: function(stream, state)
+		{
 			if (stream.eatSpace()) {
 				return null;
 			}
@@ -111,7 +117,8 @@ CodeMirror.defineMode("dasm", function(config, parserConfig) {
 			return (state.tokenize || tokenBase)(stream, state);
 		},
 
-		indent: function(state, textAfter) {
+		indent: function(state, textAfter)
+		{
 			// label definitions, non-inline comments, 'def' and 'end'
 			// should be moved to the beginning of a line.
 			//

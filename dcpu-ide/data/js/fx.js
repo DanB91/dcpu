@@ -7,26 +7,30 @@ const FxFrameTime = 1000/FxFrameRate;
 // This defines some basic visual effects for UI elements..
 var fx = {
 	// show makes the given element visible.
-	show : function (e) {
+	show : function (e)
+	{
 		e.style.visibility = 'visible';
 		e.style.display = 'block';
 		return this;
 	},
 
 	// hide makes the given element invisible.
-	hide : function (e) {
+	hide : function (e)
+	{
 		e.style.visibility = 'hidden';
 		e.style.display = 'none';
 		return this;
 	},
 
 	// isVisible returns true if the given element is currently visible.
-	isVisible : function (e) {
+	isVisible : function (e)
+	{
 		return e.style.visibility == 'visible';
 	},
 
 	// metrics returns the element's pixel coordinates and dimensions.
-	metrics : function (e) {
+	metrics : function (e)
+	{
 		var t = parseInt(e.style.top) || parseInt(e.clientTop) || 0;
 		var l = parseInt(e.style.left) || parseInt(e.clientLeft) || 0;
 		var w = parseInt(e.clientWidth) || 0;
@@ -96,7 +100,8 @@ var fx = {
 		}
 
 		// Perform incremental move to new area.
-		var interval = setInterval(function() {
+		var interval = setInterval(function()
+		{
 			if (steps <= 0) {
 				clearInterval(interval);
 				cfg.node._fx_busy = false;

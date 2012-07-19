@@ -36,10 +36,12 @@ window.onload = function ()
 	api.request({
 		url: '/api/config',
 		type: "json",
-		onData : function (data) {
+		onData : function (data)
+		{
 			config = data;
 		},
-		onError : function (msg, status) {
+		onError : function (msg, status)
+		{
 			console.error("Failed to load configuration data.");
 		},
 	});

@@ -40,6 +40,12 @@ function Dashboard ()
 			key:   'H',
 			data:  '',
 		},
+		{
+			id:    'diAbout',
+			title: 'About',
+			src:   '/dashboard/about.html', 
+			data:  '',
+		},
 	];
 	this.selectedItem = -1;
 }
@@ -91,8 +97,10 @@ Dashboard.prototype.init = function (id)
 			btn.title += ' (alt+' + this.items[n].key + ')';
 		}
 
-		(function(idx) {
-			btn.onclick = function () {
+		(function(idx)
+		{
+			btn.onclick = function ()
+			{
 				me.select(idx);
 			}
 		}(n));
@@ -100,11 +108,13 @@ Dashboard.prototype.init = function (id)
 		li.appendChild(btn);
 		ul.appendChild(li);
 
-		(function(idx) {
+		(function(idx)
+		{
 			api.request({
 				refresh: true,
 				url: me.items[idx].src,
-				onData : function (data) {
+				onData : function (data)
+				{
 					me.items[idx].data = data;
 
 					if (idx == 0) {
@@ -113,7 +123,8 @@ Dashboard.prototype.init = function (id)
 						me.select(0);
 					}
 				},
-				onError : function (msg, status) {
+				onError : function (msg, status)
+				{
 					console.error('Dashboard.init: ',
 						me.items[idx].src, status, msg);
 				},
@@ -127,12 +138,13 @@ Dashboard.prototype.init = function (id)
 
 // onKey is called whenever a keypress event occurs.
 // The parameter holds the key event data.
-Dashboard.prototype.onKey = function (e) {
-	var key = (e.which != 0) ? e.which : e.keyCode;
-
+Dashboard.prototype.onKey = function (e)
+{
 	if (!e.altKey) {
 		return;
 	}
+
+	var key = (e.which != 0) ? e.which : e.keyCode;
 
 	switch (key) {
 	case 192: // ~
@@ -194,7 +206,8 @@ Dashboard.prototype.toggle = function ()
 		left:      hide ? -m.width : 0,
 		duration: 500,
 		unit:     'px',
-		onFinish: function() {
+		onFinish: function()
+		{
 			if (hide) {
 				fx.hide(node);
 			}
