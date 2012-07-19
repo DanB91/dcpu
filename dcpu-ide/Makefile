@@ -14,13 +14,13 @@ all: build
 build:
 	cd codegen && go run *.go -d -i ../$(DATADIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
 	go build $(LDFLAGS)
+	rm -rf $(CLEANFILES)
 
-install: compress
+install:
+	./compress_data.sh
 	cd codegen && go run *.go -i ../$(DEPLOYDIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
 	go install $(LDFLAGS) -s
-
-compress:
-	./compress_data.sh
+	rm -rf $(CLEANFILES)
 
 clean:
 	go clean ./...

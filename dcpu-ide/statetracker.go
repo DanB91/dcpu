@@ -4,7 +4,6 @@
 package main
 
 import (
-	"log"
 	"sync/atomic"
 	"time"
 )
@@ -53,8 +52,6 @@ func (s *StateTracker) Poll() <-chan struct{} {
 				b := atomic.LoadInt64(&s.lastRequest)
 
 				if a-b >= s.timeout {
-					log.Printf("Idle for %d second(s). Shutting down.",
-						(a-b)/int64(time.Second))
 					c <- struct{}{}
 				}
 			}

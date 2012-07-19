@@ -27,8 +27,8 @@ func launchBrowser(url string) {
 	}
 
 	url = "http://" + url
+	app := getBrowserPath(DefaultBrowser)
 
-	app := getBrowserPath()
 	if strings.Index(app, "chromium") != -1 {
 		// Chromium can run in 'app mode'.
 		// This gets rid of url bars, buttons, etc.
@@ -44,7 +44,6 @@ func launchBrowser(url string) {
 	if err != nil {
 		log.Printf("Failed to launch a suitable browser.")
 		log.Printf("Either open the url %q manually, or set the $BROWSER "+
-			"environment variable and run this program again.",
-			url)
+			"environment variable and run this program again.", url)
 	}
 }

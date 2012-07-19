@@ -5,21 +5,20 @@ package main
 
 import (
 	"os"
-	"os/exec"
 )
 
-// Find full path to browser.
-func getBrowserPath() string {
+// Find path to browser.
+func getBrowserPath(defaultpath string) string {
 	// The $BROWSER environment variable takes precedence.
 	file := os.Getenv("BROWSER")
 	if len(file) > 0 {
 		return file
 	}
 
-	file, err := exec.LookPath("open")
-	if err == nil {
-		return file
-	}
+	return defaultpath + ".exe"
+}
 
-	return DefaultBrowser
+// Find the location of the configuration file.
+func getConfigPath() string {
+	panic("getConfigPath not implemented.")
 }

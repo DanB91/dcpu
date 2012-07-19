@@ -8,10 +8,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 )
 
 var (
+	cfgpath string
 	config  *Config
 	tracker *StateTracker
 )
@@ -27,11 +29,20 @@ func main() {
 	go launchBrowser(config.Address)
 
 	<-quit
+
+	shutdown()
+}
+
+func shutdown() {
+	log.Printf("Shutting down.")
+	config.Save(cfgpath)
 }
 
 func parseArgs() {
+	cfgpath = getConfigPath()
 	config = NewConfig()
 
+	flag.StringVar(&cfgpath, "c", cfgpath, "Path to configuration file.")
 	flag.UintVar(&config.Timeout, "t", config.Timeout,
 		"Shut the server down when it has been idle for t seconds.")
 
@@ -46,4 +57,6 @@ func parseArgs() {
 		fmt.Printf("%s\n", Version())
 		os.Exit(0)
 	}
+
+	config.Load(cfgpath)
 }
