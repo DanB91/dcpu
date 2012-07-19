@@ -18,7 +18,22 @@ func getBrowserPath(defaultpath string) string {
 	return defaultpath + ".exe"
 }
 
-// Find the location of the configuration file.
+// Find suitable location for the configuration file.
 func getConfigPath() string {
-	panic("getConfigPath not implemented.")
+	file := os.Getenv("%USERPROFILE%")
+	if len(file) > 0 {
+		goto ret
+	}
+
+	hd := os.Getenv("%HOMEDRIVE%")
+	hp := os.Getenv("%HOMEPATH%")
+	if len(hd) > 0 && len(hp) > 0 {
+		file = path.Join(hd, hp)
+		goto ret
+	}
+
+	return ""
+
+ret:
+	return path.Join(file, fmt.Sprintf("%s.cfg", AppName))
 }

@@ -21,7 +21,7 @@ func getBrowserPath(defaultpath string) string {
 	return defaultpath
 }
 
-// Find the location of the configuration file.
+// Find suitable location for the configuration file.
 // For unix systems this is usually in $HOME.
 func getConfigPath() string {
 	var file string
