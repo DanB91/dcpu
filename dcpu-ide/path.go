@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/user"
 	"path"
@@ -13,44 +12,53 @@ import (
 
 // Find suitable location for the configuration file.
 func getConfigPath() string {
-	var f string
+	var dir string
 
 	switch runtime.GOOS {
 	case "windows":
-		f = os.Getenv("LOCALAPPDATA")
+		dir = os.Getenv("LOCALAPPDATA")
 
-		if len(f) == 0 {
-			f = os.Getenv("APPDATA")
+		if len(dir) == 0 {
+			dir = os.Getenv("APPDATA")
 		}
 
-		if len(f) == 0 {
+		if len(dir) == 0 {
 			hd := os.Getenv("HOMEDRIVE")
 			hp := os.Getenv("HOMEPATH")
 
 			if len(hd) > 0 && len(hp) > 0 {
-				f = path.Join(hd, hp)
+				dir = path.Join(hd, hp)
 			}
 		}
 
-		if len(f) == 0 {
+		if len(dir) == 0 {
 			// This is only relevant if we are running under cygwin.
-			f = os.Getenv("HOME")
+			dir = os.Getenv("HOME")
 		}
 
 	case "freebsd", "linux", "darwin":
-		f = os.Getenv("HOME")
+		dir = os.Getenv("HOME")
 
-		if len(f) == 0 {
+		if len(dir) == 0 {
 			usr, err := user.Current()
 			if err == nil {
-				f = path.Join("/home", usr.Username)
+				dir = path.Join("/home", usr.Username)
 			}
 		}
 	}
 
-	if len(f) == 0 {
+	if len(dir) == 0 {
 		return ""
 	}
 
-	return path.Join(f, fmt.Sprintf("%s.cfg", AppName))
+	file := AppName
+
+	switch runtime.GOOS {
+	case "freebsd", "linux", "darwin":
+		file = "." + file
+	case "windows":
+		file += ".cfg"
+	}
+
+	return path.Join(dir, file)
 }

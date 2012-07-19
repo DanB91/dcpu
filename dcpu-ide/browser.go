@@ -38,7 +38,7 @@ func launchBrowser(url string) {
 		args = []string{url}
 	}
 
-	log.Printf("Launching %s...", app)
+	log.Printf("Launching %s %v", app, args)
 
 	err := exec.Command(app, args...).Run()
 	if err != nil {

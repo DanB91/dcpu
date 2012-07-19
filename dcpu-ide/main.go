@@ -37,6 +37,7 @@ func shutdown() {
 	log.Printf("Idle for %d second(s). Shutting down.", config.Timeout)
 
 	if len(cfgpath) > 0 {
+		log.Printf("Saving %s", cfgpath)
 		config.Save(cfgpath)
 	}
 }
@@ -59,6 +60,7 @@ func parseArgs() {
 	}
 
 	if len(cfgpath) > 0 {
+		log.Printf("Loading %s", cfgpath)
 		config.Load(cfgpath)
 	}
 
