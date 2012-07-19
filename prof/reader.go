@@ -52,13 +52,24 @@ func Read(r io.Reader) (p *Profile, err error) {
 
 	// [4]
 	for i := range p.Functions {
-		if err = binary.Read(r, be, &p.Functions[i].Start); err != nil {
+		if err = binary.Read(r, be, &p.Functions[i].StartAddr); err != nil {
 			return
 		}
 
-		if err = binary.Read(r, be, &p.Functions[i].End); err != nil {
+		if err = binary.Read(r, be, &p.Functions[i].EndAddr); err != nil {
 			return
 		}
+
+		var line uint32
+		if err = binary.Read(r, be, &line); err != nil {
+			return
+		}
+		p.Functions[i].StartLine = int(line)
+
+		if err = binary.Read(r, be, &line); err != nil {
+			return
+		}
+		p.Functions[i].EndLine = int(line)
 
 		var size uint16
 		if err = binary.Read(r, be, &size); err != nil {

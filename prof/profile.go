@@ -125,8 +125,8 @@ func (p *Profile) ListFunctions() BlockList {
 		var fname string
 
 		for i := range p.funcblocks {
-			s = p.Functions[i].Start
-			e = p.Functions[i].End
+			s = p.Functions[i].StartAddr
+			e = p.Functions[i].EndAddr
 
 			fname = p.getFileName(s)
 			_, fname = path.Split(fname)

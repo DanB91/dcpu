@@ -39,6 +39,8 @@ var be = binary.BigEndian
 //        Where N is the amount described in [3].
 //        - An unsigned 16 bit int: The functions's start address.
 //        - An unsigned 16 bit int: The functions's end address.
+//        - An unsigned 32 bit int: The functions's start line in source.
+//        - An unsigned 32 bit int: The functions's end line in source.
 //        - An unsigned 16 bit int: The length of the function name in bytes.
 //        - Each function name is written out as raw bytes.
 //    
@@ -97,12 +99,22 @@ func Write(p *Profile, w io.Writer) (err error) {
 
 	// [4]
 	for i := range p.Functions {
-		err = binary.Write(w, be, p.Functions[i].Start)
+		err = binary.Write(w, be, p.Functions[i].StartAddr)
 		if err != nil {
 			return
 		}
 
-		err = binary.Write(w, be, p.Functions[i].End)
+		err = binary.Write(w, be, p.Functions[i].EndAddr)
+		if err != nil {
+			return
+		}
+
+		err = binary.Write(w, be, uint32(p.Functions[i].StartLine))
+		if err != nil {
+			return
+		}
+
+		err = binary.Write(w, be, uint32(p.Functions[i].EndLine))
 		if err != nil {
 			return
 		}

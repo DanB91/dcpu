@@ -24,7 +24,7 @@ func TestIdentity(t *testing.T) {
 
 	var dbg asm.DebugInfo
 	dbg.Files = []asm.FileInfo{{"a.dasm", 0}}
-	dbg.Functions = []asm.FuncInfo{{"main", 0, 5}}
+	dbg.Functions = []asm.FuncInfo{{"main", 0, 5, 0, 4}}
 	dbg.SourceMapping = make([]asm.SourceInfo, 5)
 
 	a := New(code, &dbg)
@@ -64,12 +64,20 @@ func TestIdentity(t *testing.T) {
 	}
 
 	for i := range a.Functions {
-		if a.Functions[i].Start != b.Functions[i].Start {
-			t.Fatalf("a.Functions[i].Start != b.Functions[i].Start")
+		if a.Functions[i].StartAddr != b.Functions[i].StartAddr {
+			t.Fatalf("a.Functions[i].StartAddr != b.Functions[i].StartAddr")
 		}
 
-		if a.Functions[i].End != b.Functions[i].End {
-			t.Fatalf("a.Functions[i].End != b.Functions[i].End")
+		if a.Functions[i].EndAddr != b.Functions[i].EndAddr {
+			t.Fatalf("a.Functions[i].EndAddr != b.Functions[i].EndAddr")
+		}
+
+		if a.Functions[i].StartLine != b.Functions[i].StartLine {
+			t.Fatalf("a.Functions[i].StartLine != b.Functions[i].StartLine")
+		}
+
+		if a.Functions[i].EndLine != b.Functions[i].EndLine {
+			t.Fatalf("a.Functions[i].EndLine != b.Functions[i].EndLine")
 		}
 
 		if a.Functions[i].Name != b.Functions[i].Name {
