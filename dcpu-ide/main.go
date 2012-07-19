@@ -34,7 +34,7 @@ func startup() <-chan struct{} {
 }
 
 func shutdown() {
-	log.Printf("Idle for %d secon(s). Shutting down.", config.Timeout)
+	log.Printf("Idle for %d second(s). Shutting down.", config.Timeout)
 	config.Save(cfgpath)
 }
 
