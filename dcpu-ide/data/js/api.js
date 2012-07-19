@@ -24,8 +24,10 @@ var api = {
 	// The supplied object can contain any of these fields:
 	//
 	// url:      Target url to fetch.
-	// onData:   Handler we call when data has been fetched.
-	//           It gets one parameter holding the actual data.
+	// onData:   (optional) Handler we call when data has been fetched.
+	//                      It gets one parameter holding the actual data.
+	//                      This can be omitted in synchronous calls.
+	//                      In which case, request() returns the result directly.
 	// method:   (optional) GET, POST, HEAD.
 	// data:     (optional) Data to send to target.
 	// onError:  (optional) A handler we call when an error occurred.
@@ -39,60 +41,64 @@ var api = {
 	//                      'json' and 'text'. This defaults to text. 'json'
 	//                      type will attempt to parse the returned
 	//                      data as a json encoded object and return it.
+	// async:    (optional) Determines if we should fetch content asynchronously
+	//                      or not. Defaults to true.
 	request : function (e)
 	{
-		if (!e.method) {
-			e.method = 'GET';		
+		if (!e.method == undefined) {
+			e.method = 'GET';
 		}
 
-		var xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = function ()
-		{
-			if (xhr.readyState != 4) {
-				return;
-			}
-
-			switch (xhr.status) {
-			case 200:
-				if (!e.onData) {
-					break;
-				}
-	
-				switch (e.type) {
-				case 'json':
-					var _data = {};
-					eval('data = ' + xhr.responseText);
-					e.onData(data);
-					break;
-
-				default:
-					e.onData(xhr.responseText);
-					break;
-				}
-
-				break;
-				
-			default:
-				if (e.onError) {
-					e.onError(xhr.statusText, xhr.status);
-				}
-			}
+		if (e.async == undefined) {
+			e.async = true;
 		}
 
-		// This is a hack to avoid caching of the requested url.
-		// It comes in the form <url>?<timestamp>. The caching
-		// mechanism will consider this a unique url and will therefor
-		// force a refetch from the server.
-		//
-		// The server will still refer to the same page and simply
-		// ignore the querystring component.
 		if (e.refresh) {
 			var t = new Date();
 			e.url += '?' + t.getYear() + t.getMonth() +
 				t.getDay() + t.getHours() + t.getMinutes() + t.getSeconds();
 		}
 
-		xhr.open(e.method, e.url, true);
+		var xhr = new XMLHttpRequest();
+
+		if (e.async) {
+			xhr.onreadystatechange = function ()
+			{
+				if (xhr.readyState != 4) {
+					return;
+				}
+	
+				api.handleResponse(e, xhr);
+			}
+		}
+
+		xhr.open(e.method, e.url, e.async);
 		xhr.send(e.data);
+
+		if (!e.async) {
+			return api.handleResponse(e, xhr);
+		}
+	},
+
+	handleResponse : function (e, xhr)
+	{
+		if (xhr.status != 200) {
+			if (e.onError) {
+				e.onError(xhr.statusText, xhr.status);
+			}
+			return null;
+		}
+
+		var d = xhr.responseText;
+		if (e.type == 'json') {
+			eval('d = ' + d);
+		}
+
+		if (!e.onData) {
+			return d;
+		}
+
+		e.onData(d);
+		return null;
 	}
 };

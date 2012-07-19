@@ -33,7 +33,10 @@ func parseTemplate(html []byte) (out []byte, err error) {
 	}
 
 	data := struct {
-	}{}
+		Config *Config
+	}{
+		Config: config,
+	}
 
 	var buf bytes.Buffer
 	err = t.Execute(&buf, data)

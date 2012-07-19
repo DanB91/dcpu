@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"path"
 )
 
 type Config struct {
@@ -26,7 +27,7 @@ func NewConfig() *Config {
 		c.Address = ":7070"
 	}
 
-	c.ProjectPath = getHomeDir()
+	c.ProjectPath = path.Join(getHomeDir(), AppName)
 	return c
 }
 

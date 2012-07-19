@@ -5,6 +5,11 @@ package main
 
 import "net/http"
 
+func init() {
+	Register("/api/config", apiConfig)
+	Register("/api/ping", apiPing)
+}
+
 // apiConfig returns the current configuration data.
 func apiConfig(r *http.Request) ([]byte, int) {
 	return Pack(config), 200

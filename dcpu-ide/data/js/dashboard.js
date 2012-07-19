@@ -5,65 +5,35 @@ function Dashboard ()
 {
 	this.node     = null;
 	this.overview = null;
-	this.items    = [
-		{
-			id:    'diGettingStarted',
-			title: 'Getting started',
-			src:   '/dashboard/getting_started.html', 
-			data:  '', 
-		},
-		{
-			id:    'diNewProject',
-			title: 'New Project',
-			src:   '/dashboard/new_project.html', 
-			key:   'N',
-			data:  '',
-		},
-		{
-			id:    'diOpenProject',
-			title: 'Open Project',
-			src:   '/dashboard/open_project.html', 
-			key:   'O',
-			data:  '',
-		},
-		{
-			id:    'diConfig',
-			title: 'Configuration',
-			src:   '/dashboard/config.html', 
-			key:   'C',
-			data:  '',
-		},
-		{
-			id:    'diHelp',
-			title: 'Help',
-			src:   '/dashboard/help.html', 
-			key:   'H',
-			data:  '',
-		},
-		{
-			id:    'diAbout',
-			title: 'About',
-			src:   '/dashboard/about.html', 
-			data:  '',
-		},
-	];
+	this.items    = [];
 	this.selectedItem = -1;
 }
 
 // init initializes the dashboard and its UI elements.
 Dashboard.prototype.init = function (id)
 {
+	var me = this;
+
 	this.node = document.getElementById('dashboard');
 	if (!this.node) {
 		return false;
 	}
 
-	fx.show(this.node);
-
 	this.overview = document.getElementById('dashboardOverview');
 	if (!this.overview) {
 		return false;
 	}
+
+	// Fetch item list.
+	this.items = api.request({
+		url: "/dashboard/itemlist.js",
+		type: 'json',
+		async: false,
+		onError : function (msg, status)
+		{
+			console.error('Dashboard.init: Failed to load item list.', status, msg);
+		},
+	});
 
 	// Create list for item buttons.
 	var items = document.getElementById('dashboardItems');
@@ -84,7 +54,6 @@ Dashboard.prototype.init = function (id)
 	ul.appendChild(li);
 
 	// Add menu item buttons and pre-load the menu content,
-	var me = this;
 	for (var n = 0; n < this.items.length; n++) {
 		var li = document.createElement('li');
 		var btn = document.createElement('button');
@@ -133,6 +102,7 @@ Dashboard.prototype.init = function (id)
 	}
 
 	items.appendChild(ul);
+	fx.show(this.node);
 	return true;
 }
 
@@ -180,6 +150,11 @@ Dashboard.prototype.select = function (index)
 	}
 
 	this.overview.innerHTML = this.items[index].data;
+
+	// Does this panel have initialization code?
+	if (this.items[index].init) {
+		this.items[index].init();
+	}
 
 	// Clear 'active' state on all buttons.
 	for (var n = 0; n < this.items.length; n++) {

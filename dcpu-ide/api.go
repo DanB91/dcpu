@@ -10,10 +10,12 @@ import (
 
 var api map[string]ApiHandler
 
-func init() {
-	api = make(map[string]ApiHandler)
-	api["/api/config"] = apiConfig
-	api["/api/ping"] = apiPing
+func Register(path string, ah ApiHandler) {
+	if api == nil {
+		api = make(map[string]ApiHandler)
+	}
+
+	api[path] = ah
 }
 
 // A handler for api calls.
