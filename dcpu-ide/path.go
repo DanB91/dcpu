@@ -11,7 +11,7 @@ import (
 )
 
 // Find suitable location for the configuration file.
-func getConfigPath() string {
+func getConfigPath(file string) string {
 	var dir string
 
 	switch runtime.GOOS {
@@ -50,8 +50,6 @@ func getConfigPath() string {
 	if len(dir) == 0 {
 		return ""
 	}
-
-	file := AppName
 
 	switch runtime.GOOS {
 	case "freebsd", "linux", "darwin":

@@ -43,7 +43,7 @@ func shutdown() {
 }
 
 func parseArgs() {
-	cfgpath = getConfigPath()
+	cfgpath = getConfigPath(AppName)
 	config = NewConfig()
 
 	flag.StringVar(&cfgpath, "c", cfgpath, "Path to configuration file.")
