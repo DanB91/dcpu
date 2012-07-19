@@ -5,8 +5,11 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"github.com/jteeuwen/dcpu/cpu"
+	"io"
 	"os"
+	"strings"
 )
 
 var sourceCache map[cpu.Word]string
@@ -17,6 +20,8 @@ func init() {
 
 // GetSourceLines returns a range of lines from the given file.
 func GetSourceLines(file string, start, end int) []string {
+	var lines []string
+
 	fd, err := os.Open(file)
 	if err != nil {
 		return nil
@@ -24,10 +29,16 @@ func GetSourceLines(file string, start, end int) []string {
 
 	defer fd.Close()
 
-	r := bufio.NewReader(fd)
+	if end == -1 {
+		// Get all of it.
+		var b bytes.Buffer
+		io.Copy(&b, fd)
+		code := strings.TrimRight(b.String(), " \t\r\n")
+		lines = strings.Split(code, "\n")
+	}
 
-	var lines []string
 	var data []byte
+	r := bufio.NewReader(fd)
 
 	count := 1 // line number start at 1, not 0.
 

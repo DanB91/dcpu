@@ -9,8 +9,8 @@ import (
 )
 
 type FileInfo struct {
-	Name  string
-	Start cpu.Word
+	Name      string
+	StartAddr cpu.Word
 }
 
 type FuncInfo struct {
@@ -56,7 +56,7 @@ func (d *DebugInfo) SetFileDefs(files []string) {
 
 	for i = range files {
 		d.Files[i].Name = files[i]
-		d.Files[i].Start = d.getStartAddr(i)
+		d.Files[i].StartAddr = d.getStartAddr(i)
 	}
 }
 

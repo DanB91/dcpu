@@ -26,7 +26,7 @@ func Read(r io.Reader) (p *Profile, err error) {
 
 	// [2]
 	for i := range p.Files {
-		if err = binary.Read(r, be, &p.Files[i].Start); err != nil {
+		if err = binary.Read(r, be, &p.Files[i].StartAddr); err != nil {
 			return
 		}
 
@@ -116,6 +116,6 @@ func Read(r io.Reader) (p *Profile, err error) {
 		p.Data[i] = pd
 	}
 
-	p.getInstructionSizes()
+	p.setInstructionSizes()
 	return
 }

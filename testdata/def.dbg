@@ -2,19 +2,23 @@
  "Files": [
   {
    "Name": "/a/code/go/src/github.com/jteeuwen/dcpu/testdata/def.dasm",
-   "Start": 0
+   "StartAddr": 0
   }
  ],
  "Functions": [
   {
    "Name": "main",
-   "Start": 3,
-   "End": 8
+   "StartAddr": 3,
+   "EndAddr": 8,
+   "StartLine": 9,
+   "EndLine": 12
   },
   {
    "Name": "foo",
-   "Start": 8,
-   "End": 35
+   "StartAddr": 8,
+   "EndAddr": 35,
+   "StartLine": 16,
+   "EndLine": 53
   }
  ],
  "SourceMapping": [

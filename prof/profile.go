@@ -48,7 +48,7 @@ func New(code []cpu.Word, dbg *asm.DebugInfo) *Profile {
 		p.Data[pc] = pd
 	}
 
-	p.getInstructionSizes()
+	p.setInstructionSizes()
 	return p
 }
 
@@ -66,9 +66,9 @@ func (p *Profile) UpdateCost(pc, cost cpu.Word) {
 	p.Data[pc].Penalty += uint64(cost)
 }
 
-// getInstructionSizes computes and stores the size of each instruction.
+// setInstructionSizes computes and stores the size of each instruction.
 // The size is the number of words the instruction occupies.
-func (p *Profile) getInstructionSizes() {
+func (p *Profile) setInstructionSizes() {
 	var pc, size cpu.Word
 
 	for pc = 0; pc < cpu.Word(len(p.Data)); pc += size {
@@ -86,10 +86,10 @@ func (p *Profile) ListFiles() BlockList {
 		path := os.Getenv("DCPU_PATH")
 
 		for i := range p.fileblocks {
-			s = p.Files[i].Start
+			s = p.Files[i].StartAddr
 
 			if i < len(p.fileblocks)-1 {
-				e = p.Files[i+1].Start
+				e = p.Files[i+1].StartAddr
 			} else {
 				e = cpu.Word(len(p.Data) - 1)
 			}
@@ -97,6 +97,8 @@ func (p *Profile) ListFiles() BlockList {
 			p.fileblocks[i].Data = p.Data[s:e]
 			p.fileblocks[i].StartAddr = s
 			p.fileblocks[i].EndAddr = e
+			p.fileblocks[i].StartLine = 0
+			p.fileblocks[i].EndLine = -1 // end of file.
 			p.fileblocks[i].Label = strings.Replace(p.Files[i].Name, path, "$DCPU_PATH", 1)
 		}
 	}
@@ -136,8 +138,8 @@ func (p *Profile) ListFunctions() BlockList {
 			p.funcblocks[i].EndAddr = e
 			p.funcblocks[i].StartLine = p.Functions[i].StartLine
 			p.funcblocks[i].EndLine = p.Functions[i].EndLine
-			p.funcblocks[i].Label = fmt.Sprintf("%s (%s)",
-				p.Functions[i].Name, fname)
+			p.funcblocks[i].Label = fmt.Sprintf("%s (%s:%d)",
+				p.Functions[i].Name, fname, p.Functions[i].StartLine)
 		}
 	}
 

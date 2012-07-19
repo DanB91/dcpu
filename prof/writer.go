@@ -73,7 +73,7 @@ func Write(p *Profile, w io.Writer) (err error) {
 
 	// [2]
 	for i := range p.Files {
-		err = binary.Write(w, be, p.Files[i].Start)
+		err = binary.Write(w, be, p.Files[i].StartAddr)
 		if err != nil {
 			return
 		}

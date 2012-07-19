@@ -50,16 +50,20 @@ func list(p *prof.Profile, filemode bool, filter *regexp.Regexp) {
 			continue
 		}
 
-		start, end := blocks[i].Start, blocks[i].End
+		start, end := blocks[i].StartAddr, blocks[i].EndAddr
 		totalcount, totalcost := blocks[i].Cost()
 
 		file := p.Files[p.Data[start].File]
-		startline := p.Data[start].Line
-		endline := p.Data[end-1].Line
+		startline := blocks[i].StartLine
+		endline := blocks[i].EndLine
 		source := GetSourceLines(file.Name, startline, endline)
 
 		fmt.Printf("[*] ===> %s\n", blocks[i].Label)
 		fmt.Printf("[*] %d sample(s), %d cycle(s)\n\n", totalcount, totalcost)
+
+		if startline == 0 {
+			startline++
+		}
 
 		for j := range source {
 			linedata = getLineData(p.Data, start, end, startline+j)
