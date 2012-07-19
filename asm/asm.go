@@ -104,7 +104,7 @@ func (a *assembler) buildFunction(f *parser.Function) (err error) {
 	nodes := f.Children()
 	name := nodes[0].(*parser.Label)
 
-	a.debug.SetFunctionStart(cpu.Word(len(a.code)), name.Data)
+	a.debug.SetFunctionStart(cpu.Word(len(a.code)), f.Line(), name.Data)
 
 	for i := range nodes {
 		switch tt := nodes[i].(type) {
@@ -129,7 +129,7 @@ func (a *assembler) buildFunction(f *parser.Function) (err error) {
 		}
 	}
 
-	a.debug.SetFunctionEnd(cpu.Word(len(a.code)))
+	a.debug.SetFunctionEnd(cpu.Word(len(a.code)), nodes[len(nodes)-1].Line())
 	return
 }
 

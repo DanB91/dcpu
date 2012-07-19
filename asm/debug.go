@@ -14,9 +14,11 @@ type FileInfo struct {
 }
 
 type FuncInfo struct {
-	Name  string
-	Start cpu.Word
-	End   cpu.Word
+	Name      string
+	StartAddr cpu.Word
+	EndAddr   cpu.Word
+	StartLine int
+	EndLine   int
 }
 
 // SourceInfo defines file/line/col locations in original source.
@@ -58,12 +60,17 @@ func (d *DebugInfo) SetFileDefs(files []string) {
 	}
 }
 
-func (d *DebugInfo) SetFunctionStart(addr cpu.Word, name string) {
-	d.Functions = append(d.Functions, FuncInfo{Name: name, Start: addr})
+func (d *DebugInfo) SetFunctionStart(addr cpu.Word, line int, name string) {
+	d.Functions = append(d.Functions, FuncInfo{
+		Name:      name,
+		StartAddr: addr,
+		StartLine: line,
+	})
 }
 
-func (d *DebugInfo) SetFunctionEnd(addr cpu.Word) {
-	d.Functions[len(d.Functions)-1].End = addr
+func (d *DebugInfo) SetFunctionEnd(addr cpu.Word, line int) {
+	d.Functions[len(d.Functions)-1].EndAddr = addr
+	d.Functions[len(d.Functions)-1].EndLine = line
 }
 
 // Emit emits one or more debug symbols.
