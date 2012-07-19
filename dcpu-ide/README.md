@@ -38,6 +38,20 @@ This application does some automated code generation on build.
 Which means we require that the Makefile is used to build it.
 Not doing so, will cause incorrect builds.
 
+Invoking the IDE is simple:
+
+	$ dcpu-ide
+
+If you want to force it to use a specific browser, you can set the
+`BROWSER` environment variable before calling the program:
+
+	$ BROWSER=chromium dcpu-ide
+
+Chromium has a special 'App mode' in which it can run a website.
+This removes the standard url bar and other window decorations.
+When chromium is supplied as the target browser, this program will
+automatically launch in this app mode.
+
 
 ### Debug build
 
