@@ -10,7 +10,7 @@ import (
 // Find path to browser.
 func getBrowserPath(defaultpath string) string {
 	// The $BROWSER environment variable takes precedence.
-	file := os.Getenv("BROWSER")
+	file := os.Getenv("%BROWSER%")
 	if len(file) > 0 {
 		return file
 	}
@@ -20,7 +20,12 @@ func getBrowserPath(defaultpath string) string {
 
 // Find suitable location for the configuration file.
 func getConfigPath() string {
-	file := os.Getenv("%USERPROFILE%")
+	file := os.Getenv("%LOCALAPPDATA%")
+	if len(file) > 0 {
+		goto ret
+	}
+
+	file = os.Getenv("%APPDATA%")
 	if len(file) > 0 {
 		goto ret
 	}
