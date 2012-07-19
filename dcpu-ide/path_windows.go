@@ -3,9 +3,7 @@
 
 package main
 
-import (
-	"os"
-)
+import "os"
 
 // Find path to browser.
 func getBrowserPath(defaultpath string) string {
@@ -16,29 +14,4 @@ func getBrowserPath(defaultpath string) string {
 	}
 
 	return defaultpath + ".exe"
-}
-
-// Find suitable location for the configuration file.
-func getConfigPath() string {
-	file := os.Getenv("%LOCALAPPDATA%")
-	if len(file) > 0 {
-		goto ret
-	}
-
-	file = os.Getenv("%APPDATA%")
-	if len(file) > 0 {
-		goto ret
-	}
-
-	hd := os.Getenv("%HOMEDRIVE%")
-	hp := os.Getenv("%HOMEPATH%")
-	if len(hd) > 0 && len(hp) > 0 {
-		file = path.Join(hd, hp)
-		goto ret
-	}
-
-	return ""
-
-ret:
-	return path.Join(file, fmt.Sprintf("%s.cfg", AppName))
 }
