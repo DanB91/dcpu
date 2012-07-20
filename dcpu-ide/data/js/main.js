@@ -16,7 +16,16 @@ window.onload = function ()
 {
 	// Find our UI elements.
 	workspace = new Workspace();
+	if (!workspace.init()) {
+		console.error("Failed to initialize workspace.");
+		return;
+	}
+
 	stateTracker = new StateTracker();
+	if (!stateTracker.init()) {
+		console.error("Failed to initialize state tracker.");
+		return;
+	}
 
 	dashboard = new Dashboard();
 	if (!dashboard.init()) {

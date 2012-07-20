@@ -5,10 +5,15 @@ function Dashboard ()
 {
 	this.items = [];
 	this.selectedItem = -1;
-
 	this.node = document.createElement('div');
 	this.itemlist = document.createElement('div');
 	this.overview = document.createElement('div');
+}
+
+// init initializes the dashboard and its UI elements.
+Dashboard.prototype.init = function ()
+{
+	var me = this;
 
 	this.node.id = 'dashboard';
 	this.itemlist.className = 'items';
@@ -17,12 +22,6 @@ function Dashboard ()
 	this.node.appendChild(this.itemlist);
 	this.node.appendChild(this.overview);
 	document.body.appendChild(this.node);
-}
-
-// init initializes the dashboard and its UI elements.
-Dashboard.prototype.init = function (id)
-{
-	var me = this;
 
 	// Fetch item list.
 	this.items = api.request({

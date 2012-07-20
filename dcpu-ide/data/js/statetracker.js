@@ -5,14 +5,20 @@
 function StateTracker ()
 {
 	this.node = document.createElement('div');
+	this.pingInterval = 5000;
+	this.isConnected  = true;
+}
+
+// init initializes the state tracker and its UI elements.
+StateTracker.prototype.init = function ()
+{
 	this.node.id = 'statetracker';
 	this.node.title = "Not connected to server.";
 	document.body.appendChild(this.node);
 
-	this.pingInterval = 5000;
-	this.isConnected  = true;
 	this.toggle();
 	this.poll();
+	return true;
 }
 
 // poll issues periodic keep-alive pings and monitors
