@@ -38,6 +38,16 @@ The server listens on `[::1]:7070` by default. This can be changed through the
 setting the `DCPU_IDE_ADDRESS` environment variable. The commandline flags
 always takes precedence.
 
+Profiling data for the server can be viewed while it is running by visiting
+the following urls:
+
+	Overview:     /debug/pprof
+	Goroutines:   /debug/pprof/goroutine?debug=1
+	Heap:         /debug/pprof/heap?debug=1
+	ThreadCreate: /debug/pprof/threadcreate?debug=1
+
+Except for the heap profile, this only yields useful information
+in a debug build.
 
 ### Frontend
 
