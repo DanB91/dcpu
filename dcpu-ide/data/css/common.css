@@ -35,13 +35,6 @@ code {
  border-radius: 2px 2px 2px 2px;
 }
 
-hr {
- height: 0;
- border-bottom: 1px solid #09f;
- margin: 0;
- padding: 0;
-}
-
 ::-webkit-scrollbar {
  width: 5px;
  height: 5px;

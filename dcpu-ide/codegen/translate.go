@@ -37,8 +37,6 @@ func translate(fin string) (err error) {
 		Type: mime.TypeByExtension(path.Ext(fin)),
 	})
 
-	fmt.Printf("[*] %s => %s\n", fin, fout)
-
 	fs, err := os.Open(fin)
 	if err != nil {
 		return
