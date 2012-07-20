@@ -5,9 +5,9 @@
 #
 # Dependencies on external tools:
 #
-# - htmlcompressor (https://aur.archlinux.org/packages.php?ID=48832)
-# - yuicompressor (https://aur.archlinux.org/packages.php?ID=22058)
-# - pngcrush (https://aur.archlinux.org/packages.php?ID=22877)
+# htmlcompressor: http://code.google.com/p/htmlcompressor/
+# yuicompressor: http://developer.yahoo.com/yui/compressor/
+# pngcrush: http://pmt.sourceforge.net/pngcrush/
 #
 
 SRC="data";
