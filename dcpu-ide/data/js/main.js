@@ -54,6 +54,15 @@ window.onload = function ()
 	document.onmousedown = onMouseDown;
 	document.onmouseup = onMouseUp;
 	document.onmousewheel = onMouseWheel;
+
+	var dlg = new Dialog();
+	dlg.setTitle('Sample dialog')
+	   .open();
+	
+	setTimeout(function ()
+	{
+		dlg.close();
+	}, 3000);
 };
 
 function onKeyDown (e)

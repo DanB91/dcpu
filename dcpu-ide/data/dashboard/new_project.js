@@ -1,6 +1,7 @@
 function ()
 {
-	var f = new Form('frmNewProject', "POST", '/api/newproject', 'Create project');
+	var f = new Form('frmNewProject', "POST",
+		'/api/newproject', 'Create project');
 	f.add({
 		type:     'text',
 		label:    'Name',
@@ -18,6 +19,8 @@ function ()
 
 	f.onError = function (status, msg)
 	{
-		console.error(status, msg.Message);
+		if (msg == null) {
+			msg = {Message: 'Unknown error'};
+		}
 	}
 }

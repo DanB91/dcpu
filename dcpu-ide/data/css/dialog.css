@@ -1,0 +1,80 @@
+/* This file is subject to a 1-clause BSD license.
+   Its contents can be found in the enclosed LICENSE file. */
+
+.dialog {
+ z-index: 80;
+ position:absolute;
+ visibility: hidden;
+ display: none;
+ color: #fff;
+ background-color: rgba(0,0,0, 0.6);
+ margin: auto;
+ padding: 0;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ width: 100%;
+ height: 100%;
+ overflow: hidden;
+}
+
+.dialog .frame {
+ position:absolute;
+ visibility: hidden;
+ display: none;
+ background-color: #444;
+ background: -webkit-gradient(linear, left bottom, left top, from(#444), to(#555));
+ background: -moz-linear-gradient(bottom, #444, #555);
+ background: linear-gradient(bottom, #444, #555);
+ margin: 0;
+ padding: 0;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ width: 400px;
+ height: 200px;
+ box-shadow: 0 0 20px #111;
+ border-radius: 10px 10px 10px 10px;
+}
+
+.dialog .title {
+ position:absolute;
+ margin: 0;
+ padding: 0;
+ top: 0;
+ left: 0;
+ right: 0;
+ height: 24px;
+ border-radius: 10px 10px 0 0;
+ background-color: #444;
+ border-bottom: 1px solid #555;
+ text-align: left;
+ font-weight: bold;
+}
+
+.dialog .body {
+ border-top: 1px solid #333;
+ border-bottom: 1px solid #333;
+ position:absolute;
+ margin: 0;
+ padding: 0;
+ top: 24px;
+ bottom: 33px;
+ left: 0;
+ right: 0;
+}
+
+.dialog .buttons {
+ position:absolute;
+ margin: 0;
+ padding: 0;
+ bottom: 0;
+ left: 0;
+ right: 0;
+ height: 32px;
+ border-top: 1px solid #555;
+ border-radius: 0 0 10px 10px;
+ background-color: #444;
+}

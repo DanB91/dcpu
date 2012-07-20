@@ -2,7 +2,7 @@
    Its contents can be found in the enclosed LICENSE file. */
 
 #dashboard {
- z-index: 90;
+ z-index: 30;
  background-color: #555;
  background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
  background: -moz-linear-gradient(bottom, #333, #555);
