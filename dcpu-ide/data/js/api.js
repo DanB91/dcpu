@@ -64,11 +64,9 @@ var api = {
 		if (e.async) {
 			xhr.onreadystatechange = function ()
 			{
-				if (xhr.readyState != 4) {
-					return;
+				if (xhr.readyState == 4) {
+					api.handleResponse(e, xhr);
 				}
-	
-				api.handleResponse(e, xhr);
 			}
 		}
 
@@ -82,13 +80,6 @@ var api = {
 
 	handleResponse : function (e, xhr)
 	{
-		if (xhr.status != 200) {
-			if (e.onError) {
-				e.onError(xhr.statusText, xhr.status);
-			}
-			return null;
-		}
-
 		var d = xhr.responseText;
 		if (e.type == 'json') {
 			if (d.length == 0) {
@@ -96,6 +87,13 @@ var api = {
 			}
 
 			eval('d = ' + d);
+		}
+
+		if (xhr.status != 200) {
+			if (e.onError) {
+				e.onError(d, xhr.status);
+			}
+			return null;
 		}
 
 		if (!e.onData) {
