@@ -24,11 +24,14 @@ func main() {
 }
 
 func startup() <-chan struct{} {
-	parseArgs()
+	nobrowser := parseArgs()
 	tracker = NewStateTracker(config.Timeout)
 
 	go launchServer(config.Address)
-	go launchBrowser(config.Address)
+	
+	if !nobrowser {
+		go launchBrowser(config.Address)
+	}
 
 	return tracker.Poll()
 }
@@ -42,7 +45,7 @@ func shutdown() {
 	}
 }
 
-func parseArgs() {
+func parseArgs() bool {
 	cfgpath = getConfigPath(AppName)
 	config = NewConfig()
 
@@ -52,6 +55,7 @@ func parseArgs() {
 	projdir := flag.String("p", "", "Path to directory where DASM projects are stored.")
 	timeout := flag.Uint("t", 0, "Shut the server down when it has been idle for t seconds.")
 	version := flag.Bool("v", false, "Display version information.")
+	nobrowser := flag.Bool("n", false, "Do not launch a browser.")
 
 	flag.Parse()
 
@@ -79,4 +83,6 @@ func parseArgs() {
 	if len(*projdir) > 0 {
 		config.ProjectPath = *projdir
 	}
+
+	return *nobrowser
 }

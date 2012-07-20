@@ -15,20 +15,12 @@ window.onbeforeunload = function() {
 window.onload = function ()
 {
 	// Find our UI elements.
-	if ((workspace = document.getElementById('workspace')) == null) {
-		console.error("Failed to acquire workspace element.");
-		return;
-	}
+	workspace = new Workspace();
+	stateTracker = new StateTracker();
 
 	dashboard = new Dashboard();
 	if (!dashboard.init()) {
 		console.error("Failed to initialize dashboard.");
-		return;
-	}
-
-	stateTracker = new StateTracker();
-	if (!stateTracker.init()) {
-		console.error("Failed to initialize state tracker.");
 		return;
 	}
 

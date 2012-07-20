@@ -15,25 +15,25 @@
  max-width: 600px;
 }
 
-#dashboardItems {
+#dashboard .items {
  margin: 0;
  padding: 0;
  width: 170px;
 }
 
-#dashboardItems ul {
+#dashboard .items ul {
  padding: 0;
  margin: 0;
  list-style: none;
 }
 
-#dashboardItems li {
+#dashboard .items li {
  text-align: right;
  padding: 3px;
  padding-left: 10px;
 }
 
-#dashboardItems button {
+#dashboard .items button {
  font-size: 1em;
  padding: 0;
  margin: 0;
@@ -46,15 +46,15 @@
  width: 100%;
 }
 
-#dashboardItems button:hover {
+#dashboard .items button:hover {
  border-bottom: 1px solid #ccc;
 }
 
-#dashboardItems button.active {
+#dashboard .items button.active {
  color: #09f;
 }
 
-#dashboardOverview {
+#dashboard .overview {
  position: absolute;
  right: 0;
  top: 0;
@@ -72,7 +72,7 @@
  box-shadow: inset 5px 0 10px #333;
 }
 
-#dashboardOverview ul {
+#dashboard .overview ul {
  position: relative;
  left: -20px;
 }

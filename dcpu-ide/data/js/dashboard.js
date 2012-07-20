@@ -3,26 +3,26 @@
 
 function Dashboard ()
 {
-	this.node     = null;
-	this.overview = null;
-	this.items    = [];
+	this.items = [];
 	this.selectedItem = -1;
+
+	this.node = document.createElement('div');
+	this.itemlist = document.createElement('div');
+	this.overview = document.createElement('div');
+
+	this.node.id = 'dashboard';
+	this.itemlist.className = 'items';
+	this.overview.className = 'overview';
+	
+	this.node.appendChild(this.itemlist);
+	this.node.appendChild(this.overview);
+	document.body.appendChild(this.node);
 }
 
 // init initializes the dashboard and its UI elements.
 Dashboard.prototype.init = function (id)
 {
 	var me = this;
-
-	this.node = document.getElementById('dashboard');
-	if (!this.node) {
-		return false;
-	}
-
-	this.overview = document.getElementById('dashboardOverview');
-	if (!this.overview) {
-		return false;
-	}
 
 	// Fetch item list.
 	this.items = api.request({
@@ -36,11 +36,6 @@ Dashboard.prototype.init = function (id)
 	});
 
 	// Create list for item buttons.
-	var items = document.getElementById('dashboardItems');
-	if (!items) {
-		return false;
-	}
-
 	var ul = document.createElement('ul');
 	if (!ul) {
 		return false;
@@ -107,7 +102,7 @@ Dashboard.prototype.init = function (id)
 		}
 	}
 
-	items.appendChild(ul);
+	this.itemlist.appendChild(ul);
 
 	this.select(0);
 	fx.show(this.node);

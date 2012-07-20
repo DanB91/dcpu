@@ -4,24 +4,15 @@
 // StateTracker monitors the application's connection to the server.
 function StateTracker ()
 {
-	this.node         = null;
+	this.node = document.createElement('div');
+	this.node.id = 'statetracker';
+	this.node.title = "Not connected to server.";
+	document.body.appendChild(this.node);
+
 	this.pingInterval = 5000;
 	this.isConnected  = true;
-}
-
-// init initializes the tracker and its associated components.
-StateTracker.prototype.init = function ()
-{
-	this.node = document.getElementById('statetracker');
-	if (!this.node) {
-		return false;
-	}
-
-	this.node.title = "Not connected to server.";
-
 	this.toggle();
 	this.poll();
-	return true;
 }
 
 // poll issues periodic keep-alive pings and monitors
