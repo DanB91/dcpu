@@ -45,7 +45,7 @@ var api = {
 	//                      or not. Defaults to true.
 	request : function (e)
 	{
-		if (!e.method == undefined) {
+		if (e.method == undefined) {
 			e.method = 'GET';
 		}
 
