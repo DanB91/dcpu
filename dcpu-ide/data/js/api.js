@@ -91,6 +91,10 @@ var api = {
 
 		var d = xhr.responseText;
 		if (e.type == 'json') {
+			if (d.length == 0) {
+				d = null;
+			}
+
 			eval('d = ' + d);
 		}
 

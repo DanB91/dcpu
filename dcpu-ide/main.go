@@ -28,7 +28,7 @@ func startup() <-chan struct{} {
 	tracker = NewStateTracker(config.Timeout)
 
 	go launchServer(config.Address)
-	
+
 	if !nobrowser {
 		go launchBrowser(config.Address)
 	}

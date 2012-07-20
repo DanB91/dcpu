@@ -134,40 +134,64 @@ Form.prototype.validate = function ()
 		}
 
 		if (!this.controls[n].validate(this.controls[n])) {
-			this.controls[0].setAttribute('disabled', 'disabled');
+			this.disable();
 			return false;
 		}
 	}
 
-	this.controls[0].removeAttribute('disabled');
+	this.enable();
 	return true;
+}
+
+// enable enables the submit button.
+Form.prototype.enable = function ()
+{
+	this.controls[0].removeAttribute('disabled');
+}
+
+// disable disables the submit button.
+Form.prototype.disable = function ()
+{
+	this.controls[0].setAttribute('disabled', 'disabled');
 }
 
 // submit submits the form.
 Form.prototype.submit = function ()
 {
-	var me = this;
-	var data = {};
+	this.disable();
 
+	var data = [];
 	for (var n = 1; n < this.controls.length; n++) {
-		data[this.controls[n].id] = this.controls[n].value;
+		data.push(this.controls[n].id + '=' + this.controls[n].value);
 	}
+
+	var query = data.join('&');
+	var me = this;
 
 	api.request({
 		url: this.target,
 		method: this.method,
 		type: 'json',
+		data: query,
 		onError: function (msg, status)
 		{
 			if (me.onError) {
 				me.onError(msg, status);
 			}
+
+			setTimeout(function() {
+				me.enable();
+			}, 1000);
 		},
 		onData: function (msg, status)
 		{
 			if (me.onData) {
 				me.onData(data);
 			}
+
+			setTimeout(function() {
+				me.enable();
+			}, 1000);
 		},
 	});
 }
