@@ -6,8 +6,6 @@
  position:absolute;
  visibility: hidden;
  display: none;
- color: #fff;
- background-color: rgba(0,0,0, 0.6);
  margin: auto;
  padding: 0;
  top: 0;
@@ -21,8 +19,6 @@
 
 .dialog .frame {
  position:absolute;
- visibility: hidden;
- display: none;
  background-color: #444;
  background: -webkit-gradient(linear, left bottom, left top, from(#444), to(#555));
  background: -moz-linear-gradient(bottom, #444, #555);

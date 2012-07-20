@@ -58,15 +58,16 @@ window.onload = function ()
 	var dlg = new Dialog();
 	dlg.setTitle('Sample dialog')
 	   .open();
-	
-	setTimeout(function ()
-	{
-		dlg.close();
-	}, 3000);
 };
 
 function onKeyDown (e)
 {
+	// Forward input to top-most modal dialog if need be.
+	if (dialogs.length > 0) {
+		dialogs[dialogs.length-1].onKey(e);
+		return;
+	}
+
 	dashboard.onKey(e);
 }
 

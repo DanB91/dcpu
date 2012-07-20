@@ -21,7 +21,9 @@ Dashboard.prototype.init = function ()
 	
 	this.node.appendChild(this.itemlist);
 	this.node.appendChild(this.overview);
+
 	document.body.appendChild(this.node);
+	fx.show(this.node);
 
 	// Fetch item list.
 	this.items = api.request({
@@ -44,6 +46,7 @@ Dashboard.prototype.init = function ()
 	// Title of dashboard is in first list element.
 	var li = document.createElement('li');
 	var h3 = document.createElement('h3');
+
 	h3.innerHTML = AppTitle;
 	li.appendChild(h3);
 	ul.appendChild(li);
@@ -103,9 +106,7 @@ Dashboard.prototype.init = function ()
 	}
 
 	this.itemlist.appendChild(ul);
-
 	this.select(0);
-	fx.show(this.node);
 	return true;
 }
 
@@ -175,7 +176,7 @@ Dashboard.prototype.select = function (index)
 Dashboard.prototype.toggle = function ()
 {
 	var m = fx.metrics(this.node);
-	var hide = m.left == 0;
+	var hide = fx.isVisible(this.node);
 	var node = this.node;
 
 	fx.show(node)

@@ -1,6 +1,9 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+// List of active dialogs.
+var dialogs = [];
+
 // Dialog is a simple 'popup window' displaying a message
 // along with some buttons. It is either for informative purposes,
 // or to request some sort of confirmation from the user.
@@ -26,7 +29,7 @@ function Dialog ()
 	this.buttons.className = 'buttons';
 	this.frame.appendChild(this.buttons);
 
-	this.getValue = function () { return null; } 
+	this.getValue = function () { return null; }
 }
 
 // setTitle sets the dialog title.
@@ -41,20 +44,26 @@ Dialog.prototype.setContent = function (data)
 	return this;
 }
 
+// onKey handles keyboard input.
+Dialog.prototype.onKey = function (e)
+{
+	var key = (e.which != 0) ? e.which : e.keyCode;
+
+	switch (key) {
+	case 27: // escape
+		this.close();
+	}
+}
+
 // open displays the dialog.
 Dialog.prototype.open = function ()
 {
-	var node = this.node;
+	dialogs.push(this);
+
 	document.body.appendChild(this.node);
+	fx.show(this.node);
 
-	fx.show(node)
-	  .fade({
-		node:     node,
-		to:       0.5,
-		duration: 500,
-	});
-
-	node = this.frame;
+	var node = this.frame;
 	fx.show(node);
 
 	var sm = fx.metrics();
@@ -64,12 +73,10 @@ Dialog.prototype.open = function ()
 		node: node,
 		left: -nm.width,
 		top:  (sm.height / 2) - (nm.height / 2),
-	});
-
-	fx.slideTo({
+	}).slideTo({
 		node:     node,
 		left:     (sm.width / 2) - (nm.width / 2),
-		duration: 500,
+		duration: 800,
 	});
 
 	return this;
@@ -78,25 +85,18 @@ Dialog.prototype.open = function ()
 // close hides the dialog and removes its elements from the DOM.
 Dialog.prototype.close = function ()
 {
-	var node = this.frame;
+	var n = this.node;
 	var m = fx.metrics();
 
 	fx.slideTo({
-		node:     node,
+		node:     this.frame,
 		left:     m.width,
-		duration: 500,
-	});
-
-	var node = this.node;
-	fx.fade({
-		node:     node,
-		to:       0.0,
-		duration: 500,
-		onFinish: function()
+		duration: 800,
+		onFinish: function ()
 		{
-			fx.hide(node);
-			document.body.removeChild(this.node);
-		},
+			document.body.removeChild(n);
+			dialogs.pop();
+		}
 	});
 
 	return this;

@@ -3,6 +3,7 @@
 
 #dashboard {
  z-index: 30;
+ visibility: visible;
  background-color: #555;
  background: -webkit-gradient(linear, left bottom, left top, from(#333), to(#555));
  background: -moz-linear-gradient(bottom, #333, #555);
