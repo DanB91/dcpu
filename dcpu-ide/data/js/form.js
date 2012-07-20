@@ -80,6 +80,10 @@ Form.prototype.add = function (e)
 
 	n.id = e.id;
 	n.validate = e.validate || null;
+	n.getValue = e.getValue || function ()
+	{
+		return this.value;
+	};
 	n.name = n.id;
 
 	this._add(l, n, false);
@@ -163,7 +167,7 @@ Form.prototype.submit = function ()
 	var data = [];
 	for (var n = 1; n < this.controls.length; n++) {
 		data.push(this.controls[n].id + '='
-			+ encodeURIComponent(this.controls[n].value));
+			+ encodeURIComponent(this.controls[n].getValue()));
 	}
 
 	var query = data.join('&');
