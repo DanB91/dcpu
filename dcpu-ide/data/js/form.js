@@ -30,9 +30,9 @@ function Form (id, method, target, submitLabel)
 	this.list = document.createElement('ul');
 	this.controls = [];
 	this.onData = null;
-	this.onError = function (msg, status)
+	this.onError = function (status, msg)
 	{
-		console.error(msg, error);
+		console.error(status, msg.Message);
 	}
 
 	var me = this;
@@ -178,17 +178,17 @@ Form.prototype.submit = function ()
 		method: this.method,
 		type: 'json',
 		data: query,
-		onError: function (msg, status)
+		onError: function (status, msg)
 		{
 			if (me.onError) {
-				me.onError(msg, status);
+				me.onError(status, msg);
 			}
 
 			setTimeout(function() {
 				me.enable();
 			}, 1000);
 		},
-		onData: function (msg, status)
+		onData: function (data)
 		{
 			if (me.onData) {
 				me.onData(data);

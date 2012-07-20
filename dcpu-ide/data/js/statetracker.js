@@ -37,7 +37,7 @@ StateTracker.prototype.poll = function ()
 					me.toggle();
 				}
 			},
-			onError : function (msg, status)
+			onError : function (status, msg)
 			{
 				if (me.isConnected) {
 					me.isConnected = false;

@@ -28,9 +28,10 @@ Dashboard.prototype.init = function ()
 		url: "/dashboard/itemlist.js",
 		type: 'json',
 		async: false,
-		onError : function (msg, status)
+		onError : function (status, msg)
 		{
-			console.error('Dashboard.init: Failed to load item list.', status, msg);
+			console.error('Dashboard.init: Failed to load item list.',
+				status, msg.Message);
 		},
 	});
 
@@ -77,7 +78,7 @@ Dashboard.prototype.init = function ()
 			refresh: true,
 			async: false,
 			url: src,
-			onError : function (msg, status)
+			onError : function (status, msg)
 			{
 				console.error('Dashboard.init: ',
 					src, status, msg);
@@ -92,7 +93,7 @@ Dashboard.prototype.init = function ()
 				async: false,
 				type: 'json',
 				url: src,
-				onError : function (msg, status)
+				onError : function (status, msg)
 				{
 					console.error('Dashboard.init: ',
 						src, status, msg);

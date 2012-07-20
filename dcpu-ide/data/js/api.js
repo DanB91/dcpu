@@ -91,16 +91,12 @@ var api = {
 
 		if (xhr.status != 200) {
 			if (e.onError) {
-				e.onError(d, xhr.status);
+				e.onError(xhr.status, d);
 			}
-			return null;
+		} else if (e.onData) {
+			e.onData(d);
 		}
 
-		if (!e.onData) {
-			return d;
-		}
-
-		e.onData(d);
-		return null;
+		return d;
 	}
 };
