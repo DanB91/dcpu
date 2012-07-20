@@ -20,29 +20,45 @@ if (typeof XMLHttpRequest == "undefined") {
 }
 
 var api = {
-	// request fetches data from the backend.
+	// request fetches data from a remote host.
 	// The supplied object can contain any of these fields:
 	//
-	// url:      Target url to fetch.
-	// onData:   (optional) Handler we call when data has been fetched.
-	//                      It gets one parameter holding the actual data.
-	//                      This can be omitted in synchronous calls.
-	//                      In which case, request() returns the result directly.
-	// method:   (optional) GET, POST, HEAD.
-	// data:     (optional) Data to send to target.
-	// onError:  (optional) A handler we call when an error occurred.
-	//                      It gets two parameters holding the error message
-	//                      and http status code.
-	// refresh:  (optional) If this is true, we force a new fetch from the
-	//                      server instead of relying on cached data. Defaults
-	//                      to false.
-	// type:     (optional) This determines in what format the data parameter
-	//                      comes in the onData handler. Possible type are:
-	//                      'json' and 'text'. This defaults to text. 'json'
-	//                      type will attempt to parse the returned
-	//                      data as a json encoded object and return it.
-	// async:    (optional) Determines if we should fetch content asynchronously
-	//                      or not. Defaults to true.
+	// Required fields:
+	//  - url:
+	//    Target url to fetch.
+	// 
+	// Optional fields:
+	//  - onData: 
+	//    Handler we call when data has been fetched. It gets one parameter
+	//    holding the actual data. This can be omitted in synchronous calls.
+	//    In which case, request() returns the result directly.
+	//  
+	//  - method:
+	//    GET, POST, HEAD.
+	//  
+	//  - data:
+	//    Data to send to target.
+	//  
+	//  - onError:
+	//    A handler we call when an error occurred. It gets two parameters
+	//    holding the error message and http status code.
+	//  
+	//  - refresh:
+	//    If this is true, we force a new fetch from the server instead of
+	//    relying on cached data. Defaults to false.
+	//  
+	//  - type:
+	//    This determines in what format the data parameter comes in the
+	//    onData handler. Possible type are 'json' and 'text'.
+	//    This defaults to text. 'json' type will attempt to parse the
+	//    returned data as a json encoded object and return it.
+	//  
+	//  - async:
+	//    Determines if we should fetch content asynchronously or not.
+	//    Defaults to true.
+	//  
+	//  - headers:
+	//    A key/value set of HTTP headers we wish to include.
 	request : function (e)
 	{
 		if (e.method == undefined) {
@@ -71,6 +87,13 @@ var api = {
 		}
 
 		xhr.open(e.method, e.url, e.async);
+
+		if (e.headers) {
+			for (var key in e.headers) {
+				xhr.setRequestHeader(key, e.headers[key]);
+			}
+		}
+
 		xhr.send(e.data);
 
 		if (!e.async) {

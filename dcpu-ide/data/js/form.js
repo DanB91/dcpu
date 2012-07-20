@@ -194,10 +194,13 @@ Form.prototype.submit = function ()
 	var me = this;
 
 	api.request({
-		url: this.target,
+		url:    this.target,
 		method: this.method,
-		type: 'json',
-		data: query,
+		type:   'json',
+		data:   query,
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		},
 		onError: function (status, msg)
 		{
 			if (me.onError) {
