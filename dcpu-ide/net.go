@@ -89,12 +89,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	// An api call then?
 	if handler, ok := api[r.URL.Path]; ok {
-		if r.Method == "POST" {
-			if err := r.ParseForm(); err != nil {
-				log.Printf("ParseForm: %v", err)
-			}
-		}
-
 		hdr := w.Header()
 		hdr.Set("Content-Type", "application/x-javascript")
 
