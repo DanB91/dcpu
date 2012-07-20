@@ -14,6 +14,20 @@ This is a webbrowser based development environment for DCPU assembly
 projects. It consists of a Go backend and an HTML/Javascript frontend.
 
 
+### Why? -- The commandline tools are fine!
+
+Mostly because I can and, Yes they are.
+Bret Victor's talk [Inventing on Principle][1] helped with the inspiration.
+
+As Bret demonstrates, a UI environment can offer so much more when done
+properly. Therefor I do not seek to give you a mere text editor with fancy
+colours. But this tool is supposed live and breathe DCPU assembly code and
+thus allow you to get unprecedented amounts of feedback and insight into
+whatever you are programming in it.
+
+[1]: http://www.youtube.com/watch?v=PUv66718DII
+
+
 ### Backend
 
 This is a Go web server which runs on localhost and serves to mediate
