@@ -36,15 +36,15 @@ function Form (id, method, target, submitLabel)
 	}
 
 	var me = this;
-	var submit = document.createElement('button');
+	var sb = document.createElement('button');
 	
-	submit.innerHTML = submitLabel || 'Submit';
-	submit.onclick = function ()
+	sb.innerHTML = submitLabel || 'Submit';
+	sb.onclick = function ()
 	{
 		me.submit();
 	}
-	
-	this._add(null, submit, true);
+
+	this._add(null, sb, true);
 
 	var node = document.getElementById(id);
 	node.className = 'form';
@@ -147,16 +147,36 @@ Form.prototype.validate = function ()
 	return true;
 }
 
-// enable enables the submit button.
-Form.prototype.enable = function ()
+// enable enables the submit button; optionally on a timer.
+Form.prototype.enable = function (timeout)
 {
-	this.controls[0].removeAttribute('disabled');
+	var c = this.controls[0];
+	timeout = timeout || 0;
+
+	if (timeout == 0) {
+		c.removeAttribute('disabled');
+		return;
+	}
+
+	setTimeout(function() {
+		c.removeAttribute('disabled');
+	}, timeout);
 }
 
-// disable disables the submit button.
-Form.prototype.disable = function ()
+// disable disables the submit button; optionally on a timer.
+Form.prototype.disable = function (timeout)
 {
-	this.controls[0].setAttribute('disabled', 'disabled');
+	var c = this.controls[0];
+	timeout = timeout || 0;
+
+	if (timeout == 0) {
+		c.setAttribute('disabled', 'disabled')
+		return;
+	}
+
+	setTimeout(function() {
+		c.setAttribute('disabled', 'disabled')
+	}, timeout);
 }
 
 // submit submits the form.
@@ -184,9 +204,7 @@ Form.prototype.submit = function ()
 				me.onError(status, msg);
 			}
 
-			setTimeout(function() {
-				me.enable();
-			}, 1000);
+			me.enable(1000);
 		},
 		onData: function (data)
 		{
@@ -194,9 +212,7 @@ Form.prototype.submit = function ()
 				me.onData(data);
 			}
 
-			setTimeout(function() {
-				me.enable();
-			}, 1000);
+			me.enable(1000);
 		},
 	});
 }
