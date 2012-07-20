@@ -6,8 +6,8 @@ package main
 import "net/http"
 
 func init() {
-	Register("/api/config", apiConfig)
-	Register("/api/ping", apiPing)
+	Register("/api/config", "GET", apiConfig)
+	Register("/api/ping", "GET", apiPing)
 }
 
 // apiConfig returns the current configuration data.

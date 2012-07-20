@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Register("/api/dirlist", apiDirList)
+	Register("/api/dirlist", "POST", apiDirList)
 }
 
 // apiDirList returns the contents of a given directory.

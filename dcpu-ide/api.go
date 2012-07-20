@@ -9,18 +9,23 @@ import (
 	"net/http"
 )
 
-var api map[string]ApiHandler
-
-func Register(path string, ah ApiHandler) {
-	if api == nil {
-		api = make(map[string]ApiHandler)
-	}
-
-	api[path] = ah
-}
+type ApiFunc func(*http.Request) ([]byte, int)
 
 // A handler for api calls.
-type ApiHandler func(*http.Request) ([]byte, int)
+type ApiHandler struct {
+	Func   ApiFunc
+	Method string
+}
+
+var api map[string]*ApiHandler
+
+func Register(path, method string, ah ApiFunc) {
+	if api == nil {
+		api = make(map[string]*ApiHandler)
+	}
+
+	api[path] = &ApiHandler{ah, method}
+}
 
 // Pack turns the given value into a JSON encoded byte slice.
 // It panics if something went wrong.

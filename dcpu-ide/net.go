@@ -89,6 +89,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	// An api call then?
 	if handler, ok := api[r.URL.Path]; ok {
+		if handler.Method != r.Method {
+			w.WriteHeader(404)
+			return
+		}
+
 		hdr := w.Header()
 		hdr.Set("Content-Type", "application/x-javascript")
 
@@ -96,7 +101,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		hdr.Set("Cache-Control", "private")
 		hdr.Set("Expires", AncientHistory)
 
-		data, status := handler(r)
+		data, status := handler.Func(r)
 
 		w.WriteHeader(status)
 		w.Write(data)
