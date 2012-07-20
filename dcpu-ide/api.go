@@ -5,6 +5,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -31,4 +32,13 @@ func Pack(v interface{}) []byte {
 	}
 
 	return data
+}
+
+// Errorf creates an error object we can send as an API response.
+func Errorf(f string, argv ...interface{}) []byte {
+	return Pack(struct {
+		Message string
+	}{
+		fmt.Sprintf(f, argv...),
+	})
 }
