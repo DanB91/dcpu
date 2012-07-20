@@ -3,8 +3,8 @@ function ()
 	var f = new Form('frmNewProject', "POST", '/api/newproject', 'Create project');
 	f.add({
 		type:     'text',
-		label:    'Location',
-		id:       'tLocation',
+		label:    'Name',
+		id:       'tName',
 		validate: function ()
 		{
 			return (this.value.length > 0);
@@ -15,4 +15,9 @@ function ()
 	{
 		
 	};
+
+	f.onError = function (status, msg)
+	{
+		console.error(status, msg.Message);
+	}
 }
