@@ -77,31 +77,39 @@ Dashboard.prototype.init = function (id)
 		li.appendChild(btn);
 		ul.appendChild(li);
 
-		(function(idx)
-		{
-			api.request({
-				refresh: true,
-				url: me.items[idx].src,
-				onData : function (data)
-				{
-					me.items[idx].data = data;
+		// Load external html data.
+		var src = this.items[n].src;
+		this.items[n].data = api.request({
+			refresh: true,
+			async: false,
+			url: src,
+			onError : function (msg, status)
+			{
+				console.error('Dashboard.init: ',
+					src, status, msg);
+			},
+		});
 
-					if (idx == 0) {
-						// Set the first view as the active one,
-						// once it is done loading.
-						me.select(0);
-					}
-				},
+		// Load external script if need be.
+		if (this.items[n].init != undefined) {
+			var src = this.items[n].init;
+			this.items[n].init = api.request({
+				refresh: true,
+				async: false,
+				type: 'json',
+				url: src,
 				onError : function (msg, status)
 				{
 					console.error('Dashboard.init: ',
-						me.items[idx].src, status, msg);
+						src, status, msg);
 				},
 			});
-		}(n));
+		}
 	}
 
 	items.appendChild(ul);
+
+	this.select(0);
 	fx.show(this.node);
 	return true;
 }

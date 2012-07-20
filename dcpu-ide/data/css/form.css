@@ -54,3 +54,7 @@
  box-shadow: 0px 0px 5px #111;
  border-radius: 5px 5px 5px 5px;
 }
+
+.form button[disabled] {
+ color: #777;
+}

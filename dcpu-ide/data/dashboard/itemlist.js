@@ -11,17 +11,7 @@
 		src:   '/dashboard/new_project.html', 
 		key:   'N',
 		data:  '',
-		init:  function ()
-		{
-			var f = new Form('frmNewProject', "POST", 'Create project');
-			f.add({
-				type: 'text',
-				label: 'Location',
-				value: '',
-				id: 'tLocation',
-				required: true,
-			});
-		}
+		init: '/dashboard/new_project.js',
 	},
 	{
 		id:    'diOpenProject',

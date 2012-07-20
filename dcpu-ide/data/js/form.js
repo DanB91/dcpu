@@ -7,19 +7,43 @@
 // to deal with when writing forms manually.
 //
 // Note that this does not create an actual <form> element.
-// Just a list of elements we track for content. 
-function Form (id, method, submitLabel)
+// Just a list of elements we track for content and changes. 
+function Form (id, method, target, submitLabel)
 {
-	this.method = method || "POST";
+	if (!id) {
+		console.eror('Form has no element id.');
+		return;
+	}
+
+	if (!method) {
+		console.eror('Form has no method.');
+		return;
+	}
+
+	if (!target) {
+		console.eror('Form has no submission target.');
+		return;
+	}
+
+	this.target = target;
+	this.method = method;
 	this.list = document.createElement('ul');
+	this.controls = [];
+	this.onData = null;
+	this.onError = function (msg, status)
+	{
+		console.error(msg, error);
+	}
 
 	var me = this;
 	var submit = document.createElement('button');
+	
 	submit.innerHTML = submitLabel || 'Submit';
 	submit.onclick = function ()
 	{
 		me.submit();
 	}
+	
 	this._add(null, submit, true);
 
 	var node = document.getElementById(id);
@@ -31,33 +55,43 @@ function Form (id, method, submitLabel)
 // It returns the form itself, so we can chain calls.
 Form.prototype.add = function (e)
 {
+	var me = this, l, n;
+
 	switch (e.type) {
 	case 'text':
-		var l = null;
-
-		if (e.label) {
-			l = document.createElement('label');
-			l.setAttribute('for', e.id);
-			l.innerHTML = e.label ? e.label + ":" : '';
-		}
-
-		var n = document.createElement('input');
+		n = document.createElement('input');
 		n.type = 'text';
 		n.value = e.value || '';
-		n.id = e.id;
-		n.name = n.id;
-
-		this._add(l, n, false);
+		n.addEventListener('change', function ()
+		{
+			me.validate();
+		}, false);
 		break;
+		
+	default:
+		return this;
 	}
 
-	this.validate();
+	if (e.label != undefined) {
+		l = document.createElement('label');
+		l.setAttribute('for', e.id);
+		l.innerHTML = e.label ? e.label + ":" : '';
+	}
+
+	n.id = e.id;
+	n.validate = e.validate || null;
+	n.name = n.id;
+
+	this._add(l, n, false);
 	return this;
 }
 
 // _add adds the given nodes to the form list as a single entry.
 Form.prototype._add = function (label, node, append)
 {
+	// Add control to our list of tracked nodes.
+	this.controls.push(node);
+
 	var li = document.createElement('li');
 
 	if (append) {
@@ -87,17 +121,53 @@ Form.prototype._add = function (label, node, append)
 	div = document.createElement('div');
 	div.className = "clear";
 	li.appendChild(div);
+	this.validate();
 }
 
 // validate returns true if all form fields meet their requirements.
 // It also disables the submit button for as long as this is not the case.
 Form.prototype.validate = function ()
 {
-	return false;
+	for (var n = 1; n < this.controls.length; n++) {
+		if (!this.controls[n].validate) {
+			continue;
+		}
+
+		if (!this.controls[n].validate(this.controls[n])) {
+			this.controls[0].setAttribute('disabled', 'disabled');
+			return false;
+		}
+	}
+
+	this.controls[0].removeAttribute('disabled');
+	return true;
 }
 
 // submit submits the form.
 Form.prototype.submit = function ()
 {
-	console.log('submitting ', this);
+	var me = this;
+	var data = {};
+
+	for (var n = 1; n < this.controls.length; n++) {
+		data[this.controls[n].id] = this.controls[n].value;
+	}
+
+	api.request({
+		url: this.target,
+		method: this.method,
+		type: 'json',
+		onError: function (msg, status)
+		{
+			if (me.onError) {
+				me.onError(msg, status);
+			}
+		},
+		onData: function (msg, status)
+		{
+			if (me.onData) {
+				me.onData(data);
+			}
+		},
+	});
 }
