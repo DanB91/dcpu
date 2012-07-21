@@ -41,7 +41,7 @@ install:
 
 clean:
 	go clean ./...
-	rm -rf $(CLEANFILES)
+	rm -rf $(CLEANFILES) $(ERR_JSOUT)
 
 fmt:
 	go fmt ./...
