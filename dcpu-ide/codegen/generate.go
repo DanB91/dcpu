@@ -4,11 +4,11 @@
 package main
 
 import (
-	"io/ioutil"
-	"text/template"
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"text/template"
 )
 
 type KeyValuePair struct {
@@ -50,4 +50,3 @@ func generate(data, infile, outfile string) (err error) {
 	defer fd.Close()
 	return t.ExecuteTemplate(fd, filepath.Base(infile), cd)
 }
-
