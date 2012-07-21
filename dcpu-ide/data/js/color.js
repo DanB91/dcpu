@@ -41,7 +41,7 @@ Color.prototype.parse = function(value)
 		return;
 	}
 
-	var w = 12, h = 12;
+	var w = 1, h = 1;
 	var canvas = document.createElement('canvas');
 	canvas.width = w;
 	canvas.height = h;
