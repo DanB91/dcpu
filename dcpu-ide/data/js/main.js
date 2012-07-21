@@ -8,7 +8,8 @@ var workspace    = null;
 var dashboard    = null;
 var config       = null;
 
-window.onbeforeunload = function() {
+window.onbeforeunload = function()
+{
 	//TODO: implement clean shutdown.
 };
 

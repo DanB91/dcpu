@@ -182,7 +182,7 @@ Dashboard.prototype.toggle = function ()
 	fx.show(node)
 	  .slideTo({
 		node:     node,
-		left:      hide ? -m.width : 0,
+		left:     hide ? -m.width : 0,
 		duration: 500,
 		unit:     'px',
 		onFinish: function()
