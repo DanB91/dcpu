@@ -5,20 +5,19 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
 )
 
-type KeyValuePair struct {
-	Key   string
-	Value interface{}
-}
-
 type CodeData struct {
-	Const []KeyValuePair // Constant definitions.
-	Vars  []KeyValuePair // Variable definitions.
+	Errors []struct {
+		Name   string
+		String string
+		Code   int
+	}
 }
 
 // generate reads data entries from the data file.
@@ -27,26 +26,31 @@ type CodeData struct {
 func generate(data, infile, outfile string) (err error) {
 	bytes, err := ioutil.ReadFile(data)
 	if err != nil {
-		return
+		return fmt.Errorf("ioutil.ReadFile: %v", err)
 	}
 
 	var cd CodeData
 
 	err = json.Unmarshal(bytes, &cd)
 	if err != nil {
-		return
+		return fmt.Errorf("json.Unmarshal: %v", err)
 	}
 
 	t, err := template.New("page").ParseFiles(infile)
 	if err != nil {
-		return
+		return fmt.Errorf("template.ParseFiles: %v", err)
 	}
 
 	fd, err := os.Create(outfile)
 	if err != nil {
-		return
+		return fmt.Errorf("os.Create: %v", err)
 	}
 
 	defer fd.Close()
-	return t.ExecuteTemplate(fd, filepath.Base(infile), cd)
+	err = t.ExecuteTemplate(fd, filepath.Base(infile), cd)
+	if err != nil {
+		err = fmt.Errorf("template.Execute: %v", err)
+	}
+
+	return
 }

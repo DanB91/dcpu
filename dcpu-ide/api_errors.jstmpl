@@ -1,7 +1,12 @@
 // This file was automatically generated.
 // Any changes to it will not be preserved.
 
-{{range .Const}}
-const {{.Key}} = {{.Value}};
+{{range .Errors}}
+const {{.Name}} = {{.Code}};
 {{end}}
 
+var ErrorStrings = {
+{{range .Errors}}
+	{{.Code}}: "{{.String}}",
+{{end}}
+};

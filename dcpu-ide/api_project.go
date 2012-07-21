@@ -38,5 +38,11 @@ func apiNewProject(r *http.Request) ([]byte, int) {
 		return Error(ErrUnknown, err.Error()), http.StatusInternalServerError
 	}
 
-	return nil, 200
+	return Pack(struct {
+		Path string
+		Name string
+	}{
+		dir,
+		name,
+	}), 200
 }

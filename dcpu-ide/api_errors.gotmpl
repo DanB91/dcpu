@@ -4,7 +4,13 @@
 package main
 
 const (
-{{range .Const}}
-	{{.Key}} = {{.Value}}
+{{range .Errors}}
+	{{.Name}} = {{.Code}}
 {{end}}
 )
+
+var ErrorStrings = map[int]string {
+{{range .Errors}}
+	{{.Code}}: "{{.String}}",
+{{end}}
+}

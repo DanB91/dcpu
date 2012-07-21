@@ -55,10 +55,6 @@ window.onload = function ()
 	document.onmousedown = onMouseDown;
 	document.onmouseup = onMouseUp;
 	document.onmousewheel = onMouseWheel;
-
-	var dlg = new Dialog();
-	dlg.setTitle('Sample dialog')
-	   .open();
 };
 
 function onKeyDown (e)

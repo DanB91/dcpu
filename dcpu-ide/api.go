@@ -38,7 +38,7 @@ func Pack(v interface{}) []byte {
 	return data
 }
 
-// Errorf creates an error object we can send as an API response.
+// Error creates an error object we can send as an API response.
 func Error(code int, argv ...interface{}) []byte {
 	return Pack(struct {
 		Code int

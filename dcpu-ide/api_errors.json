@@ -1,8 +1,8 @@
 {
-	"Const": [
-		{"Key": "ErrUnknown", "Value": 1},
+	"Errors": [
+		{"Name": "ErrUnknown", "Code": 1, "String": "Unknown error"},
 
-		{"Key": "ErrMissingName", "Value": 101},
-		{"Key": "ErrDuplicateProject", "Value": 102}
+		{"Name": "ErrMissingName", "Code": 101, "String": "Missing project name"},
+		{"Name": "ErrDuplicateProject", "Code": 102, "String": "Duplicate project"}
 	]
 }

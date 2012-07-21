@@ -17,7 +17,7 @@ ERR_JSOUT = data/js/api_errors.js
 
 LDFLAGS_BUILD = -ldflags "-X main.AppVersionRev `date -u +%s`"
 LDFLAGS_INSTALL = -ldflags "-X main.AppVersionRev `date -u +%s` -s"
-CLEANFILES = static.go $(PREFIX)*.go $(DEPLOYDIR) $(ERR_GOOUT) $(ERR_JSOUT)
+CLEANFILES = static.go $(PREFIX)*.go $(DEPLOYDIR) $(ERR_GOOUT)
 
 all: build
 
@@ -37,7 +37,7 @@ install:
 	./compress_data.sh
 	cd codegen && go run *.go -i ../$(DEPLOYDIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
 	go install $(LDFLAGS_INSTALL)
-	rm -rf $(CLEANFILES)
+	rm -rf $(CLEANFILES) $(ERR_JSOUT)
 
 clean:
 	go clean ./...

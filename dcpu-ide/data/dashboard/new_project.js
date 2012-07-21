@@ -14,7 +14,7 @@ function ()
 
 	f.onData = function (data)
 	{
-		
+		console.log(data);
 	};
 
 	f.onError = function (status, err)

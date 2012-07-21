@@ -42,14 +42,14 @@ func main() {
 	if len(*data) > 0 {
 		if len(*jsin) > 0 && len(*jsout) > 0 {
 			if err = generate(*data, *jsin, *jsout); err != nil {
-				fmt.Fprintf(os.Stderr, "[e] %s: %v\n", *jsin, err)
+				fmt.Fprintf(os.Stderr, "[e] %v\n", err)
 				os.Exit(1)
 			}
 		}
 
 		if len(*goin) > 0 && len(*goout) > 0 {
 			if err = generate(*data, *goin, *goout); err != nil {
-				fmt.Fprintf(os.Stderr, "[e] %s: %v\n", *goin, err)
+				fmt.Fprintf(os.Stderr, "[e] %v\n", err)
 				os.Exit(1)
 			}
 		}

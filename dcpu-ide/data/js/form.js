@@ -206,16 +206,12 @@ Form.prototype.submit = function ()
 			if (me.onError) {
 				me.onError(status, msg);
 			}
-
-			me.enable(1000);
 		},
 		onData: function (data)
 		{
 			if (me.onData) {
 				me.onData(data);
 			}
-
-			me.enable(1000);
 		},
 	});
 }
