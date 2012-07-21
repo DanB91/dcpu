@@ -42,19 +42,3 @@
  box-shadow: inset 0px 0px 3px #111;
  border: 1px solid #111;
 }
-
-.form button {
- background-color: #444;
- color: #fff;
- cursor: pointer;
- border-top: 2px solid #555;
- border-left: 2px solid #555;
- border-right: 2px solid #222;
- border-bottom: 2px solid #222;
- box-shadow: 0px 0px 5px #111;
- border-radius: 5px 5px 5px 5px;
-}
-
-.form button[disabled] {
- color: #777;
-}

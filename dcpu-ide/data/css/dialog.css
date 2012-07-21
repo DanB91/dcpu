@@ -35,7 +35,7 @@
  border-radius: 10px 10px 10px 10px;
 }
 
-.dialog .title {
+.dialog .titlebar {
  position:absolute;
  margin: 0;
  padding: 0;
@@ -46,8 +46,16 @@
  border-radius: 10px 10px 0 0;
  background-color: #444;
  border-bottom: 1px solid #555;
+}
+
+.dialog .titlebar .title {
+ position: absolute;
+ top: 2px;
+ bottom: 2px;
+ left: 10px;
+ right: 10px;
+ color: #ccc;
  text-align: left;
- font-weight: bold;
 }
 
 .dialog .body {
@@ -55,15 +63,16 @@
  border-bottom: 1px solid #333;
  position:absolute;
  margin: 0;
- padding: 0;
+ padding: 10px;
  top: 24px;
  bottom: 33px;
  left: 0;
  right: 0;
+ overflow: auto;
 }
 
 .dialog .buttons {
- position:absolute;
+ position: absolute;
  margin: 0;
  padding: 0;
  bottom: 0;
@@ -73,4 +82,13 @@
  border-top: 1px solid #555;
  border-radius: 0 0 10px 10px;
  background-color: #444;
+}
+
+.dialog .buttons .left {
+ padding: 4px;
+}
+
+.dialog .buttons .right {
+ padding: 4px;
+ text-align: right;
 }
