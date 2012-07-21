@@ -12,16 +12,45 @@ const ButtonNo       = 6;
 const ButtonAbort    = 7;
 const ButtonRetry    = 8;
 const ButtonIgnore   = 9;
+const ButtonForward  = 10;
+const ButtonBack     = 11;
 
-// Dialog is a simple 'popup window' displaying a message
-// along with some buttons. It is either for informative purposes,
-// or to request some sort of confirmation from the user.
+// The order of these should match the constants above.
+var buttonLabels = [
+	"Ok", "Cancel", "Close", "Prev", "Next",
+	"Yes", "No", "Abort", "Retry", "Ignore",
+	"Forward", "Back"
+];
+
+// The order of these should match the constants above.
+var buttonTitles = [
+	"Ok", "Cancel", "Close", "Previous", "Next",
+	"Yes", "No", "Abort", "Retry", "Ignore",
+	"Forward", "Back"
+];
+
+// Dialog is a simple 'popup window' displaying arbitrary content
+// along with some buttons.
+//
+// In most cases, you do not want to use this directly, but go for some
+// subclassed dialog implementation. This class supplies the simplest
+// possible imlpementation of a dialog.
+//
+// Buttons can be specified in arbitrary arrangements. The possible
+// button types are listed as constants above. By default, a dialog
+// has no buttons at all.
+//
+// This also means it can not be closed by the user (only programatically).
+// The precense of at least one button will allow it to be closed by the user;
+// either by clicking a button or by hitting the escape key (in some cases).
 function Dialog ()
 {
-	// Screen-filling, transparent background. This prevents the user from
-	// getting mouse input to any controls below this div.
-	// Together with redirection of keyboard input,
-	// this makes it a modal dialog.
+	this.canClose = false;
+
+	// Screen-filling, transparent background.
+	// This prevents the user from getting mouse input to any
+	// controls below this div. Together with redirection of
+	// keyboard input, this makes it a modal dialog.
 	this.node = document.createElement('div');
 	this.node.className = 'dialog';
 
@@ -32,14 +61,14 @@ function Dialog ()
 	this.node.appendChild(this.frame);
 
 	// Title bar
-	this.title = document.createElement('div');
-	this.title.className = 'titlebar';
-	this.frame.appendChild(this.title);
+	this.titlebar = document.createElement('div');
+	this.titlebar.className = 'titlebar';
+	this.frame.appendChild(this.titlebar);
 
 	// This holds the actual title text.
 	var node = document.createElement('div');
 	node.className = 'title';
-	this.title.appendChild(node);
+	this.titlebar.appendChild(node);
 
 	// This holds the dialog content.
 	this.body = document.createElement('div');
@@ -47,29 +76,29 @@ function Dialog ()
 	this.frame.appendChild(this.body);
 
 	// Button containers.
-	this.buttons = document.createElement('div');
-	this.buttons.className = 'buttons';
-	this.frame.appendChild(this.buttons);
+	this.buttonbar = document.createElement('div');
+	this.buttonbar.className = 'buttons';
+	this.frame.appendChild(this.buttonbar);
 
 	node = document.createElement('div');
 	node.className = 'left';
-	this.buttons.appendChild(node);
+	this.buttonbar.appendChild(node);
 
 	node = document.createElement('div');
 	node.className = 'right';
-	this.buttons.appendChild(node);
+	this.buttonbar.appendChild(node);
 
 	node = document.createElement('div');
 	node.className = 'clear';
-	this.buttons.appendChild(node);
+	this.buttonbar.appendChild(node);
 
 	this.getValue = function () { return null; }
 }
 
-// setTitle sets the dialog title.
-Dialog.prototype.setTitle = function (title)
+// title sets the dialog title.
+Dialog.prototype.title = function (title)
 {
-	var node = this.title.childNodes[0];
+	var node = this.titlebar.childNodes[0];
 	if (node == undefined) {
 		return this;
 	}
@@ -78,86 +107,73 @@ Dialog.prototype.setTitle = function (title)
 	return this;
 }
 
-// setContent sets the dialog contents.
-Dialog.prototype.setContent = function (data)
+// content sets the dialog contents.
+Dialog.prototype.content = function (data)
 {
 	this.body.innerHTML = data;
 	return this;
 }
 
-// setButtons sets the dialog buttons.
-// The argument is a list of objects with two fields each:
+// button adds a single button definition to the given
+// side of the dialog (left or right).
+Dialog.prototype.button = function (btn, click, side)
+{
+	var node = document.createElement('button');
+
+	switch (btn) {
+	case ButtonClose:
+	case ButtonCancel:
+		this.canClose = true;
+
+		var me = this;
+		node.onclick = function ()
+		{
+			me.close();
+		}
+
+		break;
+	}
+
+	if (node.onclick == null) {
+		node.onclick = click;
+	}
+
+	node.title = buttonTitles[btn];
+	node.innerHTML = buttonLabels[btn];
+
+	var side = side == "left" ? 0 : 1;
+	this.buttonbar.childNodes[side].appendChild(node);
+}
+
+// buttons sets the dialog buttons.
+// The argument is a list of objects with the following fields:
 //
 // - type
 //   An integer determining the type of button.
-//   This should be any of the predefined ButtonXXX values.
+//   This should be any of the predefined ButtonXXX constants.
 //
 // - click
 //   The onclick handler for the button.
-Dialog.prototype.setButtons = function (e)
+Dialog.prototype.buttons = function (e)
 {
 	if (e == undefined || e.length == 0) {
 		return this;
 	}
 
-	var panels = [
-		this.buttons.childNodes[0], // left
-		this.buttons.childNodes[1], // right
-	];
-
 	for (var n = 0; n < e.length; n++) {
-		var side = 0;
-		var node = document.createElement('button');
-		node.onclick = e[n].click;
+		var side = 'left';
 
 		switch (e[n].type) {
 		case ButtonOk:
-			side = 1;
-			node.title = 'Ok';
-			break;
-
-		case ButtonCancel:
-			node.title = 'Cancel';
-			break;
-
-		case ButtonClose:
-			node.title = 'Close';
-			break;
-
-		case ButtonPrevious:
-			node.title = 'Prev';
-			break;
-
 		case ButtonNext:
-			node.title = 'Next';
-			side = 1;
-			break;
-
+		case ButtonForward:
 		case ButtonYes:
-			side = 1;
-			node.title = 'Yes';
-			break;
-
 		case ButtonNo:
-			node.title = 'No';
+			side = 'right';
 			break;
-
-		case ButtonAbort:
-			node.title = 'Abort';
-			break;
-
-		case ButtonRetry:
-			node.title = 'Retry';
-			break;
-
-		case ButtonIgnore:
-			node.title = 'Ignore';
-			break;
-
 		}
 
-		node.innerHTML = node.title;
-		panels[side].appendChild(node);
+		this.button(e[n].type, e[n].click, side);
 	}
 	
 	return this;
@@ -170,7 +186,9 @@ Dialog.prototype.onKey = function (e)
 
 	switch (key) {
 	case 27: // escape
-		this.close();
+		if (this.canClose) {
+			this.close();
+		}
 	}
 }
 
