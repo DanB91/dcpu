@@ -73,7 +73,14 @@ function lockApplication(dlg)
 		findLockableNodes(dashboard.node),
 		findLockableNodes(workspace.node)
 	)
-	
+
+	// Add controls in open dialogs which do not have focus.
+	for (var i = 0; i < dialogs.length-1; i++) {
+		nodelists = nodelists.concat(
+			findLockableNodes(dialogs[i].node)
+		)
+	}
+
 	for (var i = 0; i < nodelists.length; i++) {
 		for (var j = 0; j < nodelists[i].length; j++) {
 			lock(nodelists[i][j]);
@@ -96,6 +103,13 @@ function unlockApplication(dlg)
 		findLockableNodes(dashboard.node),
 		findLockableNodes(workspace.node)
 	)
+
+	// Add controls in open dialogs which do not have focus.
+	for (var i = 0; i < dialogs.length-1; i++) {
+		nodelists = nodelists.concat(
+			findLockableNodes(dialogs[i].node)
+		)
+	}
 	
 	for (var i = 0; i < nodelists.length; i++) {
 		for (var j = 0; j < nodelists[i].length; j++) {
