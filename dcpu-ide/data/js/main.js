@@ -62,22 +62,16 @@ window.onload = function ()
 // This is called by the given modal dialog when it is opened.
 function lockApplication(dlg)
 {
-	// Update a list of open dialogs.
-	dialogs.push(dlg);
+	var nodelists = [];
 
-	if (dialogs.length > 1) {
-		return; // Already locked.
-	}
-
-	var nodelists = [].concat(
-		findLockableNodes(dashboard.node),
-		findLockableNodes(workspace.node)
-	)
-
-	// Add controls in open dialogs which do not have focus.
-	for (var i = 0; i < dialogs.length-1; i++) {
+	if (dialogs.length == 0) {
 		nodelists = nodelists.concat(
-			findLockableNodes(dialogs[i].node)
+			findLockableNodes(dashboard.node),
+			findLockableNodes(workspace.node)
+		)
+	} else {
+		nodelists = nodelists.concat(
+			findLockableNodes(dialogs[dialogs.length-1].node)
 		)
 	}
 
@@ -86,6 +80,9 @@ function lockApplication(dlg)
 			lock(nodelists[i][j]);
 		}
 	}
+
+	// Update a list of open dialogs.
+	dialogs.push(dlg);
 }
 
 // unlockApplication unlocks various nodes to re-enable tab input to them,
@@ -95,22 +92,19 @@ function unlockApplication(dlg)
 	// Update a list of open dialogs.
 	dialogs.pop();
 
-	if (dialogs.length > 0) {
-		return; // Not as long as their are dialogs.
-	}
+	var nodelists = [];
 
-	var nodelists = [].concat(
-		findLockableNodes(dashboard.node),
-		findLockableNodes(workspace.node)
-	)
-
-	// Add controls in open dialogs which do not have focus.
-	for (var i = 0; i < dialogs.length-1; i++) {
+	if (dialogs.length == 0) {
+		nodelists = [].concat(
+			findLockableNodes(dashboard.node),
+			findLockableNodes(workspace.node)
+		)
+	} else {
 		nodelists = nodelists.concat(
-			findLockableNodes(dialogs[i].node)
+			findLockableNodes(dialogs[dialogs.length-1].node)
 		)
 	}
-	
+
 	for (var i = 0; i < nodelists.length; i++) {
 		for (var j = 0; j < nodelists[i].length; j++) {
 			unlock(nodelists[i][j]);
