@@ -104,6 +104,7 @@ var api = {
 	handleResponse : function (e, xhr)
 	{
 		var d = xhr.responseText;
+
 		if (e.type == 'json') {
 			if (d.length == 0) {
 				d = null;
@@ -114,6 +115,10 @@ var api = {
 
 		if (xhr.status != 200) {
 			if (e.onError) {
+				if (d == null) {
+					d = {Code: ErrUnknown, Message: 'Unknown error'};
+				}
+
 				e.onError(xhr.status, d);
 			}
 		} else if (e.onData) {

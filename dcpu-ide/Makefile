@@ -6,18 +6,34 @@ DATADIR = data
 DEPLOYDIR = deploy
 CODEDIR = ../
 PREFIX = data_
+
+## These are used to generate error constant and message 
+## definitions which are identical in Go and Javascript.
+ERR_DATA = api_errors.json
+ERR_GOIN = api_errors.gotmpl
+ERR_GOOUT = api_errors.go
+ERR_JSIN = api_errors.jstmpl
+ERR_JSOUT = data/js/api_errors.js
+
 LDFLAGS_BUILD = -ldflags "-X main.AppVersionRev `date -u +%s`"
 LDFLAGS_INSTALL = -ldflags "-X main.AppVersionRev `date -u +%s` -s"
-CLEANFILES = static.go $(PREFIX)*.go $(DEPLOYDIR)
+CLEANFILES = static.go $(PREFIX)*.go $(DEPLOYDIR) $(ERR_GOOUT) $(ERR_JSOUT)
 
 all: build
 
 build:
-	cd codegen && go run *.go -d -i ../$(DATADIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
+	cd codegen && go run *.go -d \
+		-i ../$(DATADIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX) \
+		-data ../$(ERR_DATA) \
+		-goin ../$(ERR_GOIN) -goout ../$(ERR_GOOUT) \
+		-jsin ../$(ERR_JSIN) -jsout ../$(ERR_JSOUT)
 	go build $(LDFLAGS_BUILD)
 	rm -rf $(CLEANFILES)
 
 install:
+	cd codegen && go run *.go -data ../$(ERR_DATA) \
+		-goin ../$(ERR_GOIN) -goout ../$(ERR_GOOUT) \
+		-jsin ../$(ERR_JSIN) -jsout ../$(ERR_JSOUT)
 	./compress_data.sh
 	cd codegen && go run *.go -i ../$(DEPLOYDIR) -o $(CODEDIR) -t $(TOC) -p $(PREFIX)
 	go install $(LDFLAGS_INSTALL)

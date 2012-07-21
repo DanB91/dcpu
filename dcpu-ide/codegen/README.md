@@ -11,6 +11,10 @@ implements a function which reads it directly from the original file. This
 is useful for development when data files change often. We do not want to
 rebuild and restart the entire ide server every time.
 
+The `-data`, `-jsin`, `-jsout`, `-goin` and , `-goout` all work together.
+The data file lists entries which should be turned into Go and/or JS code
+by using the respective input templates. The results are written to the
+respective output files. The data file comes in JSON format.
 
 ### License
 

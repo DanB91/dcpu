@@ -17,10 +17,8 @@ function ()
 		
 	};
 
-	f.onError = function (status, msg)
+	f.onError = function (status, err)
 	{
-		if (msg == null) {
-			msg = {Message: 'Unknown error'};
-		}
+		console.error(err);
 	}
 }

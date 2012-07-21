@@ -1,0 +1,8 @@
+{
+	"Const": [
+		{"Key": "ErrUnknown", "Value": 1},
+
+		{"Key": "ErrMissingName", "Value": 101},
+		{"Key": "ErrDuplicateProject", "Value": 102}
+	]
+}

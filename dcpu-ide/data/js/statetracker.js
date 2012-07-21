@@ -5,7 +5,7 @@
 function StateTracker ()
 {
 	this.node = document.createElement('div');
-	this.pingInterval = 5000;
+	this.pingInterval = 8000;
 	this.isConnected  = true;
 }
 
