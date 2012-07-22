@@ -22,9 +22,15 @@ function ()
 
 	f.onError = function (status, err)
 	{
-		(new ErrorDialog())
-			.content('Failed to create new project:<br />' +
-					  ErrorStrings[err.Code] + '.')
-			.open();
+		var msg = '';
+
+		if (!stateTracker.isConnected) {
+			msg = 'Disconnected from server.';
+		} else {
+			msg = 'Failed to create new project:<br />' +
+					  ErrorStrings[err.Code] + '.'
+		}
+
+		(new ErrorDialog()).content(msg).open();
 	}
 }
