@@ -81,24 +81,3 @@ button[disabled] {
 ::-webkit-scrollbar-corner {
  background-color: #222;
 }
-
-.icon {
- margin: 0;
- padding: 0;
- padding-right: 20px;
- padding-left: 10px;
- font-size: 4em;
- font-weight: bold;
- text-shadow: 0 0 10px #000;
- color: #ccc;
-}
-
-.icon-error { color: #a00 }
-.icon-info { color: #0a0 }
-.icon-denied { color: #a00 }
-.icon-arrow-left { }
-.icon-arrow-up { }
-.icon-arrow-right {  }
-.icon-arrow-down { }
-.icon-arrow-leftright { }
-.icon-arrow-updown { }
