@@ -9,8 +9,8 @@ function ErrorDialog()
 	    .title('Error');
 
 	var d = document.createElement('div');
-	d.className = 'left icon';
-	d.innerHTML = '&#x2a02;';
+	d.className = 'left icon error';
+	d.innerHTML = IconError;
 	this.body.appendChild(d);
 
 	d = document.createElement('div');

@@ -15,7 +15,9 @@ function ()
 
 	f.onData = function (data)
 	{
-		console.log(data);
+		(new InfoDialog())
+			.content('New project: ' + data.Name)
+			.open();
 	};
 
 	f.onError = function (status, err)

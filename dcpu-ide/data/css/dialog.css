@@ -29,10 +29,11 @@
  left: 0;
  right: 0;
  bottom: 0;
- width: 400px;
- height: 200px;
+ width: 350px;
+ height: 150px;
  box-shadow: 0 0 20px #111;
  border-radius: 10px 10px 10px 10px;
+ font-size: 0.8em;
 }
 
 .dialog .titlebar {
@@ -50,12 +51,13 @@
 
 .dialog .titlebar .title {
  position: absolute;
- top: 2px;
- bottom: 2px;
+ top: 5px;
+ bottom: 5px;
  left: 10px;
  right: 10px;
  color: #ccc;
  text-align: left;
+ font-weight: bold;
 }
 
 .dialog .body {
@@ -69,7 +71,6 @@
  left: 0;
  right: 0;
  overflow: auto;
- font-size: 0.8em;
 }
 
 .dialog .buttons {
@@ -99,8 +100,15 @@
  padding: 0;
  padding-right: 20px;
  padding-left: 10px;
- font-size: 3em;
+ font-size: 4em;
  font-weight: bold;
- color: #a00;
  text-shadow: 0 0 10px #000;
+}
+
+.dialog .icon.error {
+ color: #a00;
+}
+
+.dialog .icon.info {
+ color: #0a0;
 }

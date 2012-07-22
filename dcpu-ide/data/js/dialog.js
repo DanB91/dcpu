@@ -15,6 +15,17 @@ const ButtonIgnore   = 9;
 const ButtonForward  = 10;
 const ButtonBack     = 11;
 
+// Available icons -- unicode symbols.
+const IconError          = '&#x2a02;';
+const IconOk             = '&#x2713;';
+const IconDenied         = '&#x2715;';
+const IconArrowLeft      = '&#x2190;';
+const IconArrowUp        = '&#x2191;';
+const IconArrowRight     = '&#x2192;';
+const IconArrowDown      = '&#x2193;';
+const IconArrowLeftRight = '&#x2194;';
+const IconArrowUpDown    = '&#x2195;';
+
 // The order of these should match the constants above.
 var buttonLabels = [
 	"Ok", "Cancel", "Close", "Prev", "Next",

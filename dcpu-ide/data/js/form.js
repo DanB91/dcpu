@@ -136,7 +136,6 @@ Form.prototype._add = function (label, node, append)
 // It also disables the submit button for as long as this is not the case.
 Form.prototype.validate = function ()
 {
-	console.log('validate');
 	for (var n = 1; n < this.controls.length; n++) {
 		if (!this.controls[n].validate) {
 			continue;
