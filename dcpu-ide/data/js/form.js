@@ -62,7 +62,11 @@ Form.prototype.add = function (e)
 		n = document.createElement('input');
 		n.type = 'text';
 		n.value = e.value || '';
-		n.addEventListener('change', function ()
+		n.addEventListener('keyup', function ()
+		{
+			me.validate();
+		}, false);
+		n.addEventListener('blur', function ()
 		{
 			me.validate();
 		}, false);
@@ -132,6 +136,7 @@ Form.prototype._add = function (label, node, append)
 // It also disables the submit button for as long as this is not the case.
 Form.prototype.validate = function ()
 {
+	console.log('validate');
 	for (var n = 1; n < this.controls.length; n++) {
 		if (!this.controls[n].validate) {
 			continue;

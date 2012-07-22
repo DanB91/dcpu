@@ -110,7 +110,11 @@ var api = {
 				d = null;
 			}
 
-			eval('d = ' + d);
+			try {
+				eval('d = ' + d);
+			} catch (ex) {
+				console.error('api.handleResponse: ', e, ex);
+			}
 		}
 
 		if (xhr.status != 200) {

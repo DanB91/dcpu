@@ -118,6 +118,10 @@ Dialog.prototype.content = function (data)
 // side of the dialog (left or right).
 Dialog.prototype.button = function (btn, click, side)
 {
+	if (side == undefined) {
+		side = 'right';
+	}
+
 	var node = document.createElement('button');
 
 	switch (btn) {
@@ -143,6 +147,7 @@ Dialog.prototype.button = function (btn, click, side)
 
 	var side = side == "left" ? 0 : 1;
 	this.buttonbar.childNodes[side].appendChild(node);
+	return this;
 }
 
 // buttons sets the dialog buttons.
@@ -236,6 +241,6 @@ Dialog.prototype.close = function ()
 		}
 	});
 
-	unlockApplication(this);
+	unlockApplication();
 	return this;
 }

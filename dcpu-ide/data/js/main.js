@@ -87,7 +87,7 @@ function lockApplication(dlg)
 
 // unlockApplication unlocks various nodes to re-enable tab input to them,
 // This is called by the given modal dialog when it is closed.
-function unlockApplication(dlg)
+function unlockApplication()
 {
 	// Update a list of open dialogs.
 	dialogs.pop();
