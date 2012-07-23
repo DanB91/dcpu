@@ -2,41 +2,63 @@
 // Its contents can be found in the enclosed LICENSE file.
 
 // Project represents a single, open DCPU code project.
-function Project ()
+function Project (name, path, files)
 {
-	this.name = '';
-	this.path = '';
-	this.files = [];
+	this.name = name || '';
+	this.path = path || '';
+	this.files = files || [];
 }
 
 // create creates a new project by the given name.
 function createProject (e)
 {
-	console.log('new project: ', e);
+	if (project != null) {
+		var dlg = new ConfirmDialog({
+			yesHandler : function ()
+			{
+				dlg.close();
+				project = null;
+				_createProject(e);
+			},
+			noHandler : function ()
+			{
+				dlg.close();
+			}
+		});
+		
+		dlg.content('There are unsaved changes to the current project. ' + 
+			'Are you sure you want to open a new one? All unsaved progress ' +
+			'will be lost.').open();
+		return;
+	}
 
-	/*
-	api.request({
-		url:    this.target,
-		method: this.method,
-		type:   'json',
-		data:   query,
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded'
-		},
-		onError: function (status, msg)
-		{
-			if (me.onError) {
-				me.onError(status, msg);
-			}
-		},
-		onData: function (data)
-		{
-			if (me.onData) {
-				me.onData(data);
-			}
-		},
-	});
-	*/
+	_createProject(e);
+}
+
+function _createProject (e)
+{
+	var query = '';
+	for (var k in e) {
+		query += k + '=' + encodeURIComponent(e[k]) + '&';
+	}
+
+	try {
+		var data = api.request({
+			url:    '/api/newproject',
+			method: 'POST',
+			type:   'json',
+			async:  false,
+			data:   query,
+		});
+
+		project = new Project(data.Name, data.Path, data.Files);
+		console.log(project);
+	} catch (err) {
+		(new ErrorDialog())
+			.content('Project creation failed: <br />' + err.msg)
+			.open();
+		return;
+	}
 }
 
 // load loads project data by name.

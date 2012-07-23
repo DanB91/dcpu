@@ -26,16 +26,15 @@ Dashboard.prototype.init = function ()
 	fx.show(this.node);
 
 	// Fetch item list.
-	this.items = api.request({
-		url: "/dashboard/itemlist.js",
-		type: 'json',
-		async: false,
-		onError : function (status, msg)
-		{
-			console.error('Dashboard.init: Failed to load item list.',
-				status, msg.Message);
-		},
-	});
+	try {
+		this.items = api.request({
+			url: "/dashboard/itemlist.js",
+			type: 'json',
+			async: false,
+		});
+	} catch(err) {
+		console.error('Dashboard.init: Failed to load item list.', err);
+	}
 
 	// Create list for item buttons.
 	var ul = document.createElement('ul');
@@ -77,31 +76,30 @@ Dashboard.prototype.init = function ()
 
 		// Load external html data.
 		var src = this.items[n].src;
-		this.items[n].data = api.request({
-			refresh: true,
-			async: false,
-			url: src,
-			onError : function (status, msg)
-			{
-				console.error('Dashboard.init: ',
-					src, status, msg);
-			},
-		});
+		try {
+			this.items[n].data = api.request({
+				refresh: true,
+				async: false,
+				url: src,
+			});
+		} catch(err) {
+			console.error('Dashboard.init: ', src, err);
+		}
 
 		// Load external script if need be.
 		if (this.items[n].init != undefined) {
 			var src = this.items[n].init;
-			this.items[n].init = api.request({
-				refresh: true,
-				async: false,
-				type: 'json',
-				url: src,
-				onError : function (status, msg)
-				{
-					console.error('Dashboard.init: ',
-						src, status, msg);
-				},
-			});
+
+			try {
+				this.items[n].init = api.request({
+					refresh: true,
+					async: false,
+					type: 'json',
+					url: src,
+				});
+			} catch(err) {
+				console.error('Dashboard.init: ', src, err);
+			}
 		}
 	}
 
@@ -170,6 +168,22 @@ Dashboard.prototype.select = function (index)
 	var e = document.getElementById(this.items[index].id);
 	e.className = 'active';
 	this.selectedItem = n;
+}
+
+// show shows the dashboard using a sliding animation.
+Dashboard.prototype.show = function ()
+{
+	if (!fx.isVisible(this.node)) {
+		this.toggle();
+	}
+}
+
+// hide hides the dashboard using a sliding animation.
+Dashboard.prototype.hide = function ()
+{
+	if (fx.isVisible(this.node)) {
+		this.toggle();
+	}
 }
 
 // toggle shows or hides the dashboard using a sliding animation.

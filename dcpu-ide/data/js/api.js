@@ -19,6 +19,13 @@ if (typeof XMLHttpRequest == "undefined") {
 	}
 }
 
+function ApiError(code, argv)
+{
+	this.code = code || 0;
+	this.msg = ErrorStrings[code];
+	this.args = argv || [];
+}
+
 var api = {
 	// request fetches data from a remote host.
 	// The supplied object can contain any of these fields:
@@ -63,6 +70,14 @@ var api = {
 	{
 		if (e.method == undefined) {
 			e.method = 'GET';
+		}
+
+		if(e.method == 'POST') {
+			if (e.headers == undefined) {
+				e.headers = {};
+			}
+
+			e.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 		}
 
 		if (e.async == undefined) {
@@ -118,12 +133,16 @@ var api = {
 		}
 
 		if (xhr.status != 200) {
+			if (d == null) {
+				d = new ApiError(ErrUnknown);
+			} else {
+				d = new ApiError(d.Code, d.Args);
+			}
+	
 			if (e.onError) {
-				if (d == null) {
-					d = {Code: ErrUnknown, Message: 'Unknown error'};
-				}
-
 				e.onError(xhr.status, d);
+			} else {
+				throw d;
 			}
 		} else if (e.onData) {
 			e.onData(d);

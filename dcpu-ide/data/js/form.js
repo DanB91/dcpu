@@ -190,13 +190,10 @@ Form.prototype.disable = function (timeout)
 // submit submits the form.
 Form.prototype.submit = function ()
 {
-	this.disable();
-
 	var data = {};
 	for (var n = 1; n < this.controls.length; n++) {
 		data[this.controls[n].id] = this.controls[n].getValue();
 	}
 
 	this.handler(data);
-	this.enable(1000);
 }

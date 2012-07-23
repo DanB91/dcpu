@@ -2,12 +2,15 @@
 // Its contents can be found in the enclosed LICENSE file.
 
 // This is a modal dialog extension specifically meant to display Confirms.
+// The object parameter has two optional fields:
+//
+// - yesHandler: The function to be called when 'Yes' is pressed.
+// - noHandler: The function to be called when 'No' is pressed.
 function ConfirmDialog(e)
 {
 	Dialog.call(this);
-	this.button(ButtonNo, e.noHandler)
-	    .button(ButtonYes, e.okHandler)
-	    .button(ButtonCancel, e.cancelHandler, 'left')
+	this.button(ButtonNo, e.noHandler, 'left')
+	    .button(ButtonYes, e.yesHandler)
 	    .title('Confirm');
 
 	var d = document.createElement('div');
