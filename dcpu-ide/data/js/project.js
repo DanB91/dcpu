@@ -50,9 +50,9 @@ function _createProject (e)
 		});
 
 		project = new Project(data.Name, data.Path, data.Files);
-	} catch (err) {
+	} catch (e) {
 		(new ErrorDialog())
-			.content('Project creation failed: <br />' + err.msg)
+			.content('Project creation failed: <br />' + e.message)
 			.open();
 	}
 }

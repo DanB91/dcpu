@@ -32,8 +32,8 @@ Dashboard.prototype.init = function ()
 			type: 'json',
 			async: false,
 		});
-	} catch(err) {
-		console.error('Dashboard.init: Failed to load item list.', err);
+	} catch(e) {
+		console.error('Dashboard.init: Failed to load item list.', e.message);
 	}
 
 	// Create list for item buttons.
@@ -82,8 +82,8 @@ Dashboard.prototype.init = function ()
 				async: false,
 				url: src,
 			});
-		} catch(err) {
-			console.error('Dashboard.init: ', src, err);
+		} catch(e) {
+			console.error('Dashboard.init: ', src, e.message);
 		}
 
 		// Load external script if need be.
@@ -97,8 +97,8 @@ Dashboard.prototype.init = function ()
 					type: 'json',
 					url: src,
 				});
-			} catch(err) {
-				console.error('Dashboard.init: ', src, err);
+			} catch(e) {
+				console.error('Dashboard.init: ', src, e.message);
 			}
 		}
 	}

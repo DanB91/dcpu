@@ -37,18 +37,15 @@ window.onload = function ()
 	}
 
 	// Load configuration data.
-	api.request({
-		url: '/api/config',
-		type: "json",
-		onData : function (data)
-		{
-			config = data;
-		},
-		onError : function (msg, status)
-		{
-			console.error("Failed to load configuration data.");
-		},
-	});
+	try {
+		config = api.request({
+			url: '/api/config',
+			type: "json",
+			async: false,
+		});
+	} catch(e) {
+		console.error('window.onload: ', e.message);	
+	}
 
 	// Hook some events.
 	document.onkeydown = onKeyDown;

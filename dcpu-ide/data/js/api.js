@@ -22,7 +22,7 @@ if (typeof XMLHttpRequest == "undefined") {
 function ApiError(code, argv)
 {
 	this.code = code || 0;
-	this.msg = ErrorStrings[code];
+	this.message = ErrorStrings[code];
 	this.args = argv || [];
 }
 
