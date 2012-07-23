@@ -9,6 +9,11 @@
 function ConfirmDialog(e)
 {
 	Dialog.call(this);
+
+	if (e == undefined) {
+		e = {};
+	}
+
 	this.button(ButtonNo, e.noHandler, 'left')
 	    .button(ButtonYes, e.yesHandler)
 	    .title('Confirm');

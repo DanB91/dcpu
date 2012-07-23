@@ -7,7 +7,7 @@ function Project (name, path, files)
 	this.name = name || '';
 	this.path = path || '';
 	this.files = files || [];
-	this.hasChanges = false;
+	this.hasChanges = true;
 }
 
 // create creates a new project by the given name.
@@ -15,21 +15,16 @@ function createProject (e)
 {
 	if (project != null && project.hasChanges) {
 		var dlg = new ConfirmDialog({
-			yesHandler : function ()
+			yesHandler: function ()
 			{
 				dlg.close();
-				project = null;
 				_createProject(e);
-			},
-			noHandler : function ()
-			{
-				dlg.close();
 			}
 		});
-		
+
 		dlg.content('There are unsaved changes to the current project. ' + 
-			'Are you sure you want to open a new one? All unsaved progress ' +
-			'will be lost.').open();
+			'Are you sure you want to open a new one? All unsaved ' +
+			'progress will be lost.').open();
 		return;
 	}
 
@@ -38,6 +33,8 @@ function createProject (e)
 
 function _createProject (e)
 {
+	project = null;
+
 	var query = '';
 	for (var k in e) {
 		query += k + '=' + encodeURIComponent(e[k]) + '&';

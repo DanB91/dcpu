@@ -8,7 +8,6 @@
 	
 	"Scripts": [
 		"/js/color.js",
-		"/js/channel.js",
 		"/js/fx.js",
 		"/js/api_errors.js",
 		"/js/api.js",

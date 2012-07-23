@@ -2,29 +2,29 @@
 // Its contents can be found in the enclosed LICENSE file.
 
 // Available dialog buttons.
-const ButtonOk       = 0;
-const ButtonCancel   = 1;
-const ButtonClose    = 2;
-const ButtonPrevious = 3;
-const ButtonNext     = 4;
-const ButtonYes      = 5;
-const ButtonNo       = 6;
-const ButtonAbort    = 7;
-const ButtonRetry    = 8;
-const ButtonIgnore   = 9;
-const ButtonForward  = 10;
-const ButtonBack     = 11;
+const ButtonOk       = 1;
+const ButtonCancel   = 2;
+const ButtonClose    = 3;
+const ButtonPrevious = 4;
+const ButtonNext     = 5;
+const ButtonYes      = 6;
+const ButtonNo       = 7;
+const ButtonAbort    = 8;
+const ButtonRetry    = 9;
+const ButtonIgnore   = 10;
+const ButtonForward  = 11;
+const ButtonBack     = 12;
 
 // The order of these should match the constants above.
 var buttonLabels = [
-	"Ok", "Cancel", "Close", "Prev", "Next",
+	"", "Ok", "Cancel", "Close", "Prev", "Next",
 	"Yes", "No", "Abort", "Retry", "Ignore",
 	"Forward", "Back"
 ];
 
 // The order of these should match the constants above.
 var buttonTitles = [
-	"Ok", "Cancel", "Close", "Previous", "Next",
+	"", "Ok", "Cancel", "Close", "Previous", "Next",
 	"Yes", "No", "Abort", "Retry", "Ignore",
 	"Forward", "Back"
 ];
@@ -46,6 +46,7 @@ var buttonTitles = [
 function Dialog ()
 {
 	this.canClose = false;
+	this.buttonState = 0;
 
 	// Screen-filling, transparent background.
 	// This prevents the user from getting mouse input to any
@@ -122,28 +123,43 @@ Dialog.prototype.button = function (btn, click, side)
 		side = 'right';
 	}
 
+	var me = this;
 	var node = document.createElement('button');
-
-	switch (btn) {
-	case ButtonClose:
-	case ButtonCancel:
-		this.canClose = true;
-
-		var me = this;
-		node.onclick = function ()
-		{
-			me.close();
-		}
-
-		break;
-	}
-
-	if (node.onclick == null) {
-		node.onclick = click;
-	}
 
 	node.title = buttonTitles[btn];
 	node.innerHTML = buttonLabels[btn];
+
+	switch (btn) {
+	case ButtonOk:
+	case ButtonCancel:
+	case ButtonClose:
+	case ButtonYes:
+	case ButtonNo:
+	case ButtonAbort:
+	case ButtonRetry:
+	case ButtonIgnore:
+		this.canClose = true;
+		node.onclick = function ()
+		{
+			if (click != undefined) {
+				click(this);
+			}
+
+			me.buttonState = btn;
+			me.close();
+		}
+		break;
+	default:
+		node.onclick = function ()
+		{
+			if (click != undefined) {
+				click(this);
+			}
+
+			me.buttonState = btn;
+		}
+		break;
+	}
 
 	var side = side == "left" ? 0 : 1;
 	this.buttonbar.childNodes[side].appendChild(node);
@@ -244,3 +260,4 @@ Dialog.prototype.close = function ()
 	unlockApplication();
 	return this;
 }
+
