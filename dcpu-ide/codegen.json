@@ -1,9 +1,23 @@
 {
 	"Errors": [
-		{"Name": "ErrUnknown", "Code": 1, "String": "Unknown error"},
+		{"Name": "ErrUnknown", "Code": 1,
+			"String": "Unknown error"},
 
-		{"Name": "ErrMissingName", "Code": 101, "String": "Missing project name"},
-		{"Name": "ErrDuplicateProject", "Code": 102, "String": "The specified project already exists"}
+		{"Name": "ErrMissingName", "Code": 101,
+			"String": "Missing project name"},
+		{"Name": "ErrDuplicateProject", "Code": 102,
+			"String": "The specified project already exists"},
+		{"Name": "ErrTemplateFailure", "Code": 103,
+			"String": "Failed to initialize code template"},
+
+		{"Name": "ErrInvalidPath", "Code": 201,
+			"String": "Invalid file path specified"},
+		{"Name": "ErrNotDirectory", "Code": 202,
+			"String": "The given path is not a directory"},
+		{"Name": "ErrNotFile", "Code": 203,
+			"String": "The given path is not a file"},
+		{"Name": "ErrPathNotExist", "Code": 204,
+			"String": "The given path does not exist"}
 	],
 	
 	"Scripts": [

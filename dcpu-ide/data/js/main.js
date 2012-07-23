@@ -181,6 +181,21 @@ function onMouseWheel (e)
 	
 }
 
+String.prototype.ltrim = function()
+{
+	return this.replace(/^\W+/, '')
+}
+
+String.prototype.rtrim = function()
+{
+	return this.replace(/\W+$/, '')
+}
+
+String.prototype.trim = function()
+{
+	return this.replace(/(^\W+)|(\W+$)/, '')
+}
+
 /*
 	editor = CodeMirror(workspace, {
 		mode: "dasm",

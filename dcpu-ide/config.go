@@ -11,10 +11,12 @@ import (
 )
 
 type Config struct {
-	Address     string `json:"-"` // Listen address for server.
-	Timeout     uint   // Shut the server down after X seconds of idleness.
-	IncludePath string // DCPU path, pointing to standard library.
-	ProjectPath string // Base directory for code projects.
+	Address         string `json:"-"` // Listen address for server.
+	Timeout         uint   // Shut the server down after X seconds of idleness.
+	IncludePath     string // DCPU path, pointing to standard library.
+	ProjectPath     string // Base directory for code projects.
+	AuthorName      string // Name of author.
+	AuthorCopyright string // Author's copyright notice.
 }
 
 func NewConfig() *Config {
@@ -50,13 +52,17 @@ func (c *Config) Save(file string) {
 	// It has different requirements for which tags are in place.
 
 	cfg := struct {
-		Address     string
-		ProjectPath string
-		Timeout     uint
+		Address         string
+		ProjectPath     string
+		AuthorName      string
+		AuthorCopyright string
+		Timeout         uint
 	}{
-		config.Address,
-		config.ProjectPath,
-		config.Timeout,
+		Address:         config.Address,
+		ProjectPath:     config.ProjectPath,
+		AuthorName:      config.AuthorName,
+		AuthorCopyright: config.AuthorCopyright,
+		Timeout:         config.Timeout,
 	}
 
 	data, err := json.MarshalIndent(cfg, "", "  ")

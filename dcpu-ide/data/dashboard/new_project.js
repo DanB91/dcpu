@@ -11,7 +11,7 @@ function ()
 		id:       'tName',
 		validate: function ()
 		{
-			return (this.value.length > 0);
+			return (this.value.trim().length > 0);
 		},
 	});
 }

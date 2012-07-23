@@ -1,19 +1,22 @@
-// This file was automatically generated.
-// Any changes to it will not be preserved.
+// This file is subject to a 1-clause BSD license.
+// Its contents can be found in the enclosed LICENSE file.
 
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
+	"text/template"
 )
 
 func init() {
 	Register("/api/newproject", "POST", apiNewProject)
 }
 
-// apiNewProject rcreates a new project.
+// apiNewProject creates a new project.
 func apiNewProject(r *http.Request) ([]byte, int) {
 	name := r.FormValue("tName")
 
@@ -38,13 +41,64 @@ func apiNewProject(r *http.Request) ([]byte, int) {
 		return Error(ErrUnknown, err.Error()), http.StatusInternalServerError
 	}
 
-	return Pack(struct {
-		Path  string
-		Name  string
-		Files []string
-	}{
-		dir,
-		name,
-		nil,
-	}), 200
+	// Create project object.
+	proj := &Project{
+		Path:            dir,
+		Name:            name,
+		AuthorName:      config.AuthorName,
+		AuthorCopyright: config.AuthorCopyright,
+		Files: []string{
+			"README.md",
+			"main.dasm",
+		},
+	}
+
+	// Copy over initial code template files.
+	err = createProjectTemplate(proj)
+	if err != nil {
+		return Error(ErrTemplateFailure, err), http.StatusInternalServerError
+	}
+
+	return Pack(proj), 200
+}
+
+// createProjectTemplate copies all project templates over to the new
+// project directory after running them through Go's template engine.
+func createProjectTemplate(proj *Project) (err error) {
+	for i := range proj.Files {
+		if err = copyFile(
+			proj,
+			path.Join(proj.Path, proj.Files[i]),
+			path.Join("/project/template", proj.Files[i]),
+		); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+// copyFile parses a single project temlate file and writes it
+// to the destination file.
+func copyFile(proj *Project, dst, src string) (err error) {
+	fout, err := os.Create(dst)
+
+	if err != nil {
+		return
+	}
+
+	defer fout.Close()
+
+	file, ok := static[src]
+	if !ok {
+		return fmt.Errorf("%q not could not be found.", src)
+	}
+
+	t, err := template.New("page").Parse(string(file.Data()))
+
+	if err != nil {
+		return
+	}
+
+	return t.Execute(fout, proj)
 }

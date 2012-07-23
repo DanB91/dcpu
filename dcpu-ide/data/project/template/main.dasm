@@ -1,0 +1,8 @@
+; This file is {{.AuthorCopyright}}
+
+	jsr main
+	sub pc, 1
+
+def main
+	
+end def
