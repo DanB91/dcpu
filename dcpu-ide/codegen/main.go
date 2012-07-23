@@ -16,6 +16,16 @@ type File struct {
 	Type string // Content/mime type
 }
 
+type CodeData struct {
+	Errors []struct {
+		Name   string
+		String string
+		Code   int
+	}
+	Stylesheets []string
+	Scripts     []string
+}
+
 var (
 	files []File
 

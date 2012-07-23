@@ -12,16 +12,6 @@ import (
 	"text/template"
 )
 
-type CodeData struct {
-	Errors []struct {
-		Name   string
-		String string
-		Code   int
-	}
-	Stylesheets []string
-	Scripts     []string
-}
-
 // generate reads data entries from the data file.
 // It passes the data through the Go template defined in infile,
 // and writes the result to outfile.
