@@ -39,10 +39,12 @@ func apiNewProject(r *http.Request) ([]byte, int) {
 	}
 
 	return Pack(struct {
-		Path string
-		Name string
+		Path  string
+		Name  string
+		Files []string
 	}{
 		dir,
 		name,
+		nil,
 	}), 200
 }

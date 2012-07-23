@@ -21,6 +21,8 @@
 		"/js/dialog.js",
 		"/js/errordialog.js",
 		"/js/infodialog.js",
+		"/js/confirmdialog.js",
+		"/js/project.js",
 		"/js/main.js"
 	],
 	

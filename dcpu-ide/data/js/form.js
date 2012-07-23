@@ -7,38 +7,36 @@
 // to deal with when writing forms manually.
 //
 // Note that this does not create an actual <form> element.
-// Just a list of elements we track for content and changes. 
-function Form (id, method, target, submitLabel)
+// Just a list of elements we track for content and changes.
+// Sending a form to a remote host, is the responsibility of the
+// supplied handler function. it os only called whenever the
+// form passes all validation steps on submission.
+//
+// The parameter is an object with the following fields:
+//
+// - id: The form's id.
+// - handler: A function used to handle the form submission.
+//            It accepts one parameter wich is an object with all
+//            form field names and values.
+function Form (e)
 {
-	if (!id) {
-		console.eror('Form has no element id.');
+	if (e == undefined) {
 		return;
 	}
 
-	if (!method) {
-		console.eror('Form has no method.');
+	if (e.handler == undefined) {
+		console.error('Form has no submission handler.');
 		return;
 	}
 
-	if (!target) {
-		console.eror('Form has no submission target.');
-		return;
-	}
-
-	this.target = target;
-	this.method = method;
+	this.handler = e.handler;
 	this.list = document.createElement('ul');
 	this.controls = [];
-	this.onData = null;
-	this.onError = function (status, msg)
-	{
-		console.error(status, msg.Message);
-	}
 
 	var me = this;
 	var sb = document.createElement('button');
-	
-	sb.innerHTML = submitLabel || 'Submit';
+
+	sb.innerHTML = 'Submit';
 	sb.onclick = function ()
 	{
 		me.submit();
@@ -46,7 +44,7 @@ function Form (id, method, target, submitLabel)
 
 	this._add(null, sb, true);
 
-	var node = document.getElementById(id);
+	var node = document.getElementById(e.id);
 	node.className = 'form';
 	node.appendChild(this.list);
 }
@@ -129,6 +127,8 @@ Form.prototype._add = function (label, node, append)
 	div = document.createElement('div');
 	div.className = "clear";
 	li.appendChild(div);
+
+	this.list.childNodes[0].childNodes[1].childNodes[0].focus();
 	this.validate();
 }
 
@@ -136,6 +136,10 @@ Form.prototype._add = function (label, node, append)
 // It also disables the submit button for as long as this is not the case.
 Form.prototype.validate = function ()
 {
+	if (this.onValidate != undefined && !this.onValidate()) {
+		return false;
+	}
+
 	for (var n = 1; n < this.controls.length; n++) {
 		if (!this.controls[n].validate) {
 			continue;
@@ -188,34 +192,11 @@ Form.prototype.submit = function ()
 {
 	this.disable();
 
-	var data = [];
+	var data = {};
 	for (var n = 1; n < this.controls.length; n++) {
-		data.push(this.controls[n].id + '='
-			+ encodeURIComponent(this.controls[n].getValue()));
+		data[this.controls[n].id] = this.controls[n].getValue();
 	}
 
-	var query = data.join('&');
-	var me = this;
-
-	api.request({
-		url:    this.target,
-		method: this.method,
-		type:   'json',
-		data:   query,
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded'
-		},
-		onError: function (status, msg)
-		{
-			if (me.onError) {
-				me.onError(status, msg);
-			}
-		},
-		onData: function (data)
-		{
-			if (me.onData) {
-				me.onData(data);
-			}
-		},
-	});
+	this.handler(data);
+	this.enable(1000);
 }

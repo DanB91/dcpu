@@ -8,6 +8,7 @@ var stateTracker = null;
 var workspace    = null;
 var dashboard    = null;
 var config       = null;
+var project      = {};
 
 window.onbeforeunload = function()
 {

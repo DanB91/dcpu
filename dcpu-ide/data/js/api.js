@@ -113,7 +113,7 @@ var api = {
 			try {
 				eval('d = ' + d);
 			} catch (ex) {
-				console.error('api.handleResponse: ', e, ex);
+				console.error(e.url, ex.toString());
 			}
 		}
 

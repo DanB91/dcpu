@@ -11,3 +11,4 @@ const IconArrowRight     = '&#x2192;';
 const IconArrowDown      = '&#x2193;';
 const IconArrowLeftRight = '&#x2194;';
 const IconArrowUpDown    = '&#x2195;';
+const IconQuestion       = '&#x2753;';
