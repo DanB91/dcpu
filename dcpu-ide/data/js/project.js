@@ -7,12 +7,13 @@ function Project (name, path, files)
 	this.name = name || '';
 	this.path = path || '';
 	this.files = files || [];
+	this.hasChanges = false;
 }
 
 // create creates a new project by the given name.
 function createProject (e)
 {
-	if (project != null) {
+	if (project != null && project.hasChanges) {
 		var dlg = new ConfirmDialog({
 			yesHandler : function ()
 			{
@@ -52,12 +53,10 @@ function _createProject (e)
 		});
 
 		project = new Project(data.Name, data.Path, data.Files);
-		console.log(project);
 	} catch (err) {
 		(new ErrorDialog())
 			.content('Project creation failed: <br />' + err.msg)
 			.open();
-		return;
 	}
 }
 
