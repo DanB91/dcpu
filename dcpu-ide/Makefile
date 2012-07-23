@@ -26,8 +26,8 @@ TOC = static.go
 ## Build Stage 3
 LDFLAGS_BUILD = -ldflags "-X main.AppVersionRev `date -u +%s`"
 LDFLAGS_INSTALL = -ldflags "-X main.AppVersionRev `date -u +%s` -s"
-CLEAN_BUILD = static.go $(DEPLOYDIR) $(CG_ERR_GOOUT) $(PREFIX)*.go
-CLEAN_INSTALL = $(CLEAN_BUILD) $(CG_ERR_JSOUT) $(CG_INDEX_OUT) ./$(CG)/$(CG)
+CLEAN_BUILD = static.go $(DEPLOYDIR) $(CG_ERR_GOOUT) $(PREFIX)*.go ./$(CG)/$(CG)
+CLEAN_INSTALL = $(CLEAN_BUILD) $(CG_ERR_JSOUT) $(CG_INDEX_OUT)
 
 all: build
 
