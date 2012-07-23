@@ -16,7 +16,7 @@ import (
 )
 
 func translate(fin string) (err error) {
-	relpath := strings.Replace(fin, *indir, "", 1)
+	relpath := strings.Replace(fin, *convin, "", 1)
 	fout := strings.Replace(relpath, string(filepath.Separator), "_", -1)
 
 	varname := fout
@@ -29,8 +29,8 @@ func translate(fin string) (err error) {
 		varname = "_" + varname
 	}
 
-	fout = *prefix + fout + ".go"
-	fout = filepath.Join(*outdir, fout)
+	fout = *convpre + fout + ".go"
+	fout = filepath.Join(*convout, fout)
 	files = append(files, File{
 		Path: relpath,
 		Var:  varname,

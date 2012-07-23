@@ -19,23 +19,36 @@ type File struct {
 var (
 	files []File
 
-	// Options for Go code generation from arbitrary input files.
-	indir   = flag.String("i", "", "Path to input directory.")
-	outdir  = flag.String("o", "", "Path to output directory.")
-	prefix  = flag.String("p", "", "Prefix generated files with this.")
-	tocfile = flag.String("t", "", "File name for index of generated code.")
-	dev     = flag.Bool("d", false, "Output code for dev mode.")
+	// Misc flag.
+	dev = flag.Bool("d", false, "Output for debug mode.")
+
+	// Options for file coversion to Go code.
+	convin  = flag.String("convin", "", "Path to conversion input directory.")
+	convout = flag.String("convout", "", "Path to conversion output directory.")
+	convpre = flag.String("convpre", "", "Prefix generated conversion files with this.")
+	convtoc = flag.String("convtoc", "", "File name for index of converted code.")
 
 	// Options for code generation from templates and data.
 	cgdata = flag.String("cgdata", "", "Input data (JSON) file that should be translated to source code.")
 	cgin   = flag.String("cgin", "", "Input file with code template.")
 	cgout  = flag.String("cgout", "", "Output file for generated code.")
+
+	// Merge files.
+	mergein  = flag.String("mergein", "", "Input directory for file merge.")
+	mergeout = flag.String("mergeout", "", "Output file for file merge.")
 )
 
 func main() {
 	var err error
 
 	flag.Parse()
+
+	if len(*mergein) > 0 && len(*mergeout) > 0 {
+		if err = merge(*mergein, *mergeout); err != nil {
+			fmt.Fprintf(os.Stderr, "[e] %v\n", err)
+			os.Exit(1)
+		}
+	}
 
 	if len(*cgdata) > 0 && len(*cgin) > 0 && len(*cgout) > 0 {
 		if err = generate(*cgdata, *cgin, *cgout); err != nil {
@@ -44,25 +57,23 @@ func main() {
 		}
 	}
 
-	if len(*indir) > 0 && len(*outdir) > 0 {
-		if err = parseFiles(); err != nil {
+	if len(*convin) > 0 && len(*convout) > 0 {
+		err = filepath.Walk(*convin, func(fin string, info os.FileInfo, e error) (err error) {
+			if e != nil || info.IsDir() {
+				return e
+			}
+
+			return translate(fin)
+		})
+
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "[e] %v\n", err)
 			os.Exit(1)
 		}
 
-		if err = createTOC(); err != nil {
+		if err = createTOC(*convtoc, files); err != nil {
 			fmt.Fprintf(os.Stderr, "[e] %v\n", err)
 			os.Exit(1)
 		}
 	}
-}
-
-func parseFiles() error {
-	return filepath.Walk(*indir, func(fin string, info os.FileInfo, e error) (err error) {
-		if e != nil || info.IsDir() {
-			return e
-		}
-
-		return translate(fin)
-	})
 }

@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-func createTOC() (err error) {
-	fd, err := os.Create(*tocfile)
+func createTOC(file string, files []File) (err error) {
+	fd, err := os.Create(file)
 	if err != nil {
 		return
 	}

@@ -38,6 +38,13 @@ func generate(data, infile, outfile string) (err error) {
 		return fmt.Errorf("json.Unmarshal: %v", err)
 	}
 
+	if !*dev {
+		// In release mode, we'll be having all style and script
+		// files merged into one.
+		cd.Scripts = []string{"/app.js"}
+		cd.Stylesheets = []string{"/app.css"}
+	}
+
 	t, err := template.New("page").ParseFiles(infile)
 	if err != nil {
 		return fmt.Errorf("template.ParseFiles: %v", err)
