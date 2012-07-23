@@ -41,7 +41,7 @@ func (c *Config) Load(file string) {
 	json.Unmarshal(data, c)
 }
 
-// Load saves configuration data from to a file.
+// Save saves configuration data from to a file.
 func (c *Config) Save(file string) {
 	// Cherry-pick the fields we want to store.
 	// 
