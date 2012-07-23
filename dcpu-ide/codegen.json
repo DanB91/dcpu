@@ -11,13 +11,15 @@
 			"String": "Failed to initialize code template"},
 
 		{"Name": "ErrInvalidPath", "Code": 201,
-			"String": "Invalid file path specified"},
+			"String": "Invalid path specified"},
 		{"Name": "ErrNotDirectory", "Code": 202,
 			"String": "The given path is not a directory"},
 		{"Name": "ErrNotFile", "Code": 203,
 			"String": "The given path is not a file"},
 		{"Name": "ErrPathNotExist", "Code": 204,
-			"String": "The given path does not exist"}
+			"String": "The given path does not exist"},
+		{"Name": "ErrFileRead", "Code": 205,
+			"String": "Unable to read file"}
 	],
 	
 	"Scripts": [
