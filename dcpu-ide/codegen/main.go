@@ -26,12 +26,10 @@ var (
 	tocfile = flag.String("t", "", "File name for index of generated code.")
 	dev     = flag.Bool("d", false, "Output code for dev mode.")
 
-	// Options for javascript & Go generation from templates and data.
-	data  = flag.String("data", "", "Input data (JSON) file that should be translated to javascript and/or Go.")
-	jsin  = flag.String("jsin", "", "Input javascript template.")
-	jsout = flag.String("jsout", "", "Output generated javascript file.")
-	goin  = flag.String("goin", "", "Input Go template.")
-	goout = flag.String("goout", "", "Output generated Go file.")
+	// Options for code generation from templates and data.
+	cgdata = flag.String("cgdata", "", "Input data (JSON) file that should be translated to source code.")
+	cgin   = flag.String("cgin", "", "Input file with code template.")
+	cgout  = flag.String("cgout", "", "Output file for generated code.")
 )
 
 func main() {
@@ -39,19 +37,10 @@ func main() {
 
 	flag.Parse()
 
-	if len(*data) > 0 {
-		if len(*jsin) > 0 && len(*jsout) > 0 {
-			if err = generate(*data, *jsin, *jsout); err != nil {
-				fmt.Fprintf(os.Stderr, "[e] %v\n", err)
-				os.Exit(1)
-			}
-		}
-
-		if len(*goin) > 0 && len(*goout) > 0 {
-			if err = generate(*data, *goin, *goout); err != nil {
-				fmt.Fprintf(os.Stderr, "[e] %v\n", err)
-				os.Exit(1)
-			}
+	if len(*cgdata) > 0 && len(*cgin) > 0 && len(*cgout) > 0 {
+		if err = generate(*cgdata, *cgin, *cgout); err != nil {
+			fmt.Fprintf(os.Stderr, "[e] %v\n", err)
+			os.Exit(1)
 		}
 	}
 

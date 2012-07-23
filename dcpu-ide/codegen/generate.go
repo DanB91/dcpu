@@ -18,6 +18,8 @@ type CodeData struct {
 		String string
 		Code   int
 	}
+	Stylesheets []string
+	Scripts     []string
 }
 
 // generate reads data entries from the data file.

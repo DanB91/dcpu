@@ -1,0 +1,38 @@
+{
+	"Errors": [
+		{"Name": "ErrUnknown", "Code": 1, "String": "Unknown error"},
+
+		{"Name": "ErrMissingName", "Code": 101, "String": "Missing project name"},
+		{"Name": "ErrDuplicateProject", "Code": 102, "String": "The specified project already exists"}
+	],
+	
+	"Scripts": [
+		"/js/codemirror.js",
+		"/js/dasm.js",
+		"/js/api.js",
+		"/js/api_errors.js",
+		"/js/dashboard.js",
+		"/js/statetracker.js",
+		"/js/form.js",
+		"/js/workspace.js",
+		"/js/color.js",
+		"/js/fx.js",
+		"/js/icons.js",
+		"/js/dialog.js",
+		"/js/errordialog.js",
+		"/js/infodialog.js",
+		"/js/main.js"
+	],
+	
+	"Stylesheets": [
+		"/css/common.css",
+		"/css/form.css",
+		"/css/codemirror.css",
+		"/css/eclipse.css",
+		"/css/dashboard.css",
+		"/css/statetracker.css",
+		"/css/workspace.css",
+		"/css/dialog.css",
+		"/css/icons.css"
+	]
+}
