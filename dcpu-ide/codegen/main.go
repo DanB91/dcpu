@@ -20,7 +20,8 @@ var (
 	files []File
 
 	// Misc flag.
-	dev = flag.Bool("d", false, "Output for debug mode.")
+	dev  = flag.Bool("d", false, "Output for debug mode.")
+	data = flag.String("data", "", "Input data (JSON) for merging and template parsing.")
 
 	// Options for file coversion to Go code.
 	convin  = flag.String("convin", "", "Path to conversion input directory.")
@@ -29,13 +30,13 @@ var (
 	convtoc = flag.String("convtoc", "", "File name for index of converted code.")
 
 	// Options for code generation from templates and data.
-	cgdata = flag.String("cgdata", "", "Input data (JSON) file that should be translated to source code.")
-	cgin   = flag.String("cgin", "", "Input file with code template.")
-	cgout  = flag.String("cgout", "", "Output file for generated code.")
+	cgin  = flag.String("cgin", "", "Input file with code template.")
+	cgout = flag.String("cgout", "", "Output file for generated code.")
 
 	// Merge files.
-	mergein  = flag.String("mergein", "", "Input directory for file merge.")
-	mergeout = flag.String("mergeout", "", "Output file for file merge.")
+	mergetype = flag.String("mergetype", "", "Merge type: js or css.")
+	mergeout  = flag.String("mergeout", "", "Output file for file merge.")
+	mergepre  = flag.String("mergepre", "", "Path prefix for each merge target.")
 )
 
 func main() {
@@ -43,15 +44,15 @@ func main() {
 
 	flag.Parse()
 
-	if len(*mergein) > 0 && len(*mergeout) > 0 {
-		if err = merge(*mergein, *mergeout); err != nil {
+	if len(*data) > 0 && len(*mergetype) > 0 && len(*mergeout) > 0 {
+		if err = merge(*data, *mergetype, *mergepre, *mergeout); err != nil {
 			fmt.Fprintf(os.Stderr, "[e] %v\n", err)
 			os.Exit(1)
 		}
 	}
 
-	if len(*cgdata) > 0 && len(*cgin) > 0 && len(*cgout) > 0 {
-		if err = generate(*cgdata, *cgin, *cgout); err != nil {
+	if len(*data) > 0 && len(*cgin) > 0 && len(*cgout) > 0 {
+		if err = generate(*data, *cgin, *cgout); err != nil {
 			fmt.Fprintf(os.Stderr, "[e] %v\n", err)
 			os.Exit(1)
 		}

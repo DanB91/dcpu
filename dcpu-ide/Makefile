@@ -21,10 +21,9 @@ CG_INDEX_OUT = $(DATADIR)/index.html
 ## Build Stage 2
 ## Merges multiple stylesheets and javascript files into a single
 ## file for each type. Only applies to install builds.
-MERGE_IN_JS = $(DEPLOYDIR)/js/
 MERGE_OUT_JS = $(DEPLOYDIR)/app.js
-MERGE_IN_CSS = $(DEPLOYDIR)/css/
 MERGE_OUT_CSS = $(DEPLOYDIR)/app.css
+MERGE_PREFIX = ./$(DEPLOYDIR)/
 
 ## Build Stage 3
 ## Generate Go code from static web data for embedding.
@@ -43,22 +42,21 @@ all: build
 
 build: 
 	cd $(CG) && go build -ldflags="-s"
-	$(CGC) -d -cgdata $(CG_DATA) -cgin $(CG_ERR_GOIN) -cgout $(CG_ERR_GOOUT)
-	$(CGC) -d -cgdata $(CG_DATA) -cgin $(CG_ERR_JSIN) -cgout $(CG_ERR_JSOUT)
-	$(CGC) -d -cgdata $(CG_DATA) -cgin $(CG_INDEX_IN) -cgout $(CG_INDEX_OUT)
+	$(CGC) -d -data $(CG_DATA) -cgin $(CG_ERR_GOIN) -cgout $(CG_ERR_GOOUT)
+	$(CGC) -d -data $(CG_DATA) -cgin $(CG_ERR_JSIN) -cgout $(CG_ERR_JSOUT)
+	$(CGC) -d -data $(CG_DATA) -cgin $(CG_INDEX_IN) -cgout $(CG_INDEX_OUT)
 	$(CGC) -d -convin $(DATADIR) -convout . -convtoc $(TOC) -convpre $(PREFIX)
 	go build $(LDFLAGS_BUILD)
 	rm -rf $(CLEAN_BUILD)
 
 install: 
 	cd $(CG) && go build -ldflags="-s"
-	$(CGC) -cgdata $(CG_DATA) -cgin $(CG_ERR_GOIN) -cgout $(CG_ERR_GOOUT)
-	$(CGC) -cgdata $(CG_DATA) -cgin $(CG_ERR_JSIN) -cgout $(CG_ERR_JSOUT)
-	$(CGC) -cgdata $(CG_DATA) -cgin $(CG_INDEX_IN) -cgout $(CG_INDEX_OUT)
+	$(CGC) -data $(CG_DATA) -cgin $(CG_ERR_GOIN) -cgout $(CG_ERR_GOOUT)
+	$(CGC) -data $(CG_DATA) -cgin $(CG_ERR_JSIN) -cgout $(CG_ERR_JSOUT)
+	$(CGC) -data $(CG_DATA) -cgin $(CG_INDEX_IN) -cgout $(CG_INDEX_OUT)
 	./compress_data.sh
-	$(CGC) -mergein $(MERGE_IN_JS) -mergeout $(MERGE_OUT_JS)
-	$(CGC) -mergein $(MERGE_IN_CSS) -mergeout $(MERGE_OUT_CSS)
-	rm -rf $(DEPLOYDIR)/js/ $(DEPLOYDIR)/css/
+	$(CGC) -data $(CG_DATA) -mergetype js -mergepre $(MERGE_PREFIX) -mergeout $(MERGE_OUT_JS)
+	$(CGC) -data $(CG_DATA) -mergetype css -mergepre $(MERGE_PREFIX) -mergeout $(MERGE_OUT_CSS)
 	$(CGC) -convin $(DEPLOYDIR) -convout . -convtoc $(TOC) -convpre $(PREFIX)
 	go install $(LDFLAGS_INSTALL)
 	rm -rf $(CLEAN_INSTALL)
