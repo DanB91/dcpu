@@ -10,53 +10,6 @@ function Project (name, path, files)
 	this.hasChanges = true;
 }
 
-// create creates a new project by the given name.
-function createProject (e)
-{
-	if (project != null && project.hasChanges) {
-		var dlg = new ConfirmDialog({
-			yesHandler: function ()
-			{
-				dlg.close();
-				_createProject(e);
-			}
-		});
-
-		dlg.content('There are unsaved changes to the current project. ' + 
-			'Are you sure you want to open a new one? All unsaved ' +
-			'progress will be lost.').open();
-		return;
-	}
-
-	_createProject(e);
-}
-
-function _createProject (e)
-{
-	project = null;
-
-	var query = '';
-	for (var k in e) {
-		query += k + '=' + encodeURIComponent(e[k]) + '&';
-	}
-
-	try {
-		var data = api.request({
-			url:    '/api/newproject',
-			method: 'POST',
-			type:   'json',
-			async:  false,
-			data:   query,
-		});
-
-		project = new Project(data.Name, data.Path, data.Files);
-	} catch (e) {
-		(new ErrorDialog())
-			.content('Project creation failed: <br />' + e.message)
-			.open();
-	}
-}
-
 // load loads project data by name.
 Project.prototype.load = function (name)
 {
@@ -68,3 +21,25 @@ Project.prototype.save = function (name)
 {
 	
 }
+
+// createProject creates a new project
+function createProject(e)
+{
+	if (project != null && project.hasChanges) {
+		var dlg = new ConfirmDialog({
+			yesHandler: function ()
+			{
+				dlg.close();
+				apiCreateProject(socket, e["name"]);
+			}
+		});
+
+		dlg.content('There are unsaved changes to the current project. ' + 
+			'Are you sure you want to open a new one? All unsaved ' +
+			'progress will be lost.').open();
+		return;
+	}
+
+	apiCreateProject(socket, e["name"]);
+}
+

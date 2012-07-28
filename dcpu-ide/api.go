@@ -4,46 +4,31 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http"
+	"log"
 )
 
-type ApiFunc func(*http.Request) ([]byte, int)
+type ApiHandler func(*Client, []byte)
 
-// A handler for api calls.
-type ApiHandler struct {
-	Func   ApiFunc
-	Method string
+var handlers map[byte]ApiHandler
+
+func Register(id byte, ah ApiHandler) {
+	if handlers == nil {
+		handlers = make(map[byte]ApiHandler)
+	}
+	handlers[id] = ah
 }
 
-var api map[string]*ApiHandler
+// apiDispatch processes an incoming socket message and
+// delagates it to the appropriate handler.
+func apiDispatch(c *Client, in []byte) {
+	id := in[0]
+	in = in[1:]
 
-func Register(path, method string, ah ApiFunc) {
-	if api == nil {
-		api = make(map[string]*ApiHandler)
+	if s, ok := MessageStrings[id]; ok {
+		log.Printf("%s [i] %s", c.conn.Request().RemoteAddr, s)
 	}
 
-	api[path] = &ApiHandler{ah, method}
-}
-
-// Pack turns the given value into a JSON encoded byte slice.
-// It panics if something went wrong.
-func Pack(v interface{}) []byte {
-	data, err := json.Marshal(v)
-
-	if err != nil {
-		panic(err)
+	if ah, ok := handlers[id]; ok {
+		ah(c, in)
 	}
-
-	return data
-}
-
-// Error creates an error object we can send as an API response.
-func Error(code int, argv ...interface{}) []byte {
-	return Pack(struct {
-		Code int
-		Args []interface{}
-	}{
-		code, argv,
-	})
 }

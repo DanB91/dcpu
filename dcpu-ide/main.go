@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	cfgpath string
-	config  *Config
 	tracker *StateTracker
+	config  *Config
+	cfgpath string
 )
 
 func main() {
@@ -37,8 +37,6 @@ func startup() <-chan struct{} {
 }
 
 func shutdown() {
-	log.Printf("Idle for %d second(s). Shutting down.", config.Timeout)
-
 	if len(cfgpath) > 0 {
 		log.Printf("Saving %s", cfgpath)
 		config.Save(cfgpath)

@@ -9,7 +9,7 @@ function InfoDialog()
 	    .title('Info');
 
 	var d = document.createElement('div');
-	d.className = 'left icon icon-info';
+	d.className = 'left icon icon-ok';
 	d.innerHTML = IconOk;
 	this.body.appendChild(d);
 

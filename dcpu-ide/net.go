@@ -4,6 +4,7 @@
 package main
 
 import (
+	"code.google.com/p/go.net/websocket"
 	"compress/gzip"
 	"fmt"
 	"io"
@@ -13,10 +14,6 @@ import (
 	"strings"
 	"time"
 )
-
-// An expiration date somewhere in the distant past.
-// Used in response handler for API calls. They should not be cached.
-var AncientHistory string
 
 // gzipResponseWriter wraps the http.ResponseWriter in a gzip compressor.
 type gzipResponseWriter struct {
@@ -28,27 +25,27 @@ func (this gzipResponseWriter) Write(p []byte) (int, error) {
 	return this.Writer.Write(p)
 }
 
-// launchServer starts the webserver on the given address.
-func launchServer(address string) {
-	t := time.Unix(0, 0).UTC()
+func launchServer(address string) (err error) {
+	http.Handle("/ws", websocket.Handler(wsHandler))
+	http.Handle("/", wrappedHttpHandler(httpHandler))
 
-	AncientHistory = t.Format(time.RFC1123)
-	AncientHistory = AncientHistory[:len(AncientHistory)-4] + " GMT"
-
-	http.HandleFunc("/", wrappedHandler(handler))
-	log.Printf("Listening on %q.\n", address)
-
-	if err := http.ListenAndServe(address, nil); err != nil {
-		log.Fatalf("%v\n", err)
-	}
+	log.Printf("Listening on %s", address)
+	return http.ListenAndServe(address, nil)
 }
 
-// handler handles each incoming HTTP request.
-func handler(w http.ResponseWriter, r *http.Request) {
-	if tracker != nil {
-		tracker.Ping()
-	}
+func wsHandler(ws *websocket.Conn) {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Printf("%s [p] %v", ws.Request().RemoteAddr, x)
+		}
 
+		websocket.Message.Send(ws, []byte{ErrUnknown})
+	}()
+
+	NewClient(ws).Poll()
+}
+
+func httpHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s\n", r.RemoteAddr, r.URL)
 
 	if r.URL.Path == "/" {
@@ -56,70 +53,51 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Are we serving a static file?
-	if file, ok := static[r.URL.Path]; ok {
-		hdr := w.Header()
-		hdr.Set("Content-Type", file.ContentType)
+	file, ok := static[r.URL.Path]
+	if !ok {
+		w.WriteHeader(404) // Whatever it is we're looking for, it aint here.
+		return
+	}
 
-		// These files do not change, so give them a liberal cache policy.
+	hdr := w.Header()
+	hdr.Set("Content-Type", file.ContentType)
+
+	// HTML and JS files go through our template engine first.
+	// The rest can just be written as-is.
+	if !strings.HasPrefix(file.ContentType, "text/html") &&
+		!strings.HasPrefix(file.ContentType, "application/x-javascript") {
+		w.Write(file.Data())
+		return
+	}
+
+	// HTML and JS content might need some extra processing.
+	data, err := parseTemplate(file.Data())
+
+	if err != nil {
+		log.Printf("Template error for %s: %v", r.URL.Path, err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write(data)
+}
+
+// wrappedHttpHandler returns an http.HandlerFunc that sets some default
+// response headers and optionally converts our response writer to a gzipped
+// response writer.
+func wrappedHttpHandler(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Static files do not change, so give them a liberal cache policy.
 		// One month into the future should be enough.
 		t := time.Now().UTC().Add(time.Hour * 24 * 30)
 		ts := t.Format(time.RFC1123)
 		ts = ts[:len(ts)-4] + " GMT"
 
-		hdr.Set("Cache-Control", "public")
-		hdr.Set("Expires", ts)
-
-		if !strings.HasPrefix(file.ContentType, "text/html") {
-			w.Write(file.Data())
-			return
-		}
-
-		// HTML content might need some extra processing.
-		data, err := parseTemplate(file.Data())
-
-		if err != nil {
-			log.Printf("Template error for %s: %v", r.URL.Path, err)
-			w.WriteHeader(500)
-			return
-		}
-
-		w.Write(data)
-		return
-	}
-
-	// An api call then?
-	if handler, ok := api[r.URL.Path]; ok {
-		if handler.Method != r.Method {
-			w.WriteHeader(404)
-			return
-		}
-
-		hdr := w.Header()
-		hdr.Set("Content-Type", "application/x-javascript")
-
-		// These should expire immediately.
-		hdr.Set("Cache-Control", "private")
-		hdr.Set("Expires", AncientHistory)
-
-		data, status := handler.Func(r)
-
-		w.WriteHeader(status)
-		w.Write(data)
-		return
-	}
-
-	// Whatever it is we're looking for, it aint here.
-	w.WriteHeader(404)
-}
-
-// wrappedHandler returns an http.HandlerFunc that sets some default
-// response headers and optionally converts our response writer to a gzipped
-// response writer.
-func wrappedHandler(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
 		hdr := w.Header()
 		hdr.Set("Server", fmt.Sprintf("%s/%d.%d",
 			AppName, AppVersionMajor, AppVersionMinor))
+		hdr.Set("Cache-Control", "public")
+		hdr.Set("Expires", ts)
 
 		// If the client does not support gzip compression,
 		// we should just write our response out normally.

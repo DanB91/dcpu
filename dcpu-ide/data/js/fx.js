@@ -34,7 +34,7 @@ var fx = {
 	// If e is null, it returns metrics for the current browser window.
 	metrics : function (e)
 	{
-		var t = 0, l = 0, b, r, w, h;
+		var t, l, b, r, w, h;
 
 		if (e == undefined) {
 			if (window.innerHeight) {
@@ -63,7 +63,7 @@ var fx = {
 
 		return {top: t, left: l, bottom: b, right: r, width: w, height: h};
 	},
-	
+
 	// move puts the given element at the given location.
 	// This does not animate. It just moves the object immediately.
 	// If you want animation, use fx.slideTo().
@@ -110,7 +110,8 @@ var fx = {
 	//             This can be either larger or smaller than the current
 	//             node opacity. This effectively fades in or out.
 	// - duration: (optional) Number of milliseconds the animation should take.
-	// - onFinish: (optional) An event handler which
+	// - onFinish: (optional) An event handler which is fired when the
+	//                        animation is done.
 	fade : function (e)
 	{
 		if (e.node == undefined || e.to == undefined || e.node._fx_busy) {
@@ -118,7 +119,11 @@ var fx = {
 		}
 
 		e.node._fx_busy = true;
-		e.to = parseFloat(e.to);
+		e.to = parseFloat(e.to) || 0.0;
+
+		if (e.duration == undefined) {
+			e.duration = DefaultDuration;
+		}
 
 		var steps = Math.ceil((parseInt(e.duration) || FxDefaultDuration) / FxFrameRate);
 		var style = e.node.style;
@@ -168,6 +173,10 @@ var fx = {
 
 		// Ensure we don't get stuck in more than one animation.
 		e.node._fx_busy = true;
+
+		if (e.duration == undefined) {
+			e.duration = DefaultDuration;
+		}
 
 		if (e.unit == undefined) {
 			e.unit = 'px';

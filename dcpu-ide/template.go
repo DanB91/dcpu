@@ -6,8 +6,8 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"runtime"
+	"text/template"
 )
 
 var funcs template.FuncMap
@@ -32,10 +32,15 @@ func parseTemplate(html []byte) (out []byte, err error) {
 		return
 	}
 
+	addr := config.Address
+	if addr[0] == ':' {
+		addr = "localhost" + addr
+	}
+
 	data := struct {
-		Config *Config
+		SocketAddress string
 	}{
-		Config: config,
+		fmt.Sprintf("ws://%s/ws", addr),
 	}
 
 	var buf bytes.Buffer

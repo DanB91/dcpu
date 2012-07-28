@@ -27,7 +27,7 @@ Dashboard.prototype.init = function ()
 
 	// Fetch item list.
 	try {
-		this.items = api.request({
+		this.items = xhr.request({
 			url: "/dashboard/itemlist.js",
 			type: 'json',
 			async: false,
@@ -77,7 +77,7 @@ Dashboard.prototype.init = function ()
 		// Load external html data.
 		var src = this.items[n].src;
 		try {
-			this.items[n].data = api.request({
+			this.items[n].data = xhr.request({
 				refresh: true,
 				async: false,
 				url: src,
@@ -91,7 +91,7 @@ Dashboard.prototype.init = function ()
 			var src = this.items[n].init;
 
 			try {
-				this.items[n].init = api.request({
+				this.items[n].init = xhr.request({
 					refresh: true,
 					async: false,
 					type: 'json',

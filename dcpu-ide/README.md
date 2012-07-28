@@ -3,12 +3,12 @@
 Some warnings ahead of time:
 
 * This is work in progress and thus subject to lots of breaking changes.
-* The release build will only work on unix systems. This should be fixed
-  at some point, but I have other priorities now. The debug build should be
-  ok on any Go-capable platform, since it involves only Go tools.
-* The important parts of this application are tested in both Firefox 13+ and
-  Chrome 20+, but Chrome remains my primary target browser. Support for any
-  other browsers /may/ come at some point, but don't hold your breath.
+* The release build will only work on unix systems because it relies on
+  some external tools and scripts. This should be fixed at some point,
+  but I have other priorities now. The debug build should be ok on any
+  Go-capable platform, since it involves only Go tools.
+* This only works properly in websocket-capable browsers
+  with binary support. This includes Chromium 15.0.874+
 
 This is a webbrowser based development environment for DCPU assembly
 projects. It consists of a Go backend and an HTML/Javascript frontend.
@@ -16,7 +16,7 @@ projects. It consists of a Go backend and an HTML/Javascript frontend.
 
 ### Why? -- The commandline tools are fine!
 
-Mostly because I can and, Yes they are.
+Mostly because I can and Yes, they are.
 Bret Victor's talk [Inventing on Principle][1] helped with the inspiration.
 
 As Bret demonstrates, a UI environment can offer so much more when done
@@ -30,31 +30,23 @@ whatever you are programming in it.
 
 ### Backend
 
-This is a Go web server which runs on localhost and serves to mediate
-commands from the frontend to the dcpu toolchain.
+The backend of this program is an embedded http/websocket server written in Go.
+Initial static content (html, js, css, images) is delivered through a normal
+HTTP connection. From that point on, everything goes through a websocket.
 
-The server listens on `[::1]:7070` by default. This can be changed through the
-`-a` commandline flag, altering the `.dcpu-ide` configuration file, or by
-setting the `DCPU_IDE_ADDRESS` environment variable. The commandline flags
-always takes precedence.
-
-Profiling data for the server can be viewed while it is running by visiting
-the following urls:
-
-	Overview:     /debug/pprof
-	Goroutines:   /debug/pprof/goroutine?debug=1
-	Heap:         /debug/pprof/heap?debug=1
-	ThreadCreate: /debug/pprof/threadcreate?debug=1
-
-Except for the heap profile, this only yields useful information
-in a debug build.
 
 ### Frontend
 
-This is an interactive web application that runs in your browser.
-It is configured to connect to the backend server running on localhost.
-It uses this server to transparently call the DCPU tools in this repository.
- 
+The frontend is a web page which interacts with the server through
+a websocket. Initial static content (html, js, css, images) is delivered
+through a normal HTTP connection. Once the DOM has loaded and javascript
+takes over, every interaction with the server will go through a websocket.
+
+
+### Dependencies
+
+* [code.google.com/p/go.net/websocket](code.google.com/p/go.net/websocket)
+
 
 ### Usage
 

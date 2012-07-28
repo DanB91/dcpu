@@ -2,13 +2,13 @@ function ()
 {
 	var f = new Form({
 		id: 'frmNewProject',
-		handler: createProject,
+		handler: apiCreateProject,
 	});
 
 	f.add({
 		type:     'text',
 		label:    'Name',
-		id:       'tName',
+		id:       'name',
 		validate: function ()
 		{
 			return (this.value.trim().length > 0);
