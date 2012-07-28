@@ -20,13 +20,6 @@ Commandline tools:
 * **dcpu-fmt**: This tool formats DCPU source files according to some
   predefined styling rules.
 
-Graphical tools:
-
-* **dcpu-ide**: This is a graphical DCPU code editor and debugger.
-  It runs a Go webserver as backend and serves the application as a web app.
-  The server mediates dcpu related commands between the front-end and the
-  dcpu toolchain in this repository.
-
 Packages:
 
 * **parser**: This holds a package that parses assembly source and turns it
@@ -66,17 +59,10 @@ Refer to the README of each individual tool for more info.
 
 To install all tools in one go, do the following:
 
-    $ git clone https://github.com/jteeuwen/dcpu.git
-    $ cd dcpu
-    $ make install
+    $ go get https://github.com/jteeuwen/dcpu/<pkg|cmd>
 
 The commandline programs will be installed where ever your `$GOBIN` points to.
 They are now ready for use.
-
-We use a make file, because the `dcpu-ide` code requires some build magic that
-the standard go tools can not deal with. Notably, it performs pre-build
-code generation using another Go program (dcpu-ide/codegen) which is built and
-run exclusively during compilation to generate the code.
 
 
 ### License
