@@ -1,6 +1,10 @@
 // This file is subject to a 1-clause BSD license.
 // Its contents can be found in the enclosed LICENSE file.
 
+// Available icons -- unicode symbols.
+const IconError = '&#x2a02;';
+const IconOk    = '&#x2713;';
+
 // Available dialog buttons.
 const ButtonOk       = 1;
 const ButtonCancel   = 2;

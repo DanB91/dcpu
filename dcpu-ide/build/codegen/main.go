@@ -17,7 +17,7 @@ type File struct {
 }
 
 type CodeData struct {
-	Errors []struct {
+	Messages []struct {
 		Name   string
 		String string
 		Code   int
