@@ -2,8 +2,8 @@
 // Its contents can be found in the enclosed LICENSE file.
 
 // Available icons -- unicode symbols.
-const IconError = '&#x2a02;';
-const IconOk    = '&#x2713;';
+const IconError   = '&#x2a02;';
+const IconOk      = '&#x2713;';
 
 // Available dialog buttons.
 const ButtonOk       = 1;
@@ -257,7 +257,6 @@ Dialog.prototype.close = function ()
 		onFinish: function ()
 		{
 			document.body.removeChild(n);
-			dialogs.pop();
 		}
 	});
 

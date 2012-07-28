@@ -35,7 +35,7 @@ var xhr = {
 	//    Target url to fetch.
 	// 
 	// Optional fields:
-	//  - onData: 
+	//  - ondata: 
 	//    Handler we call when data has been fetched. It gets one parameter
 	//    holding the actual data. This can be omitted in synchronous calls.
 	//    In which case, request() returns the result directly.
@@ -46,7 +46,7 @@ var xhr = {
 	//  - data:
 	//    Data to send to target.
 	//  
-	//  - onError:
+	//  - onerror:
 	//    A handler we call when an error occurred. It gets two parameters
 	//    holding the error message and http status code.
 	//  
@@ -96,7 +96,7 @@ var xhr = {
 			req.onreadystatechange = function ()
 			{
 				if (req.readyState == 4) {
-					req.handleResponse(e, xhr);
+					xhr.handleResponse(e, req);
 				}
 			}
 		}
@@ -139,13 +139,13 @@ var xhr = {
 				d = new XhrError(d.Code, d.Args);
 			}
 
-			if (e.onError) {
-				e.onError(req.status, d);
+			if (e.onerror) {
+				e.onerror(req.status, d);
 			} else {
 				throw d;
 			}
-		} else if (e.onData) {
-			e.onData(d);
+		} else if (e.ondata) {
+			e.ondata(d);
 		}
 
 		return d;

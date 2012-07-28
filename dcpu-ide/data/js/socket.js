@@ -68,7 +68,7 @@ Socket.prototype.init = function (onopen)
 	this.conn.onerror = function (e)
 	{
 		console.error('websocket.onerror', e);
-	
+
 		if (me.onerror != null) {
 			me.onerror(e);
 		}
@@ -100,9 +100,4 @@ Socket.prototype.close = function ()
 
 	this.onopen = null;
 	this.onerror = null;
-
-	(new ErrorDialog())
-		.content('We have lost our connection to the server. '+
-			     'Please ensure it is still running.')
-		.open();
 }

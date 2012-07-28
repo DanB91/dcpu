@@ -3,12 +3,12 @@
 
 const AppTitle = 'dcpu-ide &#x2af9;&#x2afa;';
 
-var dialogs   = [];
-var workspace = null;
-var dashboard = null;
-var socket    = null;
-var config    = null;
-var project   = null;
+var dialogs      = [];
+var workspace    = null;
+var dashboard    = null;
+var socket       = null;
+var config       = null;
+var project      = null;
 
 window.onload = function ()
 {

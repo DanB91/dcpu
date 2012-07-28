@@ -79,7 +79,7 @@ var fx = {
 	move : function (e)
 	{
 		if (e.node == undefined || e.node._fx_busy) {
-			return;
+			return this;
 		}
 
 		var n = e.node;
@@ -115,7 +115,7 @@ var fx = {
 	fade : function (e)
 	{
 		if (e.node == undefined || e.to == undefined || e.node._fx_busy) {
-			return;
+			return this;
 		}
 
 		e.node._fx_busy = true;
@@ -168,7 +168,7 @@ var fx = {
 	slideTo : function (e)
 	{
 		if (e.node == undefined || e.node._fx_busy) {
-			return;
+			return this;
 		}
 
 		// Ensure we don't get stuck in more than one animation.

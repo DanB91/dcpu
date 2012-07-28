@@ -18,7 +18,7 @@ Dashboard.prototype.init = function ()
 	this.node.id = 'dashboard';
 	this.itemlist.className = 'items';
 	this.overview.className = 'overview';
-	
+
 	this.node.appendChild(this.itemlist);
 	this.node.appendChild(this.overview);
 
@@ -38,9 +38,6 @@ Dashboard.prototype.init = function ()
 
 	// Create list for item buttons.
 	var ul = document.createElement('ul');
-	if (!ul) {
-		return false;
-	}
 
 	// Title of dashboard is in first list element.
 	var li = document.createElement('li');
@@ -84,6 +81,7 @@ Dashboard.prototype.init = function ()
 			});
 		} catch(e) {
 			console.error('Dashboard.init: ', src, e.message);
+			return false;
 		}
 
 		// Load external script if need be.
@@ -99,6 +97,7 @@ Dashboard.prototype.init = function ()
 				});
 			} catch(e) {
 				console.error('Dashboard.init: ', src, e.message);
+				return false;
 			}
 		}
 	}
