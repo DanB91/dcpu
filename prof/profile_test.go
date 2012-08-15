@@ -54,7 +54,7 @@ func TestIdentity(t *testing.T) {
 			t.Fatalf("a.Files[i].Name != b.Files[i].Name")
 		}
 
-		if a.Files[i].Start != b.Files[i].Start {
+		if a.Files[i].StartAddr != b.Files[i].StartAddr {
 			t.Fatalf("a.Files[i].Start != b.Files[i].Start")
 		}
 	}

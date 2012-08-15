@@ -173,7 +173,7 @@ func (c *CPU) skipBranch(pc Word) {
 		}
 	}
 
-	// The skipcount denotes how manu instructions we skipped.
+	// The skipcount denotes how many instructions we skipped.
 	// The spec notes that for every skipped branch, the cycle cost
 	// increments by one. We should notify somebody about this.
 	//
@@ -194,10 +194,10 @@ func (c *CPU) Step() (err error) {
 	// the spec. We can only handle one interrupt per clock cycle.
 	// 
 	// However, this implementation allows one queued interrupt,
-	// as well as at least one non-ququed interrupt to be triggered
+	// as well as at least one non-queued interrupt to be triggered
 	// in a single cycle. Notably when we are about to execute
 	// a non-cached HWI or INT.
-	if sz := len(c.intQueue); !c.queueInterrupts && sz > 0 {
+	if !c.queueInterrupts && len(c.intQueue) > 0 {
 		c.triggerInterrupt(<-c.intQueue)
 	}
 
